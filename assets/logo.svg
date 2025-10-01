@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="140" height="28" viewBox="0 0 140 28">
+  <defs>
+    <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5ae0b5" />
+      <stop offset="1" stop-color="#5bb2ff" />
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="url(#lg)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 22 L14 6 L20 18 L28 10"/>
+  </g>
+  <text x="36" y="21" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700" fill="#e6eef8">Reelo Visions</text>
+</svg>
