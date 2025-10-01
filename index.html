@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Reelo Visions – AI-Powered Content & Virtual Reception</title>
-  <meta name="description" content="Reelo Visions builds AI-powered content, websites, and virtual receptionist workflows that help home-service and e‑commerce businesses convert more leads 24/7." />
+  <meta name="description" content="Reelo Visions builds AI-powered content, websites, and virtual receptionist workflows that help home-service and e-commerce businesses convert more leads 24/7." />
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,7 @@
   <meta property="og:description" content="Websites, AI phone agents, and content systems that actually move revenue." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.reelovisions.com/" />
-  <meta property="og:image" content="https://www.reelovisions.com/assets/og-cover.png" />
+  <meta property="og:image" content="/assets/og-cover.png" />
   <meta name="twitter:card" content="summary_large_image" />
 </head>
 
@@ -22,7 +22,7 @@
   <!-- Header / Nav -->
   <header class="site-header">
     <div class="container nav-wrap">
-      <a href="#" class="brand">
+      <a href="/" class="brand">
         <img src="/assets/logo.svg" alt="Reelo Visions" class="logo" />
         <span>Reelo Visions</span>
       </a>
@@ -48,9 +48,9 @@
           <a href="#work" class="btn btn--ghost">See Work</a>
         </div>
         <ul class="hero-points">
-          <li>Lightning‑fast website (Vercel) + SEO basics</li>
+          <li>Lightning-fast website (Vercel) + SEO basics</li>
           <li>AI receptionist flows with call summaries & booking</li>
-          <li>Email/SMS follow‑ups that don’t feel robotic</li>
+          <li>Email/SMS follow-ups that don’t feel robotic</li>
         </ul>
       </div>
       <div class="hero-art" aria-hidden="true">
@@ -77,7 +77,7 @@
       <div class="grid-3">
         <div class="card service">
           <h3>Website Sprint</h3>
-          <p>Modern, fast, and simple. We ship your site in days, not months. Includes on‑page SEO, analytics, and SSL.</p>
+          <p>Modern, fast, and simple. We ship your site in days, not months. Includes on-page SEO, analytics, and SSL.</p>
           <ul class="checklist">
             <li>Static Vercel hosting</li>
             <li>Copy cleanup & brand polish</li>
@@ -86,7 +86,7 @@
         </div>
         <div class="card service">
           <h3>AI Receptionist</h3>
-          <p>Phone agent that answers, routes, books, and emails call summaries. Built to sound human and ask smart follow‑ups.</p>
+          <p>Phone agent that answers, routes, books, and emails call summaries. Built to sound human and ask smart follow-ups.</p>
           <ul class="checklist">
             <li>IVR spam filter</li>
             <li>Knowledge base replies</li>
@@ -134,9 +134,9 @@
       <div class="grid-3">
         <div class="card price">
           <h3>Starter</h3>
-          <p class="price-tag">$499 setup + $99/mo</p>
+          <p class="price-tag">$499 setup + $49/mo</p>
           <ul class="checklist">
-            <li>One‑page site</li>
+            <li>One-page site</li>
             <li>Contact form</li>
             <li>Basic analytics</li>
           </ul>
@@ -144,9 +144,9 @@
         </div>
         <div class="card price price--focus">
           <h3>Growth</h3>
-          <p class="price-tag">$499 setup + $149/mo</p>
+          <p class="price-tag">$999 setup + $99/mo</p>
           <ul class="checklist">
-            <li>Multi‑page site</li>
+            <li>Multi-page site</li>
             <li>Lead capture + CRM relay</li>
             <li>Quarterly content refresh</li>
           </ul>
@@ -154,7 +154,7 @@
         </div>
         <div class="card price">
           <h3>Reception+</h3>
-          <p class="price-tag">$499 setup + $199/mo</p>
+          <p class="price-tag">$1,499 setup + $199/mo</p>
           <ul class="checklist">
             <li>AI phone agent demo line</li>
             <li>Booking + summaries</li>
@@ -163,7 +163,7 @@
           <a href="#contact" class="btn btn--block">Talk to Sales</a>
         </div>
       </div>
-      <p class="fine">Need custom? We’ll scope it same‑day.</p>
+      <p class="fine">Need custom? We’ll scope it same-day.</p>
     </div>
   </section>
 
@@ -184,12 +184,15 @@
         <h2>Contact</h2>
         <p>Tell us what you want to build. We’ll reply with a simple plan and a price.</p>
         <ul class="contact-list">
-          <li>📧 <a href="mailto:hello@reelovisions.com">hello@reelovisions.com</a></li>
-          <li>📞 <a href="tel:+1-612-840-6268">(612) 840‑6268</a> (demo)</li>
+          <!-- Replace with your real contact info -->
+          <li>📧 <a href="mailto:Steve@reelovisions.com">Steve@reelovisions.com</a></li>
+          <li>📞 <a href="tel:+1-612-840-6268">(612) 840-6268</a> (demo)</li>
         </ul>
+        <p class="muted" style="margin-top:8px;">By submitting the form, you can choose to receive text updates. You can opt out anytime.</p>
       </div>
-      <form id="contactForm" class="card form" method="POST" action="https://formspree.io/f/reelovisions@gmail.com">
-        <!-- Replace the action URL with your real Formspree endpoint or other handler -->
+
+      <!-- FORM WITH REQUIRED CONSENT CHECKBOX -->
+      <form id="contactForm" class="card form" method="POST" action="https://formspree.io/f/your-id-here">
         <label>
           <span>Name</span>
           <input type="text" name="name" required />
@@ -199,9 +202,23 @@
           <input type="email" name="email" required />
         </label>
         <label>
+          <span>Mobile Phone (for SMS)</span>
+          <input type="tel" name="phone" inputmode="tel" />
+        </label>
+        <label>
           <span>What do you need?</span>
           <textarea name="message" rows="5" required placeholder="Website sprint, AI receptionist, content engine…"></textarea>
         </label>
+
+        <!-- REQUIRED CONSENT -->
+        <label style="display:flex; gap:8px; align-items:flex-start; margin-top:6px;">
+          <input type="checkbox" name="sms_consent" required />
+          <span>
+            I agree to receive SMS messages about my appointments and service updates. I can reply <strong>STOP</strong> to cancel or <strong>HELP</strong> for help. Message &amp; data rates may apply.
+            See <a href="/sms-terms.html" target="_blank" rel="noopener">SMS Terms</a>.
+          </span>
+        </label>
+
         <input type="hidden" name="_subject" value="New Lead – Reelo Visions" />
         <button type="submit" class="btn btn--block">Send</button>
         <p id="formMsg" class="form-msg" role="status" aria-live="polite"></p>
@@ -217,6 +234,7 @@
         <p class="muted">© <span id="year"></span> Reelo Visions. All rights reserved.</p>
       </div>
       <nav class="foot-nav">
+        <a href="/sms-terms.html">SMS Terms</a>
         <a href="#privacy">Privacy</a>
         <a href="#terms">Terms</a>
       </nav>
