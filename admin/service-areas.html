@@ -45,27 +45,34 @@
     </header>
 
     <!-- Policies -->
-    <div class="card">
-      <h2 class="section">Policies</h2>
+<div class="card">
+  <h2 style="margin:0 0 12px;">Policies</h2>
 
-      <div class="row" style="margin:8px 0;">
-        <label class="switch">
-          <input type="checkbox" id="enforceZip">
-          <strong>Enforce service ZIPs</strong>
-        </label>
-        <span class="muted">If ON, new appointments must match your ZIP list.</span>
-      </div>
-
-      <div class="row" style="margin:8px 0;">
-        <label class="switch">
-          <input type="checkbox" id="enforceRadius">
-          <strong>Enforce radius from HQ</strong>
-        </label>
-        <span class="muted">If ON, bookings must be within your radius from HQ lat/lon.</span>
-      </div>
-
-      <div class="muted" id="policySummary">ZIPS: OFF · Radius: OFF</div>
+  <div class="policy-row">
+    <label class="toggle">
+      <input id="enforceZip" type="checkbox" />
+      <span class="slider"></span>
+    </label>
+    <div class="policy-text">
+      <div class="policy-title">Enforce service ZIPs</div>
+      <div class="muted">If ON, new appointments must match your ZIP list.</div>
     </div>
+  </div>
+
+  <div class="policy-row">
+    <label class="toggle">
+      <input id="enforceRadius" type="checkbox" />
+      <span class="slider"></span>
+    </label>
+    <div class="policy-text">
+      <div class="policy-title">Enforce radius from HQ</div>
+      <div class="muted">If ON, bookings must be within your radius from HQ lat/lon.</div>
+    </div>
+  </div>
+
+  <div class="muted" id="policySummary">ZIPS: OFF · Radius: OFF</div>
+</div>
+
 
     <!-- HQ + Radius -->
     <div class="card">
