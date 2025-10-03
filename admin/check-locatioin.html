@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Service Location Check</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; padding: 24px; }
+    label { display:block; margin:12px 0 4px; }
+    input { width: 320px; padding: 8px; }
+    button { padding: 8px 12px; margin-top: 16px; }
+    pre { background:#f7f7f7; padding:12px; border:1px solid #e5e5e5; border-radius:8px; }
+  </style>
+</head>
+<body>
+  <h1>Service Location Check</h1>
+
+  <label>ZIP</label>
+  <input id="zip" placeholder="e.g. 75072" value="" />
+
+  <label>Latitude</label>
+  <input id="lat" placeholder="e.g. 33.199" value="" />
+
+  <label>Longitude</label>
+  <input id="lon" placeholder="e.g. -96.691" value="" />
+
+  <div><button id="checkBtn">Check</button></div>
+
+  <h3>Result</h3>
+  <pre id="out">—</pre>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const SUPABASE_URL = "https://yvjwajopxbcaedzofqww.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2andham9weGJjYWVkem9mcXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODk0NjQsImV4cCI6MjA3NDk2NTQ2NH0.1VVEkgThCltfebpCWa-4DReb9qSO5zdt2a_83CfsBsY";
+
+    const supa = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const out = document.getElementById('out');
+    const $ = id => document.getElementById(id);
+
+    document.getElementById('checkBtn').addEventListener('click', async () => {
+      out.textContent = "Checking…";
+      const p_zip = String($('zip').value || '').trim();
+      const p_lat = Number($('lat').value);
+      const p_lon = Number($('lon').value);
+
+      const { data, error } = await supa.rpc('check_service_location', { p_zip, p_lat, p_lon });
+      if (error) {
+        out.textContent = "ERROR:\n" + (error.message || JSON.stringify(error, null, 2));
+        return;
+      }
+      out.textContent = "Allowed? " + (data ? "YES" : "NO");
+    });
+  </script>
+</body>
+</html>
