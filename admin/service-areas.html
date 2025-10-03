@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Service Areas | Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="/favicon.ico" />
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; margin: 24px; }
+    header { display:flex; gap:16px; align-items:center; margin-bottom:16px; }
+    nav a { margin-right: 12px; text-decoration:none; color:#0366d6; }
+    .card { border:1px solid #e5e7eb; border-radius:12px; padding:16px; max-width:720px; }
+    table { width:100%; border-collapse: collapse; margin-top:12px; }
+    th, td { padding:10px; border-bottom:1px solid #f0f0f0; text-align:left; }
+    input[type=text] { padding:8px; border:1px solid #d1d5db; border-radius:8px; width:140px; }
+    button { padding:8px 12px; border:1px solid #d1d5db; background:#fff; border-radius:8px; cursor:pointer; }
+    button.primary { background:#111827; color:#fff; border-color:#111827; }
+    .row { display:flex; gap:8px; align-items:center; margin-top:8px; }
+    .status { margin-top:10px; font-size:14px; }
+    .status.ok { color:#065f46; }
+    .status.err { color:#991b1b; }
+    .muted { color:#6b7280; font-size:13px; }
+  </style>
+  <script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+</head>
+<body>
+  <header>
+    <h1 style="margin:0;">Service Areas</h1>
+  </header>
+
+  <nav>
+    <a href="/admin/index.html">Dashboard</a>
+    <a href="/admin/service-areas.html"><strong>Service Areas</strong></a>
+    <a href="#" id="logout-link">Logout</a>
+  </nav>
+
+  <div class="card">
+    <div class="row">
+      <label for="zipInput">Add ZIP</label>
+      <input id="zipInput" type="text" pattern="\\d{5}" maxlength="5" placeholder="e.g. 55401" />
+      <button class="primary" id="addBtn">Add</button>
+    </div>
+    <div class="muted">Must be exactly 5 digits. Duplicate adds are ignored (upsert).</div>
+
+    <table id="zipsTable">
+      <thead>
+        <tr><th>ZIP</th><th style="width:120px;">Action</th></tr>
+      </thead>
+      <tbody id="zipsBody"></tbody>
+    </table>
+
+    <div id="status" class="status"></div>
+  </div>
+
+<script>
+  // ---------- Config ----------
+  const SUPABASE_URL = 'https://yvjwajopxbcaedzofqww.supabase.co';
+  // Paste the SAME anon key you already use in /admin/login.html and /admin/index.html
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2andham9weGJjYWVkem9mcXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODk0NjQsImV4cCI6MjA3NDk2NTQ2NH0.1VVEkgThCltfebpCWa-4DReb9qSO5zdt2a_83CfsBsY';
+
+  const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ---------- Auth Guard ----------
+  (async () => {
+    const { data: { session } } = await client.auth.getSession();
+    if (!session) {
+      window.location.href = '/admin/login.html';
+      return;
+    }
+    await loadZips();
+  })();
+
+  document.getElementById('logout-link').addEventListener('click', async (e) => {
+    e.preventDefault();
+    await client.auth.signOut();
+    window.location.href = '/admin/login.html';
+  });
+
+  const statusEl = document.getElementById('status');
+  function toastOk(msg) { statusEl.textContent = msg; statusEl.className = 'status ok'; }
+  function toastErr(msg) { statusEl.textContent = msg; statusEl.className = 'status err'; }
+
+  async function loadZips() {
+    statusEl.textContent = '';
+    const tbody = document.getElementById('zipsBody');
+    tbody.innerHTML = '<tr><td colspan="2" class="muted">Loading…</td></tr>';
+
+    // RLS ensures we only see our company rows
+    const { data, error } = await client
+      .from('company_zipcodes')
+      .select('zipcode')
+      .order('zipcode');
+
+    if (error) {
+      tbody.innerHTML = '';
+      toastErr(error.message);
+      return;
+    }
+
+    tbody.innerHTML = '';
+    if (!data || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="2" class="muted">No ZIPs yet.</td></tr>';
+      return;
+    }
+
+    for (const row of data) {
+      tbody.appendChild(renderRow(row.zipcode));
+    }
+  }
+
+  function renderRow(zip) {
+    const tr = document.createElement('tr');
+    const tdZip = document.createElement('td');
+    tdZip.textContent = zip;
+
+    const tdAct = document.createElement('td');
+    const delBtn = document.createElement('button');
+    delBtn.textContent = 'Delete';
+    delBtn.addEventListener('click', () => onDelete(zip));
+    tdAct.appendChild(delBtn);
+
+    tr.appendChild(tdZip);
+    tr.appendChild(tdAct);
+    return tr;
+  }
+
+  async function onDelete(zip) {
+    statusEl.textContent = '';
+    const { data, error } = await client.rpc('delete_company_zipcode', { p_zip: zip });
+    if (error) { toastErr(error.message); return; }
+    toastOk(`Deleted ${zip}`);
+    await loadZips();
+  }
+
+  async function onAdd() {
+    statusEl.textContent = '';
+    const input = document.getElementById('zipInput');
+    const zip = (input.value || '').trim();
+
+    if (!/^[0-9]{5}$/.test(zip)) {
+      toastErr('ZIP must be exactly 5 digits');
+      return;
+    }
+
+    const { data, error } = await client.rpc('upsert_company_zipcode', { p_zip: zip });
+    if (error) { toastErr(error.message); return; }
+    input.value = '';
+    toastOk(`Saved ${zip}`);
+    await loadZips();
+  }
+
+  document.getElementById('addBtn').addEventListener('click', onAdd);
+  document.getElementById('zipInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') onAdd(); });
+</script>
+</body>
+</html>
