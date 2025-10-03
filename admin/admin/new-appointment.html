@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>New Appointment | Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://rsms.me/inter/inter.css" rel="stylesheet">
+  <style>
+    :root { --fg:#0f172a; --muted:#64748b; --line:#e2e8f0; --brand:#2563eb; --bg:#fff; --chip:#f8fafc; }
+    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; margin:0; color:var(--fg); background:#fafafa; }
+    .wrap { max-width: 960px; margin: 32px auto; padding: 0 16px; }
+    header { display:flex; gap:20px; align-items:center; margin-bottom:24px; }
+    nav a { text-decoration:none; color:var(--muted); font-weight:600; margin-right:16px; }
+    nav a.active { color:var(--fg); }
+    h1 { font-size: 28px; margin: 0 0 8px; }
+    .card { background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:18px; margin:16px 0; }
+    .row { display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; }
+    label { display:block; font-weight:600; margin-bottom:6px; }
+    input, select, textarea { padding:10px 12px; border:1px solid var(--line); border-radius:10px; font:inherit; background:#fff; }
+    input[type="datetime-local"] { min-width:240px; }
+    button { padding:10px 14px; border:1px solid var(--line); background:var(--chip); border-radius:10px; cursor:pointer; font-weight:600; }
+    button.primary { background:var(--brand); border-color:var(--brand); color:#fff; }
+    .muted { color:var(--muted); font-size:14px; }
+    .status { margin-top:12px; white-space:pre-wrap; }
+    .ok { color:#16a34a; }
+    .err { color:#b91c1c; }
+    .list { border:1px solid var(--line); border-radius:10px; padding:8px; max-height:220px; overflow:auto; background:#fff; }
+    .list-item { padding:8px; border-bottom:1px solid #f1f5f9; cursor:pointer; }
+    .list-item:last-child { border-bottom:none; }
+    .pill { display:inline-block; padding:2px 8px; background:#eef2ff; border:1px solid #e2e8f0; border-radius:999px; font-size:12px; margin-left:8px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1 style="margin-right:auto;">New Appointment</h1>
+      <nav>
+        <a href="/admin/">Dashboard</a>
+        <a href="/admin/service-areas.html">Service Areas</a>
+        <a href="/admin/new-appointment.html" class="active">New Appointment</a>
+        <a href="#" id="logout">Logout</a>
+      </nav>
+    </header>
+
+    <!-- Customer picker -->
+    <div class="card">
+      <h2 style="margin:0 0 12px;">1) Pick or Create Customer</h2>
+      <div class="row">
+        <div>
+          <label>Search (name / phone / email)</label>
+          <input id="search" placeholder="e.g. 612 or Jane">
+          <button id="searchBtn">Search</button>
+        </div>
+        <div class="muted">Click a result to select it. Or create new below.</div>
+      </div>
+      <div id="results" class="list" style="display:none;"></div>
+
+      <div style="margin-top:12px;" class="row">
+        <div>
+          <label>Full name</label>
+          <input id="cName" placeholder="Jane Test" style="min-width:220px;">
+        </div>
+        <div>
+          <label>Phone</label>
+          <input id="cPhone" placeholder="6120000000">
+        </div>
+        <div>
+          <label>Email</label>
+          <input id="cEmail" placeholder="jane@example.com">
+        </div>
+        <div>
+          <label>&nbsp;</label>
+          <button id="createCustomerBtn">Create customer</button>
+        </div>
+      </div>
+      <div id="who" class="muted">No customer selected</div>
+    </div>
+
+    <!-- Address + ZIP -->
+    <div class="card">
+      <h2 style="margin:0 0 12px;">2) Service Address</h2>
+      <div class="row">
+        <div style="flex:1; min-width:360px;">
+          <label>Street, City, State ZIP</label>
+          <input id="addr" placeholder="1616 Gettysburg Ave N, Golden Valley, MN 55427" style="width:100%;">
+        </div>
+        <div>
+          <label>&nbsp;</label>
+          <button id="geocodeBtn">Geocode</button>
+        </div>
+        <div>
+          <label>ZIP</label>
+          <input id="zip" placeholder="55427" maxlength="5" style="width:110px;">
+        </div>
+        <div>
+          <label>Result</label>
+          <span id="geoOut" class="muted">—</span>
+        </div>
+      </div>
+      <div class="muted">Geocoding uses your existing Edge Function; ZIP is what the policy checks.</div>
+    </div>
+
+    <!-- When + Notes -->
+    <div class="card">
+      <h2 style="margin:0 0 12px;">3) When & Notes</h2>
+      <div class="row">
+        <div>
+          <label>When (local time)</label>
+          <input id="when" type="datetime-local">
+        </div>
+        <div style="flex:1; min-width:280px;">
+          <label>Notes (optional)</label>
+          <input id="notes" placeholder="Short note (will be stored as JSON text)">
+        </div>
+        <div>
+          <label>&nbsp;</label>
+          <button id="createApptBtn" class="primary">Create appointment</button>
+        </div>
+      </div>
+      <div id="status" class="status"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    // ------------ Config (edit if these ever change) ------------
+    const SUPABASE_URL = 'https://yvjwajopxbcaedzofqww.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2andham9weGJjYWVkem9mcXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODk0NjQsImV4cCI6MjA3NDk2NTQ2NH0.1VVEkgThCltfebpCWa-4DReb9qSO5zdt2a_83CfsBsY';
+    const GEOCODE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/geocode`;
+    // -----------------------------------------------------------
+
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+    const supa = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: true } });
+
+    const $ = id => document.getElementById(id);
+    const out = msg => { $('status').textContent = msg; };
+    const outOK = msg => { $('status').textContent = msg; $('status').className = 'status ok'; };
+    const outERR = msg => { $('status').textContent = msg; $('status').className = 'status err'; };
+
+    // ---- Auth guard
+    const { data: { session } } = await supa.auth.getSession();
+    if (!session) { location.href = '/admin/login.html'; throw new Error('auth'); }
+
+    // ---- Customer search
+    $('searchBtn').addEventListener('click', async () => {
+      const q = $('search').value.trim();
+      const box = $('results');
+      box.style.display = 'block';
+      box.innerHTML = 'Searching…';
+      const { data, error } = await supa
+        .from('customers')
+        .select('id, full_name, phone, email')
+        .or(`full_name.ilike.%${q}%,phone.ilike.%${q}%,email.ilike.%${q}%`)
+        .order('created_at', { ascending: false })
+        .limit(25);
+      if (error) { box.innerHTML = 'Error: ' + error.message; return; }
+      if (!data || data.length === 0) { box.innerHTML = 'No matches'; return; }
+      box.innerHTML = '';
+      data.forEach(row => {
+        const div = document.createElement('div');
+        div.className = 'list-item';
+        div.innerHTML = `
+          <div><strong>${row.full_name || '(no name)'}</strong>
+            ${row.phone ? `<span class="pill">${row.phone}</span>`:''}
+            ${row.email ? `<span class="pill">${row.email}</span>`:''}
+          </div>
+          <div class="muted">${row.id}</div>`;
+        div.addEventListener('click', () => {
+          box.style.display = 'none';
+          $('who').innerHTML = `Selected: <strong>${row.full_name || '(no name)'}</strong> <span class="pill">${row.id}</span>`;
+          $('who').dataset.cid = row.id;
+        });
+        box.appendChild(div);
+      });
+    });
+
+    // ---- Create customer
+    $('createCustomerBtn').addEventListener('click', async () => {
+      const full_name = $('cName').value.trim();
+      const phone = $('cPhone').value.trim();
+      const email = $('cEmail').value.trim();
+      if (!full_name || !phone) { outERR('Name and phone are required'); return; }
+      const { data, error } = await supa
+        .from('customers')
+        .insert({ full_name, phone, email })
+        .select('id, full_name')
+        .single();
+      if (error) { outERR('Create customer failed: ' + error.message); return; }
+      $('who').innerHTML = `Selected: <strong>${data.full_name}</strong> <span class="pill">${data.id}</span>`;
+      $('who').dataset.cid = data.id;
+      outOK('Customer created');
+    });
+
+    // ---- Geocode address (ZIP policy uses this ZIP)
+    $('geocodeBtn').addEventListener('click', async () => {
+      const address = $('addr').value.trim();
+      if (!address) { outERR('Enter an address'); return; }
+      out('Geocoding…');
+      const r = await fetch(GEOCODE_FUNCTION_URL, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({ address })
+      }).catch(() => null);
+      if (!r || !r.ok) { outERR(`Geocode failed (${r && r.status})`); return; }
+      const gj = await r.json();
+      const { lat, lon, postal_code, normalized } = gj || {};
+      if (!postal_code) { outERR('No results for address'); return; }
+      $('zip').value = String(postal_code || '').slice(0,5);
+      $('geoOut').textContent = normalized
+        ? `${normalized} → lat=${lat}, lon=${lon}, ZIP=${postal_code}`
+        : `lat=${lat}, lon=${lon}, ZIP=${postal_code}`;
+      outOK('Geocoded');
+    });
+
+    // ---- Create appointment (uses the server-side checker)
+    $('createApptBtn').addEventListener('click', async () => {
+      try {
+        const cid = $('who').dataset.cid;
+        if (!cid) throw new Error('Pick or create a customer first');
+
+        const zip = $('zip').value.trim();
+        if (!/^\d{5}$/.test(zip)) throw new Error('Enter a 5-digit ZIP (after geocoding)');
+
+        const whenStr = $('when').value;
+        if (!whenStr) throw new Error('Pick a date/time');
+        const whenIso = new Date(whenStr).toISOString();
+
+        const notesText = $('notes').value.trim();
+        const p_notes = notesText ? { text: notesText } : {};
+
+        out('Creating appointment…');
+        const { data, error } = await supa.rpc('create_appointment_checked', {
+          p_customer_id: cid,
+          p_scheduled_at: whenIso,
+          p_service_zip: zip,
+          p_notes
+        });
+        if (error) throw new Error(error.message);
+        outOK('Booked ✔  ID: ' + (data?.id ?? '(created)'));
+
+        // optional: bounce back to dashboard
+        // setTimeout(() => location.href = '/admin/', 800);
+      } catch (e) {
+        outERR(String(e.message || e));
+      }
+    });
+
+    // ---- logout
+    document.getElementById('logout').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await supa.auth.signOut();
+      location.href = '/admin/login.html';
+    });
+  </script>
+</body>
+</html>
