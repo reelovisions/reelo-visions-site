@@ -6,20 +6,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" href="/favicon.ico" />
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; margin: 24px; }
+    :root { --border:#e5e7eb; --muted:#6b7280; --ink:#111827; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; margin: 24px; color:#111827;}
     header { display:flex; gap:16px; align-items:center; justify-content:space-between; margin-bottom:16px; }
-    nav a { margin-right: 12px; text-decoration:none; color:#0366d6; }
-    .card { border:1px solid #e5e7eb; border-radius:12px; padding:16px; }
+    nav a { margin-right: 12px; text-decoration:none; color:#2563eb; }
+    nav a strong { color:#111827; }
+    .card { border:1px solid var(--border); border-radius:12px; padding:16px; }
     table { width:100%; border-collapse: collapse; margin-top:12px; }
     th, td { padding:10px; border-bottom:1px solid #f0f0f0; text-align:left; vertical-align:top; }
-    .muted { color:#6b7280; font-size:13px; }
+    .muted { color:var(--muted); font-size:13px; }
     button { padding:6px 10px; border:1px solid #d1d5db; background:#fff; border-radius:8px; cursor:pointer; }
-    button.primary { background:#111827; color:#fff; border-color:#111827; }
+    button.primary { background:var(--ink); color:#fff; border-color:var(--ink); }
     .actions { display:flex; gap:6px; flex-wrap:wrap; }
     .status { margin-top:10px; font-size:14px; }
     .status.ok { color:#065f46; }
     .status.err { color:#991b1b; }
-    dialog { border:1px solid #e5e7eb; border-radius:12px; padding:16px; max-width:520px; }
+    dialog { border:1px solid var(--border); border-radius:12px; padding:16px; max-width:520px; }
     dialog .row { display:flex; gap:8px; margin-top:8px; align-items:center; }
     input[type=datetime-local], textarea { width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px; }
     textarea { min-height:120px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
@@ -61,8 +63,8 @@
     <form method="dialog" id="notesForm">
       <h3 style="margin-top:0;">Edit Notes</h3>
       <input type="hidden" id="notesApptId" />
-      <label class="muted">Notes (JSON ok or plain text)</label>
-      <textarea id="notesInput" placeholder='Example: {"tech":"Sam","priority":"high"}'></textarea>
+      <label class="muted">Type plain text or paste JSON</label>
+      <textarea id="notesInput" placeholder='Example: {"tech":"Sam","priority":"high"} or just: Noisy outdoor unit'></textarea>
       <div class="row" style="justify-content:flex-end;">
         <button type="button" id="notesCancel">Close</button>
         <button class="primary" id="notesSave" value="default">Save</button>
@@ -100,7 +102,7 @@
 <script>
   // ---------- Config ----------
   const SUPABASE_URL = 'https://yvjwajopxbcaedzofqww.supabase.co';
-  // Paste the SAME anon key you already use
+  // Paste the SAME anon key you already use in /admin/login.html
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2andham9weGJjYWVkem9mcXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODk0NjQsImV4cCI6MjA3NDk2NTQ2NH0.1VVEkgThCltfebpCWa-4DReb9qSO5zdt2a_83CfsBsY';
 
   const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -131,7 +133,7 @@
     const tbody = document.getElementById('apptBody');
     tbody.innerHTML = '<tr><td colspan="5" class="muted">Loading…</td></tr>';
 
-    // View must expose: id, scheduled_at, status, notes, customer_name, customer_phone
+    // Our tolerant view returns: id (TEXT), scheduled_at (timestamptz|null), status, notes, customer_name, customer_phone
     const { data, error } = await client
       .from('appointments_with_customer')
       .select('id, scheduled_at, status, notes, customer_name, customer_phone')
@@ -159,9 +161,9 @@
   function renderApptRow(a) {
     const tr = document.createElement('tr');
 
-    const when = new Date(a.scheduled_at);
+    const when = a.scheduled_at ? new Date(a.scheduled_at) : null;
     const tdWhen = document.createElement('td');
-    tdWhen.textContent = when.toLocaleString();
+    tdWhen.textContent = when ? when.toLocaleString() : '—';
 
     const tdCust = document.createElement('td');
     tdCust.innerHTML = `<div>${escapeHtml(a.customer_name || '—')}</div>
@@ -197,15 +199,18 @@
     return (s ?? '').toString().replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   }
 
+  // ---------- Notes display: prefer plain text; unwrap {"text": "..."}; otherwise JSON.stringify ----------
   function formatNotes(n) {
-    if (!n) return '—';
-    try {
-      if (typeof n === 'string') return n;
-      return JSON.stringify(n);
-    } catch { return '—'; }
+    if (n == null) return '—';
+    if (typeof n === 'string') return n;
+    if (typeof n === 'object') {
+      if (typeof n.text === 'string') return n.text;
+      try { return JSON.stringify(n); } catch { return '—'; }
+    }
+    return '—';
   }
 
-  // ---------- Notes ----------
+  // ---------- Notes modal ----------
   const notesDialog = document.getElementById('notesDialog');
   const notesApptId = document.getElementById('notesApptId');
   const notesInput  = document.getElementById('notesInput');
@@ -216,22 +221,34 @@
   });
 
   function openNotesModal(a) {
-    notesApptId.value = a.id;
+    notesApptId.value = a.id; // id is TEXT in our view
     try {
-      notesInput.value = (typeof a.notes === 'string') ? a.notes : JSON.stringify(a.notes || {}, null, 2);
-    } catch { notesInput.value = ''; }
+      if (typeof a.notes === 'string') {
+        notesInput.value = a.notes;
+      } else if (a.notes && typeof a.notes.text === 'string') {
+        notesInput.value = a.notes.text;
+      } else {
+        notesInput.value = a.notes ? JSON.stringify(a.notes, null, 2) : '';
+      }
+    } catch {
+      notesInput.value = '';
+    }
     notesDialog.showModal();
   }
 
   async function saveNotes() {
-    const id = notesApptId.value;
-    let payload;
+    const id = notesApptId.value;            // TEXT id
     const raw = (notesInput.value || '').trim();
-    if (!raw) payload = {};
-    else {
+    let payload;
+
+    if (!raw) {
+      payload = {};                           // if cleared, store empty object
+    } else {
+      // If valid JSON, store JSON; else store as string
       try { payload = JSON.parse(raw); }
-      catch { payload = { text: raw }; }
+      catch { payload = raw; }
     }
+
     const { error } = await client.rpc('update_appointment_notes', { p_id: id, p_notes: payload });
     if (error) { err(error.message); return; }
     notesDialog.close();
@@ -260,8 +277,8 @@
   }
 
   function openReschedModal(a) {
-    reschedApptId.value = a.id;
-    const dt = new Date(a.scheduled_at);
+    reschedApptId.value = a.id; // TEXT id
+    const dt = a.scheduled_at ? new Date(a.scheduled_at) : new Date();
     reschedWhen.value = toLocalInputValue(dt);
     reschedDialog.showModal();
   }
@@ -288,7 +305,7 @@
   });
 
   function openCancelModal(a) {
-    cancelApptId.value = a.id;
+    cancelApptId.value = a.id; // TEXT id
     cancelDialog.showModal();
   }
 
