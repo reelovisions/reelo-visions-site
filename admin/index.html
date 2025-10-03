@@ -12,6 +12,8 @@
     nav a { margin-right: 12px; text-decoration:none; color:#2563eb; }
     nav a strong { color:#111827; }
     .card { border:1px solid var(--border); border-radius:12px; padding:16px; }
+    .controls { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:8px; }
+    select, input[type=date] { padding:6px 10px; border:1px solid #d1d5db; border-radius:8px; background:#fff; }
     table { width:100%; border-collapse: collapse; margin-top:12px; }
     th, td { padding:10px; border-bottom:1px solid #f0f0f0; text-align:left; vertical-align:top; }
     .muted { color:var(--muted); font-size:13px; }
@@ -25,6 +27,7 @@
     dialog .row { display:flex; gap:8px; margin-top:8px; align-items:center; }
     input[type=datetime-local], textarea { width:100%; padding:8px; border:1px solid #d1d5db; border-radius:8px; }
     textarea { min-height:120px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .pill { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid #e5e7eb; }
   </style>
   <script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 </head>
@@ -41,6 +44,25 @@
   <div class="card">
     <h2 style="margin-top:0;">Upcoming Appointments</h2>
     <div class="muted">Live from <code>appointments_with_customer</code>.</div>
+
+    <div class="controls">
+      <label class="muted">Status</label>
+      <select id="statusFilter">
+        <option value="all">All</option>
+        <option value="scheduled" selected>Scheduled</option>
+        <option value="completed">Completed</option>
+        <option value="canceled">Canceled</option>
+      </select>
+
+      <label class="muted">Window</label>
+      <select id="timeFilter">
+        <option value="upcoming" selected>Upcoming only</option>
+        <option value="all">All time</option>
+      </select>
+
+      <button id="refreshBtn">Refresh</button>
+    </div>
+
     <table>
       <thead>
         <tr>
@@ -127,19 +149,34 @@
   function ok(msg){ statusEl.textContent = msg; statusEl.className = 'status ok'; }
   function err(msg){ statusEl.textContent = msg; statusEl.className = 'status err'; }
 
+  // ---------- Filters ----------
+  const statusFilter = document.getElementById('statusFilter');
+  const timeFilter = document.getElementById('timeFilter');
+  document.getElementById('refreshBtn').addEventListener('click', () => loadUpcoming());
+  statusFilter.addEventListener('change', () => loadUpcoming());
+  timeFilter.addEventListener('change', () => loadUpcoming());
+
   // ---------- Table rendering ----------
   async function loadUpcoming() {
     statusEl.textContent = '';
     const tbody = document.getElementById('apptBody');
     tbody.innerHTML = '<tr><td colspan="5" class="muted">Loading…</td></tr>';
 
-    // Our tolerant view returns: id (TEXT), scheduled_at (timestamptz|null), status, notes, customer_name, customer_phone
-    const { data, error } = await client
+    let query = client
       .from('appointments_with_customer')
       .select('id, scheduled_at, status, notes, customer_name, customer_phone')
-      .neq('status', 'canceled')
       .order('scheduled_at', { ascending: true })
-      .limit(200);
+      .limit(500);
+
+    const s = statusFilter.value;
+    if (s !== 'all') {
+      query = query.eq('status', s);
+    } else {
+      // Show everything except canceled if "All" + "Upcoming"
+      // We'll explicitly filter below based on timeFilter
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       tbody.innerHTML = '';
@@ -147,13 +184,20 @@
       return;
     }
 
-    tbody.innerHTML = '';
-    if (!data || data.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" class="muted">No upcoming appointments.</td></tr>';
+    // Optional client-side window: upcoming only
+    let rows = data || [];
+    if (timeFilter.value === 'upcoming') {
+      const now = Date.now();
+      rows = rows.filter(r => r.scheduled_at ? new Date(r.scheduled_at).getTime() >= now : true);
+    }
+
+    if (rows.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="muted">No matching appointments.</td></tr>';
       return;
     }
 
-    for (const appt of data) {
+    tbody.innerHTML = '';
+    for (const appt of rows) {
       tbody.appendChild(renderApptRow(appt));
     }
   }
@@ -170,7 +214,7 @@
                         <div class="muted">${escapeHtml(a.customer_phone || '')}</div>`;
 
     const tdStatus = document.createElement('td');
-    tdStatus.textContent = a.status || 'scheduled';
+    tdStatus.innerHTML = `<span class="pill">${escapeHtml(a.status || 'scheduled')}</span>`;
 
     const tdNotes = document.createElement('td');
     tdNotes.textContent = formatNotes(a.notes);
@@ -190,7 +234,11 @@
     btnCancel.textContent = 'Cancel';
     btnCancel.addEventListener('click', () => openCancelModal(a));
 
-    tdAct.append(btnNotes, btnRes, btnCancel);
+    const btnDone = document.createElement('button');
+    btnDone.textContent = 'Complete';
+    btnDone.addEventListener('click', () => markComplete(a));
+
+    tdAct.append(btnNotes, btnRes, btnCancel, btnDone);
     tr.append(tdWhen, tdCust, tdStatus, tdNotes, tdAct);
     return tr;
   }
@@ -315,6 +363,14 @@
     if (error) { err(error.message); return; }
     cancelDialog.close();
     ok('Appointment canceled');
+    await loadUpcoming();
+  }
+
+  // ---------- Complete ----------
+  async function markComplete(a) {
+    const { error } = await client.rpc('complete_appointment', { p_id: a.id });
+    if (error) { err(error.message); return; }
+    ok('Appointment marked completed');
     await loadUpcoming();
   }
 </script>
