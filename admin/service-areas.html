@@ -9,7 +9,7 @@
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; margin: 24px; }
     header { display:flex; gap:16px; align-items:center; margin-bottom:16px; }
     nav a { margin-right: 12px; text-decoration:none; color:#0366d6; }
-    .card { border:1px solid #e5e7eb; border-radius:12px; padding:16px; max-width:720px; }
+    .card { border:1px solid #e5e7eb; border-radius:12px; padding:16px; max-width:820px; }
     table { width:100%; border-collapse: collapse; margin-top:12px; }
     th, td { padding:10px; border-bottom:1px solid #f0f0f0; text-align:left; }
     input[type=text] { padding:8px; border:1px solid #d1d5db; border-radius:8px; width:140px; }
@@ -20,6 +20,14 @@
     .status.ok { color:#065f46; }
     .status.err { color:#991b1b; }
     .muted { color:#6b7280; font-size:13px; }
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; vertical-align: middle; }
+    .switch input { display:none; }
+    .slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#d1d5db; transition:.2s; border-radius:999px; }
+    .slider:before { position:absolute; content:""; height:18px; width:18px; left:3px; top:3px; background:white; transition:.2s; border-radius:50%; box-shadow:0 1px 2px rgba(0,0,0,.12); }
+    input:checked + .slider { background:#111827; }
+    input:checked + .slider:before { transform: translateX(20px); }
+    .inline { display:flex; align-items:center; gap:10px; }
+    .section-title { margin-top:0; }
   </style>
   <script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 </head>
@@ -35,6 +43,22 @@
   </nav>
 
   <div class="card">
+    <h3 class="section-title">Policy</h3>
+    <div class="inline">
+      <label class="switch">
+        <input type="checkbox" id="enforceSwitch" />
+        <span class="slider"></span>
+      </label>
+      <div>
+        <div><strong>Enforce service ZIPs</strong></div>
+        <div class="muted">If ON, new appointments must match your ZIP list. If OFF, any ZIP is accepted (useful for demo/testing).</div>
+      </div>
+    </div>
+    <div id="policyStatus" class="status"></div>
+
+    <hr style="margin:16px 0; border:none; border-top:1px solid #eee;" />
+
+    <h3 class="section-title">ZIP Codes</h3>
     <div class="row">
       <label for="zipInput">Add ZIP</label>
       <input id="zipInput" type="text" pattern="\\d{5}" maxlength="5" placeholder="e.g. 55401" />
@@ -55,9 +79,7 @@
 <script>
   // ---------- Config ----------
   const SUPABASE_URL = 'https://yvjwajopxbcaedzofqww.supabase.co';
-  // Paste the SAME anon key you already use in /admin/login.html and /admin/index.html
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2andham9weGJjYWVkem9mcXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODk0NjQsImV4cCI6MjA3NDk2NTQ2NH0.1VVEkgThCltfebpCWa-4DReb9qSO5zdt2a_83CfsBsY';
-
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2andham9weGJjYWVkem9mcXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODk0NjQsImV4cCI6MjA3NDk2NTQ2NH0.1VVEkgThCltfebpCWa-4DReb9qSO5zdt2a_83CfsBsY'; // same as other admin pages
   const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   // ---------- Auth Guard ----------
@@ -67,6 +89,7 @@
       window.location.href = '/admin/login.html';
       return;
     }
+    await loadPolicy();
     await loadZips();
   })();
 
@@ -77,15 +100,36 @@
   });
 
   const statusEl = document.getElementById('status');
+  const policyStatusEl = document.getElementById('policyStatus');
   function toastOk(msg) { statusEl.textContent = msg; statusEl.className = 'status ok'; }
   function toastErr(msg) { statusEl.textContent = msg; statusEl.className = 'status err'; }
+  function policyOk(msg) { policyStatusEl.textContent = msg; policyStatusEl.className = 'status ok'; }
+  function policyErr(msg) { policyStatusEl.textContent = msg; policyStatusEl.className = 'status err'; }
 
+  // ---------- Policy toggle ----------
+  const enforceSwitch = document.getElementById('enforceSwitch');
+
+  async function loadPolicy() {
+    policyStatusEl.textContent = 'Loading policy…';
+    const { data, error } = await client.rpc('get_company_settings');
+    if (error) { policyErr(error.message); return; }
+    enforceSwitch.checked = !!(data && data.enforce_zip);
+    policyOk(`Enforce service ZIPs is ${enforceSwitch.checked ? 'ON' : 'OFF'}`);
+  }
+
+  enforceSwitch.addEventListener('change', async () => {
+    const newVal = enforceSwitch.checked;
+    const { data, error } = await client.rpc('set_enforce_zip', { p_enforce: newVal });
+    if (error) { enforceSwitch.checked = !newVal; policyErr(error.message); return; }
+    policyOk(`Enforce service ZIPs is ${newVal ? 'ON' : 'OFF'}`);
+  });
+
+  // ---------- ZIP CRUD ----------
   async function loadZips() {
     statusEl.textContent = '';
     const tbody = document.getElementById('zipsBody');
     tbody.innerHTML = '<tr><td colspan="2" class="muted">Loading…</td></tr>';
 
-    // RLS ensures we only see our company rows
     const { data, error } = await client
       .from('company_zipcodes')
       .select('zipcode')
@@ -126,7 +170,7 @@
 
   async function onDelete(zip) {
     statusEl.textContent = '';
-    const { data, error } = await client.rpc('delete_company_zipcode', { p_zip: zip });
+    const { error } = await client.rpc('delete_company_zipcode', { p_zip: zip });
     if (error) { toastErr(error.message); return; }
     toastOk(`Deleted ${zip}`);
     await loadZips();
@@ -142,7 +186,7 @@
       return;
     }
 
-    const { data, error } = await client.rpc('upsert_company_zipcode', { p_zip: zip });
+    const { error } = await client.rpc('upsert_company_zipcode', { p_zip: zip });
     if (error) { toastErr(error.message); return; }
     input.value = '';
     toastOk(`Saved ${zip}`);
