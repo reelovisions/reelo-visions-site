@@ -125,10 +125,8 @@
   // ---------- Config ----------
   const SUPABASE_URL = 'https://yvjwajopxbcaedzofqww.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2andham9weGJjYWVkem9mcXd3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTM4OTQ2NCwiZXhwIjoyMDc0OTY1NDY0fQ.Af_Hh7RbGRR4VC2eGiSjZ-w_HpIMHIRTwnhhn_r8KkA'; // same as other admin pages
-  const GEOCODE_FUNCTION_URL = curl -L -X POST 'https://yvjwajopxbcaedzofqww.supabase.co/functions/v1/geocode' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2andham9weGJjYWVkem9mcXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODk0NjQsImV4cCI6MjA3NDk2NTQ2NH0.1VVEkgThCltfebpCWa-4DReb9qSO5zdt2a_83CfsBsY' \
-  -H 'Content-Type: application/json' \
-  --data '{"name":"Functions"}'; // <-- set this
+  // IMPORTANT: Use the Invoke URL from the function page (requires Authorization header)
+  const GEOCODE_FUNCTION_URL = 'https://yvjwajopxbcaedzofqww.supabase.co/functions/v1/geocode';
 
   const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -204,14 +202,21 @@
     await loadPolicy();
   });
 
-  // ---------- Geocode & Save HQ ----------
+  // ---------- Geocode & Save HQ (now with Authorization header) ----------
   document.getElementById('geocodeBtn').addEventListener('click', async () => {
     geoStatusEl.textContent = 'Geocoding…';
     try {
       if (!hqAddress.value.trim()) throw new Error('Enter an address');
+
+      const { data: { session } } = await client.auth.getSession();
+      const authHeader = session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {};
+
       const r = await fetch(GEOCODE_FUNCTION_URL, {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: {
+          'content-type': 'application/json',
+          ...authHeader
+        },
         body: JSON.stringify({ address: hqAddress.value })
       });
       const j = await r.json();
