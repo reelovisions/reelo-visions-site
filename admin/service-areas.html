@@ -9,6 +9,7 @@
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; margin: 24px; }
     header { display:flex; gap:16px; align-items:center; margin-bottom:16px; }
     nav a { margin-right: 12px; text-decoration:none; color:#0366d6; }
+    nav a strong { color:#111; }
     .card { border:1px solid #e5e7eb; border-radius:12px; padding:16px; max-width:900px; }
     table { width:100%; border-collapse: collapse; margin-top:12px; }
     th, td { padding:10px; border-bottom:1px solid #f0f0f0; text-align:left; }
@@ -122,10 +123,9 @@
   </div>
 
 <script>
-  // ---------- Config ----------
+  // ---------- Config (edit these two lines only) ----------
   const SUPABASE_URL = 'https://yvjwajopxbcaedzofqww.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2andham9weGJjYWVkem9mcXd3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTM4OTQ2NCwiZXhwIjoyMDc0OTY1NDY0fQ.Af_Hh7RbGRR4VC2eGiSjZ-w_HpIMHIRTwnhhn_r8KkA'; // same as other admin pages
-  // IMPORTANT: Use the Invoke URL from the function page (requires Authorization header)
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2andham9weGJjYWVkem9mcXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODk0NjQsImV4cCI6MjA3NDk2NTQ2NH0.1VVEkgThCltfebpCWa-4DReb9qSO5zdt2a_83CfsBsY'; // <-- paste your anon key here
   const GEOCODE_FUNCTION_URL = 'https://yvjwajopxbcaedzofqww.supabase.co/functions/v1/geocode';
 
   const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -175,7 +175,7 @@
     radiusMiles.value = (data && data.radius_miles) || '';
 
     if (data && data.hq_lat && data.hq_lon) {
-      hqMeta.textContent = `HQ: ${data.hq_address || '(set)'} → lat=${data.hq_lat.toFixed(6)}, lon=${data.hq_lon.toFixed(6)} · radius=${data.radius_miles ?? '—'} mi`;
+      hqMeta.textContent = `HQ: ${data.hq_address || '(set)'} → lat=${Number(data.hq_lat).toFixed(6)}, lon=${Number(data.hq_lon).toFixed(6)} · radius=${data.radius_miles ?? '—'} mi`;
     } else {
       hqMeta.textContent = 'HQ: not set';
     }
@@ -202,38 +202,43 @@
     await loadPolicy();
   });
 
-  // ---------- Geocode & Save HQ (now with Authorization header) ----------
+  // ---------- Geocode & Save HQ (uses anon key in headers) ----------
   document.getElementById('geocodeBtn').addEventListener('click', async () => {
     geoStatusEl.textContent = 'Geocoding…';
+    geoStatusEl.className = 'status';
     try {
-      if (!hqAddress.value.trim()) throw new Error('Enter an address');
+      const addr = hqAddress.value.trim();
+      if (!addr) throw new Error('Enter an address');
 
-      const { data: { session } } = await client.auth.getSession();
-      const authHeader = session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {};
-
+      // Edge Function requires a bearer; anon key is fine for this read-only call
       const r = await fetch(GEOCODE_FUNCTION_URL, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          ...authHeader
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
         },
-        body: JSON.stringify({ address: hqAddress.value })
+        body: JSON.stringify({ address: addr })
       });
-      const j = await r.json();
-      if (!r.ok) throw new Error(j?.error || 'Geocode failed');
+      const text = await r.text();
+      let j;
+      try { j = JSON.parse(text); } catch { throw new Error(`Bad geocode response: ${text.slice(0,120)}…`); }
+      if (!r.ok) throw new Error(j?.error || `Geocode failed (${r.status})`);
 
-      const radiusVal = parseFloat(radiusMiles.value || '0');
+      const miles = parseFloat(radiusMiles.value || '0');
       const { error } = await client.rpc('set_company_location', {
-        p_hq_address: hqAddress.value,
+        p_hq_address: addr,
         p_hq_lat: j.lat,
         p_hq_lon: j.lon,
-        p_radius_miles: isFinite(radiusVal) && radiusVal > 0 ? radiusVal : null
+        p_radius_miles: (isFinite(miles) && miles > 0) ? miles : null
       });
       if (error) throw error;
-      toastOk(geoStatusEl, `Location set: ${j.formatted} (${j.lat.toFixed(6)}, ${j.lon.toFixed(6)})`);
+
+      toastOk(geoStatusEl, `Location set: ${j.formatted} (${Number(j.lat).toFixed(6)}, ${Number(j.lon).toFixed(6)})`);
       await loadPolicy();
     } catch (e) {
       toastErr(geoStatusEl, e.message || String(e));
+      console.error('Geocode→save error:', e);
     }
   });
 
