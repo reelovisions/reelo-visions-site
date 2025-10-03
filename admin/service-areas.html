@@ -1,312 +1,344 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Service Areas | Admin</title>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-  :root{--bg:#0f172a;--panel:#111827;--muted:#94a3b8;--card:#0b1220;--line:#1f2937;--text:#e5eefc;--accent:#60a5fa;--green:#22c55e;--red:#ef4444}
-  *{box-sizing:border-box}
-  body{margin:0;background:radial-gradient(1200px 800px at 10% -10%,#0b1220 0%,#0a1120 40%,#0f172a 100%);color:var(--text);font:16px/1.4 Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-  a{color:var(--accent);text-decoration:none}
-  header{max-width:1100px;margin:24px auto 0;padding:0 16px;display:flex;align-items:center;gap:24px}
-  nav a{margin-right:16px;opacity:.9}
-  nav a.active{color:#fff;font-weight:700}
-  .container{max-width:1100px;margin:12px auto 48px;padding:0 16px}
-  h1{font-size:34px;margin:8px 0 20px}
-  .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.00));border:1px solid var(--line);border-radius:14px;padding:20px;margin:18px 0}
-  .section-title{font-weight:700;margin:0 0 14px}
-  .row{display:flex;gap:12px;flex-wrap:wrap}
-  label{display:block;font-size:13px;color:var(--muted);margin:8px 0 6px}
-  input,select,button{font:14px/1.2 Inter,system-ui}
-  input,select{width:100%;padding:12px 12px;border-radius:10px;background:#0c1323;color:var(--text);border:1px solid #1f2937;outline:none}
-  input:focus{border-color:#334155}
-  .col-2{flex:1 1 220px}
-  .col-3{flex:1 1 160px}
-  .muted{color:var(--muted);font-size:13px}
-  hr{border:none;border-top:1px solid var(--line);margin:16px 0}
-  .btn{padding:10px 14px;border-radius:10px;border:1px solid #1f2937;background:#0c1323;color:var(--text);cursor:pointer}
-  .btn.primary{background:var(--accent);border-color:transparent;color:#001733;font-weight:700}
-  .btn.green{background:var(--green);color:#062a10;border-color:transparent;font-weight:700}
-  .btn.red{background:#ef4444;color:#2f0b0b;border-color:transparent}
-  .inline{display:inline-flex;gap:10px;align-items:center}
-  .switch{position:relative;width:46px;height:26px;background:#1f2937;border-radius:999px;border:1px solid #273244;cursor:pointer;vertical-align:middle}
-  .switch input{display:none}
-  .switch .dot{position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:#334155;transition:.18s all}
-  .switch input:checked + .dot{left:22px;background:var(--green)}
-  table{width:100%;border-collapse:collapse;border:1px solid var(--line);border-radius:12px;overflow:hidden}
-  th,td{padding:12px;border-bottom:1px solid var(--line)}
-  .status{margin-top:10px;font-size:13px}
-  .toast{position:fixed;right:16px;bottom:16px;background:#0c1323;color:var(--text);border:1px solid #243045;padding:12px 14px;border-radius:10px;opacity:.98;z-index:50}
-</style>
+  <meta charset="utf-8" />
+  <title>Service Areas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0f172a;        /* slate-900 */
+      --panel: #111827;     /* gray-900 */
+      --panel-2: #0b1220;   /* deep */
+      --text: #e5e7eb;      /* gray-200 */
+      --muted: #a1a1aa;     /* zinc-400 */
+      --brand: #2563eb;     /* blue-600 */
+      --brand-2: #3b82f6;   /* blue-500 */
+      --ok: #10b981;        /* emerald-500 */
+      --warn: #f59e0b;      /* amber-500 */
+      --bad: #ef4444;       /* red-500 */
+      --card: #0f172a;      /* slate-900 */
+      --input: #111827;
+      --border: #1f2937;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial; }
+    .wrap { max-width:1000px; margin:24px auto 80px; padding:0 16px; }
+    header { display:flex; align-items:center; gap:24px; margin-bottom:18px; }
+    nav a { color:var(--muted); text-decoration:none; margin-right:16px; }
+    nav a.active { color:var(--text); font-weight:600; }
+    h1 { font-size:32px; font-weight:800; margin:0 0 12px; }
+    .card { background:linear-gradient(180deg, var(--panel), var(--panel-2)); border:1px solid var(--border); border-radius:14px; padding:18px; margin:16px 0; box-shadow: 0 10px 25px rgba(0,0,0,0.35) inset, 0 8px 24px rgba(0,0,0,0.25); }
+    .row { display:grid; grid-template-columns: 1fr 1fr 1fr 1fr 120px; gap:12px; }
+    label { font-size:12px; color:var(--muted); display:block; margin:0 0 6px; }
+    input, select, button { font-size:16px; }
+    input, select { width:100%; padding:10px 12px; background:var(--input); color:var(--text); border:1px solid var(--border); border-radius:10px; outline:none; }
+    input::placeholder { color:#6b7280; }
+    .btn { padding:10px 14px; border-radius:10px; border:1px solid transparent; cursor:pointer; }
+    .btn.primary { background:var(--brand); color:white; }
+    .btn.primary:hover { background:var(--brand-2); }
+    .btn.ghost { background:transparent; border-color:var(--border); color:var(--text); }
+    .status { margin-top:10px; font-size:14px; color:var(--muted); }
+    .status.ok { color:var(--ok); }
+    .status.warn { color:var(--warn); }
+    .status.bad { color:var(--bad); }
+    .tog { display:flex; align-items:center; gap:12px; margin:10px 0; }
+    .switch { position:relative; width:44px; height:26px; background:#111827; border:1px solid var(--border); border-radius:999px; cursor:pointer; }
+    .switch::after { content:""; position:absolute; top:2px; left:2px; width:20px; height:20px; background:#374151; border-radius:999px; transition: all .18s ease; }
+    .switch.on { background:#123; border-color:#1d4ed8; }
+    .switch.on::after { left:22px; background:#3b82f6; }
+    .subtle { color:var(--muted); font-size:13px; }
+    .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+    .grid4 { display:grid; grid-template-columns: 1.2fr .9fr .6fr .6fr; gap:14px; }
+    .inline { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    hr.sep { border:none; border-top:1px solid var(--border); margin:16px 0; }
+    .pill { font-size:12px; color:#cbd5e1; background:#0b1220; padding:2px 8px; border-radius:999px; border:1px solid var(--border); }
+    .muter { font-size:13px; color:#9aa2b2; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { text-align:left; padding:10px 8px; border-bottom:1px solid var(--border); }
+    th { color:#9aa2b2; font-weight:600; font-size:13px; }
+    td .btn { font-size:13px; padding:6px 10px; }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Service Areas</h1>
-    <nav>
-      <a href="/admin/"    >Dashboard</a>
-      <a href="/admin/service-areas.html" class="active">Service Areas</a>
-      <a href="/admin/new-appointment.html">New Appointment</a>
-      <a href="/admin/login.html" id="logoutLink">Logout</a>
-    </nav>
-  </header>
+  <div class="wrap">
+    <header>
+      <h1>Service Areas</h1>
+      <nav>
+        <a href="/admin/index.html">Dashboard</a>
+        <a class="active" href="/admin/service-areas.html">Service Areas</a>
+        <a href="/admin/new-appointment.html">New Appointment</a>
+        <a href="/admin/logout.html">Logout</a>
+      </nav>
+    </header>
 
-  <div class="container">
-
-    <!-- Policies -->
-    <div class="card">
-      <div class="section-title">Policies</div>
-
-      <div class="row">
-        <div class="col-2">
-          <label>Enforce service ZIPs</label>
-          <label class="switch">
-            <input id="enforceZips" type="checkbox">
-            <span class="dot"></span>
-          </label>
-          <span class="muted"> If ON, new appointments must match your ZIP list.</span>
-        </div>
-        <div class="col-2">
-          <label>Enforce radius from HQ</label>
-          <label class="switch">
-            <input id="enforceRadius" type="checkbox">
-            <span class="dot"></span>
-          </label>
-          <span class="muted"> If ON, bookings must be within your radius from HQ lat/lon.</span>
+    <!-- POLICIES -->
+    <section class="card">
+      <h2 style="margin:0 0 8px">Policies</h2>
+      <div class="tog">
+        <div id="swZips" class="switch" role="switch" aria-checked="false" tabindex="0"></div>
+        <div>
+          <div><strong>Enforce service ZIPs</strong> <span class="pill">ON/OFF</span></div>
+          <div class="subtle">If ON, new appointments must match your ZIP list.</div>
         </div>
       </div>
+      <div class="tog">
+        <div id="swRadius" class="switch" role="switch" aria-checked="false" tabindex="0"></div>
+        <div>
+          <div><strong>Enforce radius from HQ</strong> <span class="pill">ON/OFF</span></div>
+          <div class="subtle">If ON, bookings must be within your radius from HQ lat/lon.</div>
+        </div>
+      </div>
+      <div class="muter" id="policySummary">ZIPs: OFF · Radius: OFF</div>
+    </section>
 
-      <div id="polSummary" class="muted" style="margin-top:8px;">&nbsp;</div>
-    </div>
-
-    <!-- HQ & Radius -->
-    <div class="card">
-      <div class="section-title">HQ Location & Radius</div>
-
-      <div class="row">
-        <div class="col-2">
+    <!-- HQ & RADIUS -->
+    <section class="card">
+      <h2 style="margin:0 0 12px">HQ Location &amp; Radius</h2>
+      <div class="grid2">
+        <div>
           <label>Company (optional)</label>
-          <input id="hqCompany" placeholder="Company name">
+          <input id="hqCompany" placeholder="e.g. Reelo Heating &amp; Air" />
         </div>
-        <div class="col-2">
-          <label>Street</label>
-          <input id="hqStreet" placeholder="123 Main St">
-        </div>
-        <div class="col-3">
-          <label>City</label>
-          <input id="hqCity" placeholder="City">
-        </div>
-        <div class="col-3">
-          <label>State</label>
-          <input id="hqState" placeholder="MN" maxlength="2">
-        </div>
-        <div class="col-3">
-          <label>ZIP</label>
-          <input id="hqZip" placeholder="e.g. 55401" pattern="\\d{5}" maxlength="5">
-        </div>
-      </div>
-
-      <div class="row" style="margin-top:10px;">
-        <div class="col-3">
-          <button id="geocodeBtn" class="btn">Set location (use ZIP centroid)</button>
-        </div>
-        <div class="col-3">
+        <div>
           <label>Radius (miles)</label>
-          <input id="radiusMiles" value="25">
-        </div>
-        <div class="col-3" style="align-self:flex-end;">
-          <button id="saveRadiusBtn" class="btn primary">Save radius</button>
-        </div>
-      </div>
-
-      <div id="hqMeta" class="muted" style="margin-top:10px">HQ: not set</div>
-      <div id="geoStatus" class="status muted"></div>
-    </div>
-
-    <!-- ZIP CRUD -->
-    <div class="card">
-      <div class="section-title">ZIP Codes</div>
-      <div class="row">
-        <div class="col-2">
-          <input id="zipInput" placeholder="e.g. 55401" maxlength="5" pattern="\\d{5}">
-        </div>
-        <div class="col-3">
-          <button id="addBtn" class="btn primary">Add</button>
+          <div class="inline">
+            <input id="radiusMiles" inputmode="numeric" pattern="[0-9]*" placeholder="25" style="max-width:140px" />
+            <button id="saveRadiusBtn" class="btn ghost">Save radius</button>
+          </div>
         </div>
       </div>
-      <div class="muted">Must be exactly 5 digits. Duplicate adds are ignored (upsert).</div>
+      <div class="grid4" style="margin-top:12px">
+        <div>
+          <label>Street</label>
+          <input id="hqStreet" placeholder="123 Main St" />
+        </div>
+        <div>
+          <label>City</label>
+          <input id="hqCity" placeholder="McKinney" />
+        </div>
+        <div>
+          <label>State</label>
+          <input id="hqState" placeholder="TX" maxlength="2" />
+        </div>
+        <div>
+          <label>ZIP</label>
+          <input id="hqZip" placeholder="75071" maxlength="10" />
+        </div>
+      </div>
+      <div class="inline" style="margin-top:12px">
+        <button id="geocodeBtn" class="btn primary">Set location (geocode)</button>
+        <span id="geoStatus" class="status">HQ: not set</span>
+      </div>
+      <div class="muter" style="margin-top:8px">
+        Geocoding uses your edge function first; on failure we fall back to your ZIP centroid table.
+      </div>
+    </section>
 
-      <table style="margin-top:12px">
-        <thead><tr><th style="width:120px">ZIP</th><th>Action</th></tr></thead>
-        <tbody id="zipsBody"></tbody>
+    <!-- ZIP CODES -->
+    <section class="card">
+      <h2 style="margin:0 0 12px">ZIP Codes</h2>
+      <div class="inline" style="margin-bottom:10px">
+        <input id="zipInput" placeholder="e.g. 55401" maxlength="10" style="max-width:200px" />
+        <button id="addBtn" class="btn primary">Add</button>
+        <span class="muter">Must be exactly 5 digits. Duplicate adds are ignored (upsert).</span>
+      </div>
+      <table>
+        <thead>
+          <tr><th>ZIP</th><th style="width:120px;text-align:right">Action</th></tr>
+        </thead>
+        <tbody id="zipsBody">
+          <!-- rows inserted by JS -->
+        </tbody>
       </table>
-
-      <div id="status" class="status muted"></div>
-    </div>
+      <div id="zipStatus" class="status"></div>
+    </section>
   </div>
 
-  <div id="toast" class="toast" style="display:none"></div>
+  <!-- Supabase browser client -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script type="module">
+    /**************************
+     *      CONFIG — EDIT     *
+     **************************/
+    const SUPABASE_URL = 'https://YOUR-PROJECT.supabase.co';         // <-- fill me
+    const SUPABASE_ANON_KEY = 'YOUR-ANON-KEY';                       // <-- fill me
+    const GEOCODE_FUNCTION_URL = 'https://YOUR-PROJECT.supabase.co/functions/v1/geocode'; // <-- fill me
 
-<script type="module">
-  // ---------- Config (confirm these 2 lines) ----------
-  const SUPABASE_URL = 'https://yvjwajopxbcaedzofqww.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2andham9weGJjYWVkem9mcXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODk0NjQsImV4cCI6MjA3NDk2NTQ2NH0.1VVEkgThCltfebpCWa-4DReb9qSO5zdt2a_83CfsBsY';
+    // If your RPC names differ, adjust below.
+    const RPC_SET_COMPANY_LOCATION = 'set_company_location'; // p_hq_address, p_hq_lat, p_hq_lon, p_radius_miles?
+    const RPC_GET_ZIP_CENTROID     = 'get_zip_centroid';     // p_zip -> returns { zip, lat, lon }
+    const RPC_SET_RADIUS_MILES     = 'set_company_radius_miles'; // p_miles (if you have it)
+    const RPC_ADD_ZIP              = 'add_zip';              // p_zip
+    const RPC_REMOVE_ZIP           = 'remove_zip';           // p_zip
+    const VIEW_LIST_ZIPS           = 'company_zipcodes';     // or a table that lists zips for this company
 
-  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  // el helpers
-  const $ = (id) => document.getElementById(id);
-  const toast = (m) => { const t=$('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none', 2500); };
-
-  // DOM
-  const enforceZips   = $('enforceZips');
-  const enforceRadius = $('enforceRadius');
-  const polSummary    = $('polSummary');
-
-  const hqCompany = $('hqCompany');
-  const hqStreet  = $('hqStreet');
-  const hqCity    = $('hqCity');
-  const hqState   = $('hqState');
-  const hqZip     = $('hqZip');
-  const geocodeBtn= $('geocodeBtn');
-  const radiusMiles= $('radiusMiles');
-  const saveRadiusBtn = $('saveRadiusBtn');
-  const hqMeta    = $('hqMeta');
-  const geoStatus = $('geoStatus');
-
-  const zipInput  = $('zipInput');
-  const addBtn    = $('addBtn');
-  const zipsBody  = $('zipsBody');
-  const statusRow = $('status');
-
-  // auth guard
-  (async () => {
-    const { data: { session } } = await client.auth.getSession();
-    if (!session) { location.href = '/admin/login.html'; return; }
-  })();
-
-  // load settings & zips
-  async function loadSettings() {
-    const { data, error } = await client.rpc('get_company_settings');
-    if (error) { console.error(error); return; }
-
-    // toggles
-    enforceZips.checked   = !!data?.enforce_zip;
-    enforceRadius.checked = !!data?.enforce_radius;
-
-    // radius + HQ meta
-    if (data?.radius_miles) radiusMiles.value = data.radius_miles;
-    let hqLine = 'HQ: not set';
-    if (data?.hq_lat && data?.hq_lon) {
-      hqLine = `HQ: ${data?.hq_address ?? '(ZIP centroid)'} → lat=${Number(data.hq_lat).toFixed(6)}, lon=${Number(data.hq_lon).toFixed(6)} · radius=${data?.radius_miles ?? '—'} mi`;
+    // UI helpers
+    const $ = id => document.getElementById(id);
+    function setSwitch(el, on) {
+      el.classList.toggle('on', !!on);
+      el.setAttribute('aria-checked', !!on);
     }
-    hqMeta.textContent = hqLine;
+    function fmt(n) { return typeof n === 'number' ? n.toFixed(6) : String(n); }
+    function onlyDigits(str='') { return (str||'').replace(/\D/g,''); }
 
-    polSummary.textContent = `ZIPs: ${enforceZips.checked ? 'ON' : 'OFF'} · Radius: ${enforceRadius.checked ? 'ON' : 'OFF'}`;
-  }
-
-  async function loadZips() {
-    const { data, error } = await client
-      .from('company_zipcodes')
-      .select('zipcode')
-      .order('zipcode', { ascending: true });
-    if (error) { console.error(error); return; }
-    zipsBody.innerHTML = '';
-    (data || []).forEach(row => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${row.zipcode}</td>
-        <td><button class="btn red" data-zip="${row.zipcode}">Delete</button></td>`;
-      zipsBody.appendChild(tr);
+    // POLICY toggles (UI only for now — wire to your policy RPCs later if desired)
+    const swZips = $('swZips');
+    const swRadius = $('swRadius');
+    function refreshPolicySummary() {
+      const s = `ZIPs: ${swZips.classList.contains('on')?'ON':'OFF'} · Radius: ${swRadius.classList.contains('on')?'ON':'OFF'}`;
+      $('policySummary').textContent = s;
+    }
+    [swZips, swRadius].forEach(el => {
+      el.addEventListener('click', () => { setSwitch(el, !el.classList.contains('on')); refreshPolicySummary(); });
+      el.addEventListener('keydown', (e) => { if (e.key===' '||e.key==='Enter') { e.preventDefault(); el.click(); } });
     });
-  }
+    setSwitch(swZips, false);
+    setSwitch(swRadius, false);
+    refreshPolicySummary();
 
-  // toggle saves
-  enforceZips.addEventListener('change', async () => {
-    const { error } = await client.rpc('set_company_enforce_zip', { p_value: enforceZips.checked });
-    if (error) { toast(error.message); return; }
-    toast(`Service ZIPs ${enforceZips.checked ? 'enabled' : 'disabled'}`);
-    loadSettings();
-  });
+    // ZIP table
+    async function loadZips() {
+      const body = $('zipsBody');
+      body.innerHTML = '';
+      // If you don’t have a view, you can read from your table; adjust as needed:
+      const { data, error } = await client.from(VIEW_LIST_ZIPS).select('*').order('zip', { ascending: true });
+      if (error) { console.warn(error); $('zipStatus').textContent = 'Could not load ZIPs.'; return; }
+      if (!data || !data.length) {
+        body.innerHTML = `<tr><td colspan="2" class="muter">No ZIPs yet.</td></tr>`;
+        return;
+      }
+      for (const row of data) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.zip}</td>
+          <td style="text-align:right">
+            <button class="btn ghost" data-zip="${row.zip}">Delete</button>
+          </td>`;
+        body.appendChild(tr);
+      }
+      body.querySelectorAll('button[data-zip]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const z = btn.getAttribute('data-zip');
+          btn.disabled = true;
+          const { error } = await client.rpc(RPC_REMOVE_ZIP, { p_zip: z });
+          if (error) { console.warn(error); $('zipStatus').textContent = `Delete failed for ${z}.`; }
+          await loadZips();
+        });
+      });
+    }
 
-  enforceRadius.addEventListener('change', async () => {
-    const { error } = await client.rpc('set_company_enforce_radius', { p_value: enforceRadius.checked });
-    if (error) { toast(error.message); return; }
-    toast(`Radius enforcement ${enforceRadius.checked ? 'enabled' : 'disabled'}`);
-    loadSettings();
-  });
-
-  // ZIP add/delete
-  addBtn.addEventListener('click', async () => {
-    const z = (zipInput.value || '').trim();
-    if (!/^\d{5}$/.test(z)) { toast('ZIP must be 5 digits'); return; }
-    const { error } = await client.rpc('upsert_company_zipcode', { p_zip: z });
-    if (error) { toast(error.message); return; }
-    toast(`Added ${z}`);
-    zipInput.value = '';
-    loadZips();
-  });
-
-  zipsBody.addEventListener('click', async (e) => {
-    const btn = e.target.closest('button[data-zip]');
-    if (!btn) return;
-    const z = btn.getAttribute('data-zip');
-    const { error } = await client.rpc('delete_company_zipcode', { p_zip: z });
-    if (error) { toast(error.message); return; }
-    toast(`Deleted ${z}`);
-    loadZips();
-  });
-
-  // Save radius only
-  saveRadiusBtn.addEventListener('click', async () => {
-    const miles = parseInt((radiusMiles.value || '').trim(), 10);
-    if (!(miles > 0)) { toast('Enter a valid number of miles'); return; }
-    const { error } = await client.rpc('set_company_radius_miles', { p_miles: miles });
-    if (error) { toast(error.message); return; }
-    toast('Radius saved');
-    loadSettings();
-  });
-
-  // *** ZIP-based HQ setter (no external geocoder) ***
-  geocodeBtn.addEventListener('click', async () => {
-    geoStatus.textContent = 'Setting HQ from ZIP centroid...';
-    const z = (hqZip.value || '').trim();
-    if (!/^\d{5}$/.test(z)) { geoStatus.textContent = 'ZIP must be 5 digits.'; return; }
-
-    // free-form address we’ll store for display (not used for lat/lon)
-    const addr = [
-      (hqCompany.value || '').trim(),
-      (hqStreet.value  || '').trim(),
-      [ (hqCity.value||'').trim(), (hqState.value||'').trim(), z ].filter(Boolean).join(' ')
-    ].filter(Boolean).join(', ');
-
-    const miles = parseInt((radiusMiles.value || '').trim(), 10);
-    const { data, error } = await client.rpc('set_company_location_from_zip', {
-      p_zip: z,
-      p_radius_miles: Number.isFinite(miles) ? miles : null,
-      p_hq_address: addr || z
+    $('addBtn').addEventListener('click', async () => {
+      const z = onlyDigits($('zipInput').value).padStart(5,'0');
+      if (!/^\d{5}$/.test(z)) { $('zipStatus').textContent = 'ZIP must be exactly 5 digits.'; return; }
+      $('zipStatus').textContent = 'Adding…';
+      const { error } = await client.rpc(RPC_ADD_ZIP, { p_zip: z });
+      if (error) { console.warn(error); $('zipStatus').textContent = `Add failed: ${error.message}`; }
+      else { $('zipStatus').textContent = `Added ${z}.`; $('zipInput').value = ''; }
+      await loadZips();
     });
-    if (error) { geoStatus.textContent = error.message; toast(error.message); return; }
 
-    geoStatus.textContent = 'HQ saved from ZIP centroid.';
-    toast('HQ updated');
-    loadSettings();
-  });
+    // Save radius (if your RPC exists)
+    $('saveRadiusBtn').addEventListener('click', async () => {
+      const miles = parseInt(onlyDigits($('radiusMiles').value), 10) || null;
+      if (!miles) { alert('Enter a number for miles'); return; }
+      if (!RPC_SET_RADIUS_MILES) { alert('No radius RPC configured'); return; }
+      const { error } = await client.rpc(RPC_SET_RADIUS_MILES, { p_miles: miles });
+      if (error) { alert('Save radius failed: ' + error.message); return; }
+      alert('Radius saved.');
+    });
 
-  // logout
-  $('logoutLink').addEventListener('click', async (e) => {
-    e.preventDefault();
-    await client.auth.signOut();
-    location.href = '/admin/login.html';
-  });
+    // Geocode button with ZIP-centroid fallback
+    $('geocodeBtn').addEventListener('click', async (e) => {
+      e.preventDefault();
+      $('geoStatus').className = 'status';
+      $('geoStatus').textContent = 'Geocoding…';
 
-  // init
-  await loadSettings();
-  await loadZips();
-</script>
+      const street = $('hqStreet').value.trim();
+      const city   = $('hqCity').value.trim();
+      const state  = $('hqState').value.trim();
+      const zipRaw = $('hqZip').value.trim();
+      const zip5   = onlyDigits(zipRaw).padStart(5, '0');
+      const address = [street, city, state, zip5].filter(Boolean).join(', ');
+
+      if (!zip5 || zip5.length !== 5) {
+        $('geoStatus').className = 'status bad';
+        $('geoStatus').textContent = 'ZIP is missing/invalid; cannot set location.';
+        return;
+      }
+
+      let lat = null, lon = null, source = null;
+
+      // 1) Try the Edge Function first
+      try {
+        const r = await fetch(GEOCODE_FUNCTION_URL, {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          },
+          body: JSON.stringify({ address })
+        });
+        if (r.ok) {
+          const body = await r.json().catch(()=>null);
+          if (body && typeof body.lat === 'number' && typeof body.lon === 'number') {
+            lat = body.lat; lon = body.lon; source = 'geocode';
+          }
+        } else if (r.status !== 404) {
+          console.warn('Geocode function error:', r.status, await r.text().catch(()=>'')); // continue to fallback
+        }
+      } catch (err) {
+        console.warn('Geocode request failed:', err);
+      }
+
+      // 2) Fallback to ZIP centroid
+      if (lat == null || lon == null) {
+        const { data, error } = await client.rpc(RPC_GET_ZIP_CENTROID, { p_zip: zip5 });
+        if (error) {
+          $('geoStatus').className = 'status bad';
+          $('geoStatus').textContent = 'ZIP centroid lookup failed.';
+          console.warn(error);
+          return;
+        }
+        if (!data || !data.length || data[0].lat == null || data[0].lon == null) {
+          $('geoStatus').className = 'status bad';
+          $('geoStatus').textContent = `No centroid for ZIP ${zip5}.`;
+          return;
+        }
+        lat = data[0].lat;
+        lon = data[0].lon;
+        source = 'zip-centroid';
+      }
+
+      // 3) Save to company settings via your RPC
+      try {
+        const miles = parseInt(onlyDigits($('radiusMiles').value), 10) || null;
+        const { error } = await client.rpc(RPC_SET_COMPANY_LOCATION, {
+          p_hq_address: address,
+          p_hq_lat: lat,
+          p_hq_lon: lon,
+          p_radius_miles: miles
+        });
+        if (error) {
+          $('geoStatus').className = 'status bad';
+          $('geoStatus').textContent = 'Saving HQ failed.';
+          console.error(error);
+          return;
+        }
+        $('geoStatus').className = 'status ok';
+        $('geoStatus').textContent =
+          `HQ set: ${address} → lat=${fmt(lat)}, lon=${fmt(lon)} (${source})`;
+      } catch (e2) {
+        $('geoStatus').className = 'status bad';
+        $('geoStatus').textContent = 'Unexpected error saving HQ.';
+        console.error(e2);
+      }
+    });
+
+    // initial load
+    loadZips().catch(console.warn);
+  </script>
 </body>
 </html>
