@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Set Company (one-time)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 2rem; }
+    .box { max-width: 620px; padding: 1rem 1.25rem; border: 1px solid #ddd; border-radius: 8px; }
+    code { background:#f6f8fa; padding:2px 4px; border-radius:4px; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <h1>Set Company for this session</h1>
+  <div class="box">
+    <p>This page sets your company id for the current session and then sends you to
+      <code>/admin/service-areas.html</code>.</p>
+    <p id="status">Working…</p>
+  </div>
+
+  <script>
+    // TODO: put YOUR exact values here (copy from your other pages)
+    const SUPABASE_URL = 'https://yvjwajopxbcaedzofqww.supabase.co';   // <-- your URL
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // <-- your anon key
+
+    // Your company UUID (you gave me this)
+    const COMPANY_ID = 'a105e900-8f47-4e1c-b0b6-c126cb904252';
+
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    (async () => {
+      const out = (msg) => document.getElementById('status').textContent = msg;
+
+      // Make sure we have a session (sign in anonymously if needed)
+      let { data: { session } } = await client.auth.getSession();
+      if (!session) {
+        const { error } = await client.auth.signInAnonymously();
+        if (error) { out('Auth error: ' + error.message); return; }
+      }
+
+      // Call our RPC to set the session variable app.company_id
+      const { error } = await client.rpc('set_config', {
+        parameter: 'app.company_id',
+        value: COMPANY_ID,
+        is_local: true
+      });
+
+      if (error) {
+        out('Failed to set company: ' + error.message +
+            ' — Make sure the RPC "public.set_config" exists (Step 1).');
+        return;
+      }
+
+      out('Done! Redirecting to Service Areas…');
+      setTimeout(() => {
+        window.location.href = '/admin/service-areas.html';
+      }, 700);
+    })();
+  </script>
+</body>
+</html>
