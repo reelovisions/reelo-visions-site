@@ -1,0 +1,186 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Reelo Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 24px; max-width: 980px; }
+      header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+      form { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; margin-bottom: 24px; }
+      form > div { display: flex; flex-direction: column; }
+      label { font-size: 12px; opacity: 0.8; margin-bottom: 4px; }
+      input, select, textarea, button { padding: 8px; font-size: 14px; }
+      textarea { min-height: 80px; grid-column: 1 / -1; }
+      .row-1 { grid-column: 1 / -1; }
+      .actions { grid-column: 1 / -1; display: flex; gap: 12px; align-items: center; }
+      .ok { color: #0a7f2e; }
+      .err { color: #b00020; white-space: pre-wrap; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { border-bottom: 1px solid #eee; padding: 8px; text-align: left; }
+      th { background: #fafafa; }
+      .muted { opacity: .75; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Reelo Admin</h1>
+      <div>
+        <span id="who" class="muted"></span>
+        <button id="logout">Logout</button>
+      </div>
+    </header>
+
+    <section id="guard" class="err" style="display:none;">Redirecting to login…</section>
+
+    <section id="create">
+      <h2>Create Appointment</h2>
+      <form id="apptForm">
+        <div class="row-1">
+          <label>Full name</label>
+          <input id="full_name" required />
+        </div>
+        <div><label>Phone</label><input id="phone" /></div>
+        <div><label>Email</label><input id="email" /></div>
+        <div class="row-1"><label>Address line 1</label><input id="address_line1" /></div>
+        <div><label>City</label><input id="city" /></div>
+        <div><label>State</label><input id="state" /></div>
+        <div><label>ZIP</label><input id="zip" /></div>
+        <div><label>Scheduled at</label><input id="scheduled_at" type="datetime-local" required /></div>
+        <div>
+          <label>Type</label>
+          <select id="appt_type">
+            <option value="service" selected>service</option>
+            <option value="estimate">estimate</option>
+            <option value="other">other</option>
+          </select>
+        </div>
+        <textarea id="notes" placeholder="Notes (optional)"></textarea>
+        <div class="actions">
+          <button id="submitBtn" type="submit">Create Appointment</button>
+          <span id="hint"></span>
+        </div>
+      </form>
+    </section>
+
+    <section>
+      <h2>Upcoming Appointments</h2>
+      <table id="apptTable">
+        <thead>
+          <tr>
+            <th>When</th><th>Name</th><th>Type</th><th>Phone</th><th>Email</th><th>Address</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+      const SUPABASE_URL  = "https://yvjwajopxbcaedzofqww.supabase.co";
+      const SUPABASE_ANON = "PASTE_YOUR_ANON_KEY"; // <-- use same anon key as login.html
+
+      const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+      // Robust auth guard: show admin if session exists, else go to login
+      (async () => {
+        const { data: { session } } = await client.auth.getSession();
+        if (session) {
+          document.getElementById('who').textContent = session.user.email;
+        } else {
+          const { data: { subscription } } = client.auth.onAuthStateChange((_evt, sess) => {
+            if (sess) {
+              document.getElementById('who').textContent = sess.user.email;
+              subscription.unsubscribe();
+            } else {
+              location.href = "/admin/login.html";
+            }
+          });
+          setTimeout(() => location.href = "/admin/login.html", 1500);
+        }
+      })();
+
+      document.getElementById('logout').addEventListener('click', async () => {
+        await client.auth.signOut();
+        location.href = "/admin/login.html";
+      });
+
+      // Create Appointment
+      const form = document.getElementById("apptForm");
+      const hint = document.getElementById("hint");
+      const submitBtn = document.getElementById("submitBtn");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        hint.textContent = "Creating…"; hint.className = ""; submitBtn.disabled = true;
+
+        const full_name = document.getElementById("full_name").value.trim();
+        const phone = document.getElementById("phone").value.trim() || null;
+        const email = document.getElementById("email").value.trim() || null;
+        const address_line1 = document.getElementById("address_line1").value.trim() || null;
+        const city = document.getElementById("city").value.trim() || null;
+        const state = document.getElementById("state").value.trim() || null;
+        const zip = document.getElementById("zip").value.trim() || null;
+        const dtLocal = document.getElementById("scheduled_at").value;
+        const scheduled_at = new Date(dtLocal).toISOString();
+        const appt_type = document.getElementById("appt_type").value;
+        const notes = document.getElementById("notes").value || null;
+
+        const { data, error } = await client.rpc("create_appointment", {
+          p_full_name: full_name,
+          p_phone: phone,
+          p_email: email,
+          p_address_line1: address_line1,
+          p_city: city,
+          p_state: state,
+          p_zip: zip,
+          p_scheduled_at: scheduled_at,
+          p_appt_type: appt_type,
+          p_notes: notes,  // server casts text->jsonb if needed
+          p_source: "admin",
+        });
+
+        submitBtn.disabled = false;
+        if (error) { hint.textContent = error.message; hint.className = "err"; return; }
+        hint.textContent = "Appointment created."; hint.className = "ok";
+        form.reset();
+        loadUpcoming();
+      });
+
+      // Load upcoming appts from the view
+      async function loadUpcoming() {
+        const tbody = document.querySelector("#apptTable tbody");
+        tbody.innerHTML = "<tr><td colspan='6' class='muted'>Loading…</td></tr>";
+
+        const { data, error } = await client
+          .from('appointments_with_customer')
+          .select('*')
+          .gte('scheduled_at', new Date().toISOString())
+          .order('scheduled_at', { ascending: true })
+          .limit(50);
+
+        if (error) { tbody.innerHTML = `<tr><td colspan="6" class="err">${error.message}</td></tr>`; return; }
+
+        if (!data || data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" class="muted">No upcoming appointments.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = data.map(row => {
+          const when = new Date(row.scheduled_at).toLocaleString();
+          const addr = [row.address_line1, row.city, row.state, row.zip].filter(Boolean).join(", ");
+          return `<tr>
+            <td>${when}</td>
+            <td>${row.full_name ?? ''}</td>
+            <td>${row.appt_type ?? ''}</td>
+            <td>${row.phone ?? ''}</td>
+            <td>${row.email ?? ''}</td>
+            <td>${addr}</td>
+          </tr>`;
+        }).join("");
+      }
+
+      loadUpcoming();
+    </script>
+  </body>
+</html>
