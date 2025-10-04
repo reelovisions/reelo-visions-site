@@ -204,6 +204,67 @@ $('btnSetHQ').addEventListener('click', async () => {
   }
 })();
 
+</script><script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  // TODO: put YOUR values here
+  const SUPABASE_URL  = 'https://yvjwajopxbcaedzofqww.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9....'; // your anon key
+  const COMPANY_ID    = 'a105e900-8f47-4e1c-b0b6-c126cb904252';    // your company UUID
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  async function ensureSession() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      const { error } = await supabase.auth.signInAnonymously();
+      if (error) throw new Error('Anon sign-in failed: ' + error.message);
+    }
+  }
+
+  // Set the per-request session key your RPCs expect
+  async function setCompanyForSession() {
+    const { error } = await supabase.rpc('set_config', {
+      p_key: 'app.company_id',
+      p_value: COMPANY_ID
+    });
+    if (error) throw new Error('set_config failed: ' + error.message);
+  }
+
+  async function loadZips() {
+    const { data, error } = await supabase.rpc('get_company_zips'); // no args
+    if (error) { console.error('loadZips error:', error); return; }
+    console.log('ZIPs:', data);
+    // TODO: render rows into your table
+  }
+
+  // Hook up your “Add” button
+  document.getElementById('addBtn')?.addEventListener('click', async () => {
+    const input = document.getElementById('zipInput');
+    const raw   = (input?.value || '').trim();
+    const zip   = raw.replace(/\D/g, '').padStart(5, '0'); // keep digits, 5 chars
+
+    if (zip.length !== 5) { alert('ZIP must be 5 digits'); return; }
+
+    const { error } = await supabase.rpc('add_company_zip', { p_zip: zip });
+    if (error) { alert('Add ZIP failed: ' + error.message); return; }
+
+    input.value = '';
+    await loadZips();
+  });
+
+  // --- On page load ---
+  (async () => {
+    try {
+      await ensureSession();
+      await setCompanyForSession();
+      await loadZips();
+    } catch (e) {
+      console.error(e);
+      alert(e.message);
+    }
+  })();
 </script>
+
 </body>
 </html>
