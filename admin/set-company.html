@@ -4,66 +4,31 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Service Areas | Admin</title>
-
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <style>
-    :root {
-      --bg: #0f172a;
-      --panel: #111827;
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-      --primary: #3b82f6;
-      --primary-2: #2563eb;
-      --danger: #ef4444;
-      --ok: #10b981;
-      --border: #1f2937;
-    }
-    html, body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif; }
-    a { color: var(--primary); text-decoration: none; }
-    .wrap { max-width: 1000px; margin: 24px auto; padding: 0 16px; }
-    header { display: flex; align-items:center; gap:20px; margin-bottom: 20px; }
-    header h1 { font-size: 28px; margin:0; }
-    nav a { margin-right: 14px; color: var(--muted); }
-    nav a.active { color: var(--text); }
-
-    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin: 18px 0; box-shadow: 0 8px 24px rgba(0,0,0,.25) inset; }
-    .card h2 { margin: 0 0 14px; font-size: 22px; }
-
-    label { display:block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
-    input[type="text"], input[type="number"] {
-      width: 100%; padding: 12px 14px; border-radius: 10px;
-      border: 1px solid var(--border); background: #0b1020; color: var(--text);
-      outline: none;
-    }
-    input::placeholder { color: #6b7280; }
-
-    .row { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; }
-    .col-12 { grid-column: span 12; }
-    .col-6  { grid-column: span 6; }
-    .col-4  { grid-column: span 4; }
-    .col-3  { grid-column: span 3; }
-
-    .btn {
-      display:inline-flex; align-items:center; justify-content:center;
-      padding: 10px 16px; border-radius: 10px; border: 1px solid transparent;
-      background: var(--primary); color: white; cursor: pointer; font-weight: 600;
-    }
-    .btn:hover { background: var(--primary-2); }
-    .btn.secondary { background: transparent; border-color: var(--border); color: var(--text); }
-    .btn.danger { background: var(--danger); }
-    .btn:disabled { opacity: .6; cursor: not-allowed; }
-
-    .status { margin-top: 10px; font-size: 13px; color: var(--muted); white-space: pre-wrap; }
-
-    table { width: 100%; border-collapse: collapse; margin-top: 14px; }
-    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--border); }
-    th { color: var(--muted); font-weight: 600; font-size: 13px; }
-
-    .pill { display:inline-block; font-size:12px; padding: 4px 8px; border-radius: 999px; background:#0b1020; border:1px solid var(--border); color:var(--muted); }
-    .flex { display:flex; gap: 10px; align-items:center; }
-    .right { margin-left:auto; }
+    :root{--bg:#0b1220;--panel:#111a2b;--muted:#8091a7;--txt:#e8f0ff;--brand:#3b82f6;--brand-2:#2563eb;--danger:#ef4444}
+    *{box-sizing:border-box} body{margin:0;font:16px/1.5 system-ui,Segoe UI,Arial;color:var(--txt);background:radial-gradient(1200px 1200px at 10% -10%,#13213c 0%,var(--bg) 40%) fixed}
+    .wrap{max-width:1100px;margin:32px auto;padding:0 16px}
+    header{display:flex;gap:16px;align-items:center;margin-bottom:20px}
+    h1{font-size:32px;margin:0}
+    nav a{color:var(--muted);text-decoration:none;margin-right:16px}
+    .card{background:var(--panel);border:1px solid #1f2a44;border-radius:14px;padding:18px 20px;margin:18px 0;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .row{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+    .col-3{grid-column:span 3} .col-4{grid-column:span 4} .col-5{grid-column:span 5} .col-6{grid-column:span 6}
+    label{display:block;font-size:12px;color:var(--muted);margin:4px 2px}
+    input{width:100%;padding:12px 12px;border-radius:10px;border:1px solid #26324f;background:#0e1830;color:var(--txt)}
+    button{border:0;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer}
+    .primary{background:linear-gradient(180deg,var(--brand),var(--brand-2));color:#fff}
+    .muted{color:var(--muted);font-size:14px}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th,td{padding:10px 8px;border-bottom:1px solid #1f2a44}
+    th{color:#9fb0c8;text-align:left}
+    .danger{background:linear-gradient(180deg,#f87171,#ef4444);color:#fff}
+    .pill{display:inline-block;background:#152141;border:1px solid #233055;border-radius:999px;padding:6px 10px;color:#bbcade;font-size:12px}
+    #toast{position:fixed;right:16px;bottom:16px;background:#0e1830;border:1px solid #213054;padding:10px 12px;border-radius:10px;display:none}
+    .err{color:#ffb4b4}
   </style>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="wrap">
@@ -71,272 +36,240 @@
       <h1>Service Areas</h1>
       <nav>
         <a href="/admin/index.html">Dashboard</a>
-        <a href="/admin/service-areas.html" class="active">Service Areas</a>
+        <a href="/admin/service-areas.html" style="color:#fff">Service Areas</a>
         <a href="/admin/new-appointment.html">New Appointment</a>
-        <a href="/admin/logout.html" class="right">Logout</a>
+        <a href="/admin/logout.html">Logout</a>
       </nav>
     </header>
 
-    <!-- Policies (optional, can be wired later) -->
     <div class="card">
       <h2>Policies</h2>
-      <div class="row">
-        <div class="col-6">
-          <label>Enforce service ZIPs</label>
-          <div class="flex">
-            <span class="pill">If ON, new appointments must match your ZIP list.</span>
-          </div>
-        </div>
-        <div class="col-6">
-          <label>Enforce radius from HQ</label>
-          <div class="flex">
-            <span class="pill">If ON, bookings must be within your radius from HQ lat/lon.</span>
-          </div>
-        </div>
-      </div>
+      <p class="muted">We’ll wire these toggles later; today we’re getting ZIPs working end-to-end.</p>
+      <span class="pill" id="policyStatus">ZIPS: unknown</span>
     </div>
 
-    <!-- HQ Location & Radius (UI only; keep using your existing logic / edge fn) -->
     <div class="card">
       <h2>HQ Location & Radius</h2>
       <div class="row">
-        <div class="col-6">
+        <div class="col-5">
           <label>Company (optional)</label>
-          <input id="companyName" type="text" placeholder="e.g. Reelo Heating & Air" />
+          <input id="companyName" placeholder="e.g. Reelo Heating & Air">
         </div>
-        <div class="col-3">
+        <div class="col-2">
           <label>Radius (miles)</label>
-          <div class="flex">
-            <input id="radiusMiles" type="number" value="25" />
-            <button class="btn" id="saveRadiusBtn">Save radius</button>
-          </div>
+          <input id="radius" value="25">
+        </div>
+        <div class="col-2">
+          <label>&nbsp;</label>
+          <button class="primary" id="saveRadiusBtn">Save radius</button>
         </div>
       </div>
 
-      <div class="row" style="margin-top:10px;">
+      <div class="row" style="margin-top:8px">
         <div class="col-6">
           <label>Street</label>
-          <input id="hqStreet" type="text" placeholder="123 Main St" />
+          <input id="street" placeholder="123 Main St">
         </div>
         <div class="col-3">
           <label>City</label>
-          <input id="hqCity" type="text" placeholder="McKinney" />
+          <input id="city" placeholder="McKinney">
         </div>
         <div class="col-1">
           <label>State</label>
-          <input id="hqState" type="text" placeholder="TX" />
+          <input id="state" placeholder="TX">
         </div>
         <div class="col-2">
           <label>ZIP</label>
-          <input id="hqZip" type="text" placeholder="75071" />
+          <input id="hqZip" placeholder="75071">
+        </div>
+        <div class="col-3">
+          <label>&nbsp;</label>
+          <button class="primary" id="geocodeBtn">Set location (geocode)</button>
         </div>
       </div>
-
-      <div class="flex" style="margin-top:12px;">
-        <button class="btn" id="geocodeBtn">Set location (geocode)</button>
-        <span id="hqMeta" class="status">HQ: not set</span>
-      </div>
+      <p class="muted" id="hqMeta">HQ: not set</p>
     </div>
 
-    <!-- ZIP Codes -->
     <div class="card">
       <h2>ZIP Codes</h2>
       <div class="row">
-        <div class="col-4">
+        <div class="col-3">
           <label>Add ZIP</label>
-          <div class="flex">
-            <input id="zipInput" type="text" placeholder="e.g. 55401" />
-            <button class="btn" id="addZipBtn">Add</button>
-          </div>
-          <div class="status">Must be exactly 5 digits. Duplicate adds are ignored (upsert).</div>
+          <input id="zipInput" maxlength="5" placeholder="e.g. 55401" />
+        </div>
+        <div class="col-2">
+          <label>&nbsp;</label>
+          <button class="primary" id="addZipBtn">Add</button>
         </div>
       </div>
 
-      <table id="zipsTable">
-        <thead>
-          <tr><th style="width:120px;">ZIP</th><th>Action</th></tr>
-        </thead>
-        <tbody id="zipsBody">
-          <tr><td colspan="2" style="color:var(--muted)">Loading…</td></tr>
-        </tbody>
+      <table>
+        <thead><tr><th style="width:120px">ZIP</th><th>Action</th></tr></thead>
+        <tbody id="zipsBody"><tr><td colspan="2" class="muted">Loading…</td></tr></tbody>
       </table>
-
-      <div id="zipStatus" class="status"></div>
+      <p class="muted" id="zipStatus"></p>
     </div>
   </div>
 
+  <div id="toast"></div>
+
   <script>
-    // ===========================
-    // 1) CONFIG — REPLACE THESE
-    // ===========================
-    const SUPABASE_URL = 'https://yvjwajopxbcaedzofqww.supabase.co';         // TODO: paste yours
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2andham9weGJjYWVkem9mcXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODk0NjQsImV4cCI6MjA3NDk2NTQ2NH0.1VVEkgThCltfebpCWa-4DReb9qSO5zdt2a_83CfsBsY';                        // TODO: paste yours
-    const COMPANY_ID = 'a105e900-8f47-4e1c-b0b6-c126cb904252';        // your UUID
+    // ======= 1) PUT YOUR REAL VALUES HERE  =======
+    const SUPABASE_URL  = 'https://yvjwajopxbcaedzofqww.supabase.co';  // <-- YOUR project URL
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2andham9weGJjYWVkem9mcXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODk0NjQsImV4cCI6MjA3NDk2NTQ2NH0.1VVEkgThCltfebpCWa-4DReb9qSO5zdt2a_83CfsBsY'; // <-- YOUR anon key
+    // =============================================
 
-    // If you’re using your Edge geocode function, set it here:
-    const GEOCODE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/geocode`;
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-    // ===========================
-    // 2) SUPABASE CLIENT + AUTH
-    // ===========================
-    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const toast = (msg, isErr=false) => {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.style.display = 'block';
+      t.className = isErr ? 'err' : '';
+      setTimeout(()=>{ t.style.display='none' }, 2600);
+    };
 
-    async function ensureSession() {
-      const { data } = await client.auth.getSession();
-      if (!data.session) {
-        const { error } = await client.auth.signInAnonymously();
-        if (error) {
-          setZipStatus(`Auth error: ${error.message}`, true);
-          throw error;
-        }
+    // Sign in anonymously (so browser can call DB)
+    async function ensureAuth() {
+      const { data: session } = await sb.auth.getSession();
+      if (!session.session) {
+        const { error } = await sb.auth.signInAnonymously();
+        if (error) { toast('Auth error: ' + error.message, true); throw error; }
       }
     }
 
-    // ===========================
-    // 3) ZIP HELPERS (RPC CALLS)
-    // ===========================
-    const zipsBody = document.getElementById('zipsBody');
-    const zipStatus = document.getElementById('zipStatus');
-
-    function setZipStatus(msg, isErr=false) {
-      zipStatus.textContent = msg || '';
-      zipStatus.style.color = isErr ? 'var(--danger)' : 'var(--muted)';
-    }
-
-    function normalizeZip(z) {
-      return (z || '').replace(/\D/g,'').slice(0,5);
-    }
-
-    async function loadZips() {
-      await ensureSession();
-      setZipStatus('Loading ZIPs…');
-      zipsBody.innerHTML = `<tr><td colspan="2" style="color:var(--muted)">Loading…</td></tr>`;
-
-      const { data, error } = await client.rpc('zips_list', {
-        p_company_id: COMPANY_ID
-      });
-
+    // Small helpers for RPC/REST with nice errors
+    async function callRpc(name, args) {
+      const { data, error, status } = await sb.rpc(name, args ?? {});
       if (error) {
-        setZipStatus(`Could not load ZIPs: ${error.message}`, true);
-        zipsBody.innerHTML = `<tr><td colspan="2" style="color:var(--danger)">Error loading ZIPs.</td></tr>`;
-        return;
+        // surface 404 distinctly so we can fall back to REST
+        const e = new Error(error.message); e.status = status; throw e;
       }
+      return data;
+    }
+    async function restSelect(path, params) {
+      const url = new URL(SUPABASE_URL + '/rest/v1/' + path);
+      Object.entries(params || {}).forEach(([k,v]) => url.searchParams.set(k,v));
+      const res = await fetch(url, {
+        headers: {
+          apikey: SUPABASE_ANON,
+          Authorization: `Bearer ${SUPABASE_ANON}`
+        }
+      });
+      if (!res.ok) throw new Error('REST ' + res.status);
+      return res.json();
+    }
 
-      if (!data || data.length === 0) {
-        setZipStatus('No ZIPs yet.');
-        zipsBody.innerHTML = `<tr><td colspan="2" style="color:var(--muted)">No ZIPs yet. Add your first 5-digit ZIP above.</td></tr>`;
-        return;
-      }
-
-      setZipStatus('');
-      zipsBody.innerHTML = '';
-      for (const row of data) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${String(row.zip).padStart(5,'0')}</td>
-          <td>
-            <button class="btn danger" data-zip="${row.zip}">Delete</button>
-          </td>
-        `;
-        tr.querySelector('button').addEventListener('click', async (ev) => {
-          const z = String(ev.currentTarget.getAttribute('data-zip'));
-          await deleteZip(z);
-        });
-        zipsBody.appendChild(tr);
+    // =============== ZIPs ==================
+    async function loadZips() {
+      const body = document.getElementById('zipsBody');
+      body.innerHTML = `<tr><td colspan="2" class="muted">Loading…</td></tr>`;
+      try {
+        // try RPC first
+        let rows;
+        try {
+          rows = await callRpc('zips_list');
+        } catch (e) {
+          if (e.status === 404) {
+            // RPC missing — fall back to REST (RLS must restrict to your company)
+            rows = await restSelect('company_zip_codes', { select: 'zip', order: 'zip.asc' });
+          } else { throw e; }
+        }
+        if (!rows || !rows.length) {
+          body.innerHTML = `<tr><td colspan="2" class="muted">No ZIPs yet.</td></tr>`;
+          return;
+        }
+        body.innerHTML = rows.map(r => `
+          <tr>
+            <td><code>${String(r.zip).padStart(5,'0')}</code></td>
+            <td><button class="danger" data-zip="${r.zip}">Delete</button></td>
+          </tr>`).join('');
+      } catch (e) {
+        console.error(e);
+        document.getElementById('zipStatus').textContent = 'Could not load ZIPs.';
       }
     }
 
     async function addZip() {
-      const inp = document.getElementById('zipInput');
-      let z = normalizeZip(inp.value);
-      if (z.length !== 5) {
-        setZipStatus('ZIP must be exactly 5 digits.', true);
-        return;
-      }
-
-      await ensureSession();
-      setZipStatus('Adding ZIP…');
-      const { error } = await client.rpc('zips_add', {
-        p_company_id: COMPANY_ID,
-        p_zip: z
-      });
-
-      if (error) {
-        setZipStatus(`Add failed: ${error.message}`, true);
-        return;
-      }
-      setZipStatus('Added.', false);
-      inp.value = '';
-      await loadZips();
-    }
-
-    async function deleteZip(z) {
-      await ensureSession();
-      setZipStatus('Deleting…');
-      const { error } = await client.rpc('zips_delete', {
-        p_company_id: COMPANY_ID,
-        p_zip: String(z)
-      });
-      if (error) {
-        setZipStatus(`Delete failed: ${error.message}`, true);
-        return;
-      }
-      setZipStatus('Deleted.');
-      await loadZips();
-    }
-
-    // ===========================
-    // 4) HQ (optional demo wiring)
-    // ===========================
-    const hqMeta = document.getElementById('hqMeta');
-
-    async function geocodeHQ() {
-      // This posts to your Edge Function; if you prefer ZIP centroid fallback only,
-      // you can skip calling it.
+      const input = document.getElementById('zipInput');
+      const raw = (input.value || '').trim();
+      const zip = raw.replace(/\D/g,'').padStart(5,'0');
+      if (zip.length !== 5) { toast('ZIP must be 5 digits.', true); return; }
       try {
-        await ensureSession();
-        const body = {
-          address: [
-            document.getElementById('hqStreet').value,
-            document.getElementById('hqCity').value,
-            document.getElementById('hqState').value,
-            document.getElementById('hqZip').value
-          ].filter(Boolean).join(', ')
-        };
-        hqMeta.textContent = 'Geocoding…';
-        const r = await fetch(GEOCODE_FUNCTION_URL, {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json',
-            'apikey': SUPABASE_ANON_KEY,
-            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-          },
-          body: JSON.stringify(body)
-        });
-        const text = await r.text();
-        if (!r.ok) throw new Error(`HTTP ${r.status} ${text}`);
-        hqMeta.textContent = `Geocode ok: ${text.slice(0,120)}…`;
-      } catch (e) {
-        hqMeta.textContent = `Geocode failed: ${e.message}`;
+        try {
+          await callRpc('zips_add', { p_zip: zip });
+        } catch (e) {
+          if (e.status === 404) {
+            // RPC missing — upsert via REST (RLS should fill company_id from session)
+            const url = SUPABASE_URL + '/rest/v1/company_zip_codes';
+            const res = await fetch(url, {
+              method: 'POST',
+              headers: {
+                'content-type': 'application/json',
+                apikey: SUPABASE_ANON,
+                Authorization: `Bearer ${SUPABASE_ANON}`,
+                Prefer: 'resolution=merge-duplicates'
+              },
+              body: JSON.stringify([{ zip }])
+            });
+            if (!res.ok) throw new Error('REST add ZIP ' + res.status);
+          } else { throw e; }
+        }
+        input.value = '';
+        toast('ZIP added');
+        await loadZips();
+      } catch (err) {
+        console.error(err);
+        toast('Add ZIP failed: ' + err.message, true);
       }
     }
 
-    // ===========================
-    // 5) WIRE UP UI
-    // ===========================
+    async function deleteZip(zip) {
+      try {
+        try {
+          await callRpc('zips_delete', { p_zip: String(zip) });
+        } catch (e) {
+          if (e.status === 404) {
+            // RPC missing — REST delete
+            const url = new URL(SUPABASE_URL + '/rest/v1/company_zip_codes');
+            url.searchParams.set('zip', 'eq.'+zip);
+            const res = await fetch(url, {
+              method: 'DELETE',
+              headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` }
+            });
+            if (!res.ok) throw new Error('REST delete ZIP ' + res.status);
+          } else { throw e; }
+        }
+        toast('ZIP deleted');
+        await loadZips();
+      } catch (err) {
+        console.error(err);
+        toast('Delete ZIP failed: ' + err.message, true);
+      }
+    }
+
+    // Wire events
     document.getElementById('addZipBtn').addEventListener('click', addZip);
-    document.getElementById('geocodeBtn').addEventListener('click', geocodeHQ);
-    document.getElementById('saveRadiusBtn').addEventListener('click', () => {
-      const miles = document.getElementById('radiusMiles').value;
-      setZipStatus(`(demo) Saved radius ${miles} mi. (Wire to your RPC when ready)`);
+    document.getElementById('zipsBody').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-zip]');
+      if (btn) deleteZip(btn.getAttribute('data-zip'));
     });
 
-    // Initial load
+    // HQ buttons (non-blocking placeholders for now)
+    document.getElementById('geocodeBtn').addEventListener('click', () => {
+      toast('Geocode not wired yet (focus is ZIPs).');
+    });
+    document.getElementById('saveRadiusBtn').addEventListener('click', () => {
+      toast('Save radius not wired yet (focus is ZIPs).');
+    });
+
+    // Boot
     (async () => {
       try {
-        await ensureSession();
-      } catch {}
-      loadZips();
+        await ensureAuth();      // must succeed
+        await loadZips();        // then load ZIP list
+      } catch (e) {
+        // already toasted
+      }
     })();
   </script>
 </body>
