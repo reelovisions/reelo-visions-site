@@ -1,0 +1,243 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Reelo Receptionist — Appointments (Gated)</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+      :root { --bg:#0b1020; --card:#121a33; --muted:#9fb0e0; --text:#eaf0ff; --accent:#7aa2ff; --line:#1f2b52; }
+      html,body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+      .wrap{max-width:1000px;margin:28px auto;padding:16px}
+      .card{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 3px 20px rgba(0,0,0,.2);margin-bottom:14px}
+      h1{margin:0 0 16px;font-size:22px}
+      h3{margin:10px 0 8px}
+      label{display:inline-flex;align-items:center;gap:8px;margin:6px 12px 6px 0}
+      input,select{background:#0e152b;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+      input[type="date"],input[type="time"]{width:160px}
+      button{background:var(--accent);color:#05122a;border:none;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer}
+      button:hover{filter:brightness(1.08)}
+      .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+      .stack{display:flex;flex-direction:column;gap:10px}
+      .muted{color:var(--muted);font-size:12px}
+      pre{background:#0e152b;color:#cfe0ff;padding:10px;border-radius:10px;overflow:auto;max-height:260px;border:1px solid var(--line)}
+      hr{border:0;height:1px;background:var(--line);margin:12px 0}
+      .hidden{display:none}
+      .right{margin-left:auto}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Reelo Receptionist — Appointments</h1>
+
+      <!-- Auth card (shown when signed OUT) -->
+      <div class="card" id="authCard">
+        <h3>Sign in</h3>
+        <div class="row">
+          <label>Email <input id="email" value="steve@test.com"></label>
+          <label>Password <input id="password" type="password" value="changeme"></label>
+          <button id="loginBtn">Log in</button>
+        </div>
+        <div class="muted">Use a user that exists in Supabase → Auth → Users.</div>
+        <pre id="authOut"></pre>
+      </div>
+
+      <!-- App shell (hidden until signed IN) -->
+      <div id="app" class="hidden">
+        <div class="row" style="gap:6px">
+          <div class="muted" id="userInfo"></div>
+          <button id="logoutBtn" class="right">Log out</button>
+        </div>
+
+        <div class="card">
+          <h3>Create Appointment</h3>
+          <div class="stack">
+            <div class="row">
+              <label>Customer Name <input id="name" placeholder="Jane Customer"></label>
+              <label>Phone <input id="phone" placeholder="555-111-2222"></label>
+            </div>
+            <div class="row">
+              <label>Address <input id="address" style="width:360px" placeholder="123 Main St"></label>
+              <label>ZIP <input id="zip" style="width:120px" value="55303"></label>
+            </div>
+            <div class="row">
+              <label>Date <input id="date" type="date"></label>
+              <label>Time <input id="time" type="time" step="60"></label>
+              <button id="createBtn">Create Appointment</button>
+            </div>
+            <div class="muted">Tip: reusing the exact same name/time within 5 minutes will hit the “no dupes” rule.</div>
+            <pre id="createOut"></pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>My Appointments</h3>
+          <div class="row">
+            <button id="listBtn">List (active)</button>
+            <button id="listAllBtn">List (include canceled)</button>
+            <button id="csvBtn">Download CSV</button>
+          </div>
+          <pre id="listOut"></pre>
+        </div>
+
+        <div class="card">
+          <h3>Service Area Admin</h3>
+          <div class="row">
+            <label>Add ZIP <input id="adminZip" value="55401"></label>
+            <button id="addZipBtn">Add ZIP</button>
+          </div>
+          <div class="row">
+            <label>Miles <input id="miles" type="number" value="25" style="width:80px"></label>
+            <label>HQ Lat <input id="lat" value="45.226" style="width:120px"></label>
+            <label>HQ Lon <input id="lon" value="-93.389" style="width:120px"></label>
+            <button id="setRadiusBtn">Set Radius</button>
+          </div>
+          <pre id="adminOut"></pre>
+        </div>
+
+        <div class="card">
+          <h3>Manage An Appointment</h3>
+          <div class="row">
+            <label>Appt ID <input id="apptId" placeholder="paste a UUID" style="width:340px"></label>
+            <button id="cancelBtn">Cancel</button>
+            <button id="updateBtn">Update Name → “Updated”</button>
+          </div>
+          <pre id="manageOut"></pre>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+      // Your project values
+      const SUPABASE_URL = "https://yvjwajopxbcaedzofqww.supabase.co";
+      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2andham9weGJjYWVkem9mcXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODk0NjQsImV4cCI6MjA3NDk2NTQ2NH0.1VVEkgThCltfebpCWa-4DReb9qSO5zdt2a_83CfsBsY";
+
+      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const $ = (id) => document.getElementById(id);
+      const set = (id, v) => { $(id).textContent = v; };
+
+      // show/hide
+      function showApp(user) {
+        $("authCard").classList.add("hidden");
+        $("app").classList.remove("hidden");
+        $("userInfo").textContent = `Signed in as ${user.email} (${user.id})`;
+      }
+      function showLogin() {
+        $("app").classList.add("hidden");
+        $("authCard").classList.remove("hidden");
+        set("authOut", "");
+        $("userInfo").textContent = "";
+      }
+
+      // restore session on load
+      (async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) showApp(session.user);
+      })();
+
+      // listen for sign-in/out events (multi-tab safety)
+      supabase.auth.onAuthStateChange((_evt, session) => {
+        if (session?.user) showApp(session.user);
+        else showLogin();
+      });
+
+      // --- Auth ---
+      $("loginBtn").onclick = async () => {
+        const email = $("email").value.trim();
+        const password = $("password").value;
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        set("authOut", error ? `Login error: ${error.message}` : `Logged in user: ${data.user.id}`);
+      };
+      $("logoutBtn").onclick = async () => {
+        await supabase.auth.signOut();
+        showLogin();
+      };
+
+      // --- Create Appointment ---
+      $("createBtn").onclick = async () => {
+        const name = $("name").value.trim() || "Unnamed";
+        const phone = $("phone").value.trim() || "";
+        const address = $("address").value.trim() || "Unknown address";
+        const zip = $("zip").value.trim();
+        const d = $("date").value; const t = $("time").value;
+        const at = (d && t) ? new Date(`${d}T${t}:00`).toISOString() : new Date().toISOString();
+
+        const { data, error } = await supabase.rpc("create_my_appointment", {
+          p_customer_name: name,
+          p_customer_phone: phone,
+          p_address: address,
+          p_zip: zip,
+          p_notes: { source: "web" },
+          p_appt_time: at
+        });
+        set("createOut", error ? `RPC error: ${error.message}` : `New appt id: ${data}`);
+      };
+
+      // --- List (active) ---
+      $("listBtn").onclick = async () => {
+        const { data, error } = await supabase.rpc("list_my_appointments", {
+          p_limit: 25, p_offset: 0, p_include_canceled: false
+        });
+        set("listOut", error ? `List error: ${error.message}` : JSON.stringify(data, null, 2));
+      };
+
+      // --- List (all) ---
+      $("listAllBtn")?.addEventListener("click", async () => {
+        const { data, error } = await supabase.rpc("list_my_appointments", {
+          p_limit: 100, p_offset: 0, p_include_canceled: true
+        });
+        set("listOut", error ? `List error: ${error.message}` : JSON.stringify(data, null, 2));
+      });
+
+      // --- CSV (all) ---
+      $("csvBtn").onclick = async () => {
+        const { data, error } = await supabase.rpc("list_my_appointments", {
+          p_limit: 1000, p_offset: 0, p_include_canceled: true
+        });
+        if (error) return alert(error.message);
+        const rows = data || [];
+        const headers = ["id","appt_time","customer_name","customer_phone","address","zip","notes","canceled_at"];
+        const csv = [headers.join(",")]
+          .concat(rows.map(r => headers.map(h => {
+            let v = r[h]; if (v == null) return "";
+            if (typeof v === "object") v = JSON.stringify(v);
+            v = String(v).replace(/"/g,'""'); return `"${v}"`;
+          }).join(","))).join("\r\n");
+        const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
+        const a = document.createElement("a"); a.href = url; a.download = "appointments.csv"; a.click();
+        URL.revokeObjectURL(url);
+      };
+
+      // --- Admin ---
+      $("addZipBtn").onclick = async () => {
+        const zip = $("adminZip").value.trim();
+        const { error } = await supabase.rpc("add_my_zip", { p_zip: zip });
+        set("adminOut", error ? `add_my_zip error: ${error.message}` : `Added ZIP ${zip}`);
+      };
+      $("setRadiusBtn").onclick = async () => {
+        const miles = parseInt($("miles").value, 10);
+        const lat = parseFloat($("lat").value);
+        const lon = parseFloat($("lon").value);
+        const { error } = await supabase.rpc("set_my_radius", {
+          p_use_radius: true, p_radius_miles: miles, p_hq_lat: lat, p_hq_lon: lon
+        });
+        set("adminOut", error ? `set_my_radius error: ${error.message}` : `Radius set to ${miles} mi @ (${lat}, ${lon})`);
+      };
+
+      // --- Manage ---
+      $("cancelBtn").onclick = async () => {
+        const id = $("apptId").value.trim();
+        if (!id) return set("manageOut","Enter an appointment id");
+        const { error } = await supabase.rpc("cancel_my_appointment", { p_id: id });
+        set("manageOut", error ? `Cancel error: ${error.message}` : `Canceled ${id}`);
+      };
+      $("updateBtn").onclick = async () => {
+        const id = $("apptId").value.trim();
+        if (!id) return set("manageOut","Enter an appointment id");
+        const { error } = await supabase.rpc("update_my_appointment", { p_id: id, p_customer_name: "Updated" });
+        set("manageOut", error ? `Update error: ${error.message}` : `Updated ${id}`);
+      };
+    </script>
+  </body>
+</html>
