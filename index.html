@@ -1,124 +1,95 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Reelo Visions LLC — Smart Scheduling for HVAC</title>
-  <meta name="description" content="Reelo Visions LLC builds smart receptionist tools for HVAC companies — fast scheduling, clean admin, and service area controls.">
-  <style>
-    :root{
-      --bg:#0b1020;--card:#111a33;--ink:#eaf0ff;--muted:#9fb0e0;
-      --accent:#7aa2ff;--accent-2:#8affd3;--line:#1f2b52;
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    a{color:inherit;text-decoration:none}
-    .nav{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:16px 20px}
-    .logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}
-    .logo-badge{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 6px 20px rgba(122,162,255,.35)}
-    .nav a.btn{padding:10px 14px;border-radius:10px;background:var(--accent);color:#04122a;font-weight:700}
-    .hero{max-width:1200px;margin:0 auto;padding:64px 20px 40px;display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center}
-    @media (max-width: 980px){ .hero{grid-template-columns:1fr;padding-top:36px} }
-    .h1{font-size:40px;line-height:1.06;margin:0 0 12px}
-    .h1 b{background:linear-gradient(135deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
-    .lead{color:var(--muted);font-size:18px;line-height:1.6;margin:0 0 22px}
-    .cta{display:flex;gap:12px;flex-wrap:wrap}
-    .btn{padding:12px 18px;border-radius:12px;border:1px solid var(--line);background:#13214a;color:var(--ink);font-weight:700;cursor:pointer}
-    .btn-primary{background:var(--accent);color:#04122a;border:0}
-    .panel{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:18px}
-    .grid{max-width:1200px;margin:0 auto;padding:30px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    @media (max-width: 900px){ .grid{grid-template-columns:1fr} }
-    .kicker{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-    .feat h3{margin:.2rem 0 .6rem}
-    .footer{max-width:1200px;margin:40px auto 20px;padding:12px 20px;color:#93a6d8;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between}
-    .note{font-size:12px;color:var(--muted)}
-    .cardish{min-height:220px;display:flex;flex-direction:column;gap:10px}
-    .tag{display:inline-block;padding:3px 8px;border-radius:999px;background:#10204b;color:#a8b9ea;font-size:12px;border:1px solid var(--line)}
-    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
-  </style>
-</head>
-<body>
-  <header class="nav">
-    <div class="logo">
-      <div class="logo-badge" aria-hidden="true"></div>
-      <div>Reelo Visions LLC</div>
-    </div>
-    <nav class="nav-ctas">
-      <a class="btn" href="#features">Features</a>
-      <a class="btn" href="#contact">Contact</a>
-      <a class="btn btn-primary" href="./admin/app.html">Admin Login</a>
-    </nav>
-  </header>
+<#  Sync-Git.ps1
+    Usage:
+      .\Sync-Git.ps1 -RepoPath "C:\Users\sjrya\OneDrive\Desktop\reelo-visions-site" -CommitMsg "Update homepage"
+    Optional:
+      -PullFirst:$false   # skip pulling if you know you're ahead
+      -ForcePush:$true    # if remote rejected (only use if you know what you're doing)
+#>
 
-  <section class="hero">
-    <div>
-      <p class="kicker">HVAC Scheduling</p>
-      <h1 class="h1">A smarter receptionist for <b>HVAC companies</b></h1>
-      <p class="lead">Book jobs fast, cut no‑shows, and keep service areas under control. Reelo’s lightweight admin gives your team clarity without the bloat.</p>
-      <div class="cta">
-        <a class="btn btn-primary" href="#contact">Request a demo</a>
-        <a class="btn" href="./admin/app.html">Go to Admin</a>
-      </div>
-      <p class="note" style="margin-top:10px">Already a customer? Use the Admin link above to manage your appointments.</p>
-    </div>
-    <div class="panel">
-      <div class="kicker">Live Preview</div>
-      <div class="mono" style="font-size:13px;line-height:1.5;white-space:pre-wrap">
-POST /rpc/create_my_appointment
-{
-  "customer_name": "Jane Customer",
-  "address": "123 Main St, Anytown MN 55303",
-  "appt_time": "2025-10-06T14:00:00Z"
+param(
+  [Parameter(Mandatory=$true)] [string]$RepoPath,
+  [string]$CommitMsg = "Sync from local $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')",
+  [bool]$PullFirst = $true,
+  [bool]$ForcePush = $false
+)
+
+function Run($cmd, $errMsg){
+  & $cmd
+  if ($LASTEXITCODE -ne 0) { throw "$errMsg`nCommand: $cmd" }
 }
-      </div>
-      <p class="note" style="margin:10px 0 0">Powered by Supabase + Postgres with role‑based access.</p>
-    </div>
-  </section>
 
-  <section id="features" class="grid">
-    <div class="panel feat cardish">
-      <span class="tag">Fast Intake</span>
-      <h3>One-minute booking</h3>
-      <p>Quarter‑hour slots, start/end windows, and structured customer fields that map cleanly to your CRM.</p>
-    </div>
-    <div class="panel feat cardish">
-      <span class="tag">Service Area</span>
-      <h3>Zip & radius controls</h3>
-      <p>Allowlist ZIPs or define a radius from HQ. Every appointment is checked before it hits your calendar.</p>
-    </div>
-    <div class="panel feat cardish">
-      <span class="tag">CRM‑ready</span>
-      <h3>Built for Jobber & ServiceTitan</h3>
-      <p>Normalized schema available when you’re ready. Export CSV or connect your CRM adapter.</p>
-    </div>
-  </section>
+# 0) Sanity checks
+if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+  throw "Git is not installed or not on PATH."
+}
+if (-not (Test-Path $RepoPath)) {
+  throw "RepoPath not found: $RepoPath"
+}
 
-  <section id="contact" class="grid" style="padding-top:0">
-    <div class="panel">
-      <div class="kicker">Contact</div>
-      <h3>Let’s talk</h3>
-      <p class="note">Tell us about crew size, service area, and your current CRM.</p>
-      <p>Email: <a href="mailto:hello@reelovisions.com">hello@reelovisions.com</a></p>
-    </div>
-    <div class="panel">
-      <div class="kicker">Docs</div>
-      <p><a href="./admin/app.html">Admin App</a> · <a href="https://github.com/reelovisions/reelo-visions-site">GitHub</a></p>
-      <p class="note">This site is static and deploys on every push.</p>
-    </div>
-    <div class="panel">
-      <div class="kicker">Status</div>
-      <p>Uptime: <span class="tag">99.9%</span></p>
-      <p class="note">Postgres + Supabase auth. Data stored in UTC, rendered in local time.</p>
-    </div>
-  </section>
+Push-Location $RepoPath
+try {
+  # 1) Confirm we're inside a git repo
+  Run 'git rev-parse --is-inside-work-tree' "Not a git repository: $RepoPath" | Out-Null
 
-  <footer class="footer">
-    <div>© <span id="y"></span> Reelo Visions LLC</div>
-    <div class="note">Reelo is a trademark of Reelo Visions LLC.</div>
-  </footer>
+  # 2) Determine branch and remote
+  $branch = (git rev-parse --abbrev-ref HEAD).Trim()
+  if ([string]::IsNullOrWhiteSpace($branch)) { throw "Could not determine current branch." }
+  $remote = (git remote).Split("`n") | Where-Object { $_.Trim() -ne "" } | Select-Object -First 1
+  if (-not $remote) { throw "No git remote found. Add one: git remote add origin <https://github.com/user/repo.git>" }
 
-  <script>
-    document.getElementById('y').textContent = new Date().getFullYear();
-  </script>
-</body>
-</html>
+  Write-Host "→ Repo:    $RepoPath" -ForegroundColor Cyan
+  Write-Host "→ Branch:  $branch" -ForegroundColor Cyan
+  Write-Host "→ Remote:  $remote" -ForegroundColor Cyan
+
+  # 3) Fetch & (optionally) pull with rebase
+  Run 'git fetch --all --prune' "git fetch failed"
+  if ($PullFirst) {
+    # Stash local changes (if any) to avoid pull conflicts
+    $status = (git status --porcelain)
+    $stashed = $false
+    if ($status) {
+      Write-Host "Stashing local changes…" -ForegroundColor Yellow
+      Run 'git stash push -u -m "autosave: Sync-Git.ps1"' "git stash failed"
+      $stashed = $true
+    }
+
+    Write-Host "Pulling (rebase) from $remote/$branch…" -ForegroundColor Yellow
+    Run "git pull --rebase $remote $branch" "git pull --rebase failed"
+
+    if ($stashed) {
+      Write-Host "Re-applying stash…" -ForegroundColor Yellow
+      # Try to apply; if conflicts arise, user will resolve
+      Run 'git stash pop' "git stash pop failed; resolve conflicts then commit/push manually"
+    }
+  }
+
+  # 4) Stage everything (adds/changes/deletes)
+  Run 'git add -A' "git add failed"
+
+  # 5) Commit if there are staged changes
+  $changes = (git diff --cached --name-status)
+  if ($changes) {
+    Write-Host "Committing changes…" -ForegroundColor Yellow
+    Run "git commit -m `"$CommitMsg`"" "git commit failed"
+  } else {
+    Write-Host "No changes to commit." -ForegroundColor Green
+  }
+
+  # 6) Push
+  Write-Host "Pushing to $remote/$branch…" -ForegroundColor Yellow
+  $pushCmd = "git push $remote $branch"
+  $push = cmd /c $pushCmd
+  if ($LASTEXITCODE -ne 0 -and $ForcePush) {
+    Write-Host "Normal push failed. Force pushing…" -ForegroundColor Red
+    Run "git push --force-with-lease $remote $branch" "git force push failed"
+  } elseif ($LASTEXITCODE -ne 0) {
+    throw "git push failed. Try: git pull --rebase, resolve conflicts, then rerun with -ForcePush:`$true only if necessary."
+  }
+
+  # 7) Done
+  Write-Host "`n✔ Sync complete." -ForegroundColor Green
+  git status -sb
+}
+finally {
+  Pop-Location
+}
