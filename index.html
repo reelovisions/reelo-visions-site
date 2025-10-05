@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Reelo Visions LLC — Smart Scheduling for HVAC</title>
   <meta name="description" content="Reelo Visions LLC builds smart receptionist tools for HVAC companies — fast scheduling, clean admin, and service area controls.">
   <style>
@@ -13,56 +13,35 @@
     *{box-sizing:border-box}
     html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
     a{color:inherit;text-decoration:none}
-
-    /* NAV */
-    .nav{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:18px 20px;gap:16px;flex-wrap:wrap}
-    .logo{display:flex;align-items:center}
-    /* Larger, responsive logo; supports wide or tall art */
-    .logo img{
-      height:160px;              /* desktop size */
-      max-height:18vh;
-      width:auto;
-      display:block;
-      border-radius:12px;
-    }
-    @media (max-width:980px){
-      .logo img{height:120px;max-height:20vh}
-    }
-
+    .nav{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:16px 20px}
+    .logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}
+    .logo-badge{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 6px 20px rgba(122,162,255,.35)}
     .nav a.btn{padding:10px 14px;border-radius:10px;background:var(--accent);color:#04122a;font-weight:700}
-
-    /* HERO */
-    .hero{max-width:1200px;margin:0 auto;padding:36px 20px 40px;display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center}
-    @media (max-width:980px){ .hero{grid-template-columns:1fr} }
+    .hero{max-width:1200px;margin:0 auto;padding:64px 20px 40px;display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center}
+    @media (max-width: 980px){ .hero{grid-template-columns:1fr;padding-top:36px} }
     .h1{font-size:40px;line-height:1.06;margin:0 0 12px}
     .h1 b{background:linear-gradient(135deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
     .lead{color:var(--muted);font-size:18px;line-height:1.6;margin:0 0 22px}
     .cta{display:flex;gap:12px;flex-wrap:wrap}
     .btn{padding:12px 18px;border-radius:12px;border:1px solid var(--line);background:#13214a;color:var(--ink);font-weight:700;cursor:pointer}
     .btn-primary{background:var(--accent);color:#04122a;border:0}
-
-    /* CARDS/GRIDS */
     .panel{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:18px}
     .grid{max-width:1200px;margin:0 auto;padding:30px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+    @media (max-width: 900px){ .grid{grid-template-columns:1fr} }
     .kicker{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
     .feat h3{margin:.2rem 0 .6rem}
-    .tag{display:inline-block;padding:3px 8px;border-radius:999px;background:#10204b;color:#a8b9ea;font-size:12px;border:1px solid var(--line)}
-
-    /* HERO IMAGE */
-    .hero-img{border-radius:14px;border:1px solid var(--line);overflow:hidden;background:#0d1733}
-    .hero-img img{width:100%;height:auto;display:block}
-
-    /* FOOTER */
     .footer{max-width:1200px;margin:40px auto 20px;padding:12px 20px;color:#93a6d8;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between}
     .note{font-size:12px;color:var(--muted)}
+    .cardish{min-height:220px;display:flex;flex-direction:column;gap:10px}
+    .tag{display:inline-block;padding:3px 8px;border-radius:999px;background:#10204b;color:#a8b9ea;font-size:12px;border:1px solid var(--line)}
+    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
   </style>
 </head>
 <body>
   <header class="nav">
     <div class="logo">
-      <!-- New logo file, same name/path -->
-      <img src="./assets/reelo-logo.png" alt="Reelo Visions LLC logo">
+      <div class="logo-badge" aria-hidden="true"></div>
+      <div>Reelo Visions LLC</div>
     </div>
     <nav class="nav-ctas">
       <a class="btn" href="#features">Features</a>
@@ -75,33 +54,40 @@
     <div>
       <p class="kicker">HVAC Scheduling</p>
       <h1 class="h1">A smarter receptionist for <b>HVAC companies</b></h1>
-      <p class="lead">Book jobs fast, cut no-shows, and keep service areas under control. Reelo’s lightweight admin gives your team clarity without the bloat.</p>
+      <p class="lead">Book jobs fast, cut no‑shows, and keep service areas under control. Reelo’s lightweight admin gives your team clarity without the bloat.</p>
       <div class="cta">
         <a class="btn btn-primary" href="#contact">Request a demo</a>
         <a class="btn" href="./admin/app.html">Go to Admin</a>
       </div>
       <p class="note" style="margin-top:10px">Already a customer? Use the Admin link above to manage your appointments.</p>
     </div>
-
-    <!-- Right side hero image -->
-    <div class="hero-img panel" aria-label="AI receptionist working while you sleep">
-      <img src="./assets/hero-sleep.png" alt="Robot assistant working at night while a person sleeps">
+    <div class="panel">
+      <div class="kicker">Live Preview</div>
+      <div class="mono" style="font-size:13px;line-height:1.5;white-space:pre-wrap">
+POST /rpc/create_my_appointment
+{
+  "customer_name": "Jane Customer",
+  "address": "123 Main St, Anytown MN 55303",
+  "appt_time": "2025-10-06T14:00:00Z"
+}
+      </div>
+      <p class="note" style="margin:10px 0 0">Powered by Supabase + Postgres with role‑based access.</p>
     </div>
   </section>
 
   <section id="features" class="grid">
-    <div class="panel feat">
+    <div class="panel feat cardish">
       <span class="tag">Fast Intake</span>
       <h3>One-minute booking</h3>
-      <p>Quarter-hour slots, start/end windows, and structured customer fields that map cleanly to your CRM.</p>
+      <p>Quarter‑hour slots, start/end windows, and structured customer fields that map cleanly to your CRM.</p>
     </div>
-    <div class="panel feat">
+    <div class="panel feat cardish">
       <span class="tag">Service Area</span>
       <h3>Zip & radius controls</h3>
       <p>Allowlist ZIPs or define a radius from HQ. Every appointment is checked before it hits your calendar.</p>
     </div>
-    <div class="panel feat">
-      <span class="tag">CRM-ready</span>
+    <div class="panel feat cardish">
+      <span class="tag">CRM‑ready</span>
       <h3>Built for Jobber & ServiceTitan</h3>
       <p>Normalized schema available when you’re ready. Export CSV or connect your CRM adapter.</p>
     </div>
@@ -131,6 +117,8 @@
     <div class="note">Reelo is a trademark of Reelo Visions LLC.</div>
   </footer>
 
-  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
