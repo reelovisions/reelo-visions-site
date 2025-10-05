@@ -9,20 +9,23 @@
     :root{--bg:#0b1220;--panel:#111827;--muted:#94a3b8;--text:#e5e7eb;--brand:#3b82f6;--line:#1f2937}
     body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;margin:0}
     .wrap{max-width:960px;margin:0 auto;padding:24px}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px}
-    h1{margin:0 0 6px 0}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
+    h1,h2{margin:0 0 8px 0}
     label{display:block;color:#cbd5e1;font-size:14px;margin:0 0 6px 0}
-    input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:var(--text)}
+    input,select,textarea{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:var(--text)}
     button{background:var(--brand);color:#fff;border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
     .muted{color:#94a3b8}
+    .row{display:grid;grid-template-columns:1fr;gap:12px}
+    @media(min-width:640px){ .row{grid-template-columns:1fr 1fr} }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div style="margin-bottom:16px"><a href="/" style="color:#93c5fd;text-decoration:none">← Back to site</a></div>
+
     <div class="card">
       <h1>Thanks — you’re almost there</h1>
-      <p class="muted" id="summary"></p>
+      <p class="muted" id="summary">Enter your number and we’ll ring you now.</p>
 
       <form id="demo-form">
         <label for="phone">Confirm your phone (US)</label>
@@ -32,18 +35,45 @@
         <span id="status" style="margin-left:12px"></span>
       </form>
     </div>
+
+    <div class="card">
+      <h2>Quick feedback (optional)</h2>
+      <p class="muted">Help us improve the demo experience.</p>
+      <form id="feedback-form">
+        <div class="row">
+          <div>
+            <label for="fb-rating">Your rating</label>
+            <select id="fb-rating" required>
+              <option value="5">★★★★★ — Excellent</option>
+              <option value="4">★★★★☆ — Good</option>
+              <option value="3">★★★☆☆ — Okay</option>
+              <option value="2">★★☆☆☆ — Poor</option>
+              <option value="1">★☆☆☆☆ — Bad</option>
+            </select>
+          </div>
+          <div>
+            <label for="fb-reason">Main reason</label>
+            <select id="fb-reason" required>
+              <option value="ivr-flow">IVR flow / options</option>
+              <option value="audio">Audio quality</option>
+              <option value="pricing">Pricing questions</option>
+              <option value="interested">I want a sales call</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div style="height:10px"></div>
+        <label for="fb-notes">Notes (optional)</label>
+        <textarea id="fb-notes" rows="4" placeholder="Anything we should know?"></textarea>
+        <div style="height:12px"></div>
+        <button id="fb-submit" type="submit">Submit feedback</button>
+        <span id="fb-status" style="margin-left:12px"></span>
+      </form>
+    </div>
   </div>
 
   <script src="/demo/js/demo-call.js" defer></script>
-  <script>
-    // Pull lead info from query params just for display/prefill
-    const qp = new URLSearchParams(location.search);
-    const company = qp.get('company') || '';
-    const email   = qp.get('email') || '';
-    const phone10 = (qp.get('phone')||'').replace(/\\D/g,'');
-    document.getElementById('summary').textContent =
-      (company||email) ? \`We’ll ring you with a short demo for \${company} (\${email}).\` : 'Enter your number and we’ll ring you now.';
-    if (/^\\d{10}$/.test(phone10)) document.getElementById('phone').value = phone10.replace(/(\\d{3})(\\d{3})(\\d{4})/,'$1-$2-$3');
-  </script>
+  <script src="/demo/js/demo-feedback.js" defer></script>
+  <!-- demo-call.js will also prefill phone from ?phone= and set #summary -->
 </body>
 </html>
