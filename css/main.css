@@ -1,0 +1,4 @@
+﻿/* Minimal site CSS (expand later) */
+:root{--bg:#0b1220;--panel:#111827;--text:#e5e7eb;--line:#1f2937}
+body{background:var(--bg);color:var(--text);font-family:system-ui,Segoe UI,Roboto,Inter,Arial,sans-serif;margin:0}
+a{color:#93c5fd}

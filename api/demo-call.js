@@ -1,38 +1,30 @@
 ﻿export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).json({ ok: false, error: 'Method not allowed' });
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
+    return res.status(405).json({ ok: false, error: "method not allowed" });
   }
+
   try {
-    const { to } = req.body || {};
-    if (!to) return res.status(400).json({ ok: false, error: 'Missing "to"' });
+    const { to, secret } = req.body || {};
+    if (!to)   return res.status(400).json({ ok: false, error: "missing to" });
+    if (!secret) return res.status(400).json({ ok: false, error: "missing secret" });
 
-    // Normalize to US E.164 (+1XXXXXXXXXX)
-    const digits = String(to).replace(/\D+/g, '');
-    let e164;
-    if (digits.length === 10) e164 = +1;
-    else if (digits.length === 11 && digits.startsWith('1')) e164 = +;
-    else return res.status(400).json({ ok: false, error: 'Enter a valid US number (10 digits).' });
-
-    const domain = process.env.TWILIO_DEMO_DOMAIN; // e.g. https://reelo-demo-service-2156.twil.io
-    const secret = process.env.REELO_SECRET;       // e.g. RV-DEMO-2025-10-06
-    if (!domain || !secret) {
-      return res.status(500).json({ ok: false, error: 'Server missing Twilio config.' });
+    // Validate secret server-side
+    if (secret !== process.env.REELO_SECRET) {
+      return res.status(401).json({ ok: false, error: "bad secret" });
     }
 
-    const r = await fetch(${domain}/reelo-make-call, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ to: e164, secret }),
+    // Forward to your Twilio Function
+    const domain = process.env.TWILIO_DEMO_DOMAIN; // e.g. https://reelo-demo-service-2156.twil.io
+    const fwd = await fetch(`${domain}/reelo-make-call`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ to, secret }).toString(),
     });
 
-    const text = await r.text().catch(() => '');
-    if (!r.ok) return res.status(r.status).json({ ok: false, error: text || r.statusText });
-
-    let data = {};
-    try { data = JSON.parse(text); } catch {}
-    return res.status(200).json({ ok: true, ...data });
+    const data = await fwd.json().catch(() => ({}));
+    return res.status(fwd.ok ? 200 : 500).json(data);
   } catch (err) {
-    return res.status(500).json({ ok: false, error: err.message || 'Server error' });
+    return res.status(500).json({ ok: false, error: String(err?.message || err) });
   }
 }
