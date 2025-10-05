@@ -21,7 +21,7 @@
       padding:18px 20px;gap:16px;flex-wrap:wrap;
     }
     .logo{display:flex;align-items:center}
-    /* Show the logo at (near) its natural size; no forced width */
+    /* Render logo at its natural size */
     .logo img{display:block;max-height:180px;height:auto;width:auto}
 
     .nav a.btn{padding:10px 14px;border-radius:10px;background:var(--accent);color:#04122a;font-weight:700}
@@ -47,6 +47,7 @@
     @media (max-width:900px){ .grid{grid-template-columns:1fr} }
     .tag{display:inline-block;padding:3px 8px;border-radius:999px;background:#10204b;color:#a8b9ea;font-size:12px;border:1px solid var(--line)}
     .feat h3{margin:.2rem 0 .6rem}
+    .note{font-size:12px;color:var(--muted)}
 
     /* HERO IMAGE (sleeping-man) */
     .hero-img{border-radius:14px;border:1px solid var(--line);overflow:hidden;background:#0d1733}
@@ -54,13 +55,12 @@
 
     /* FOOTER */
     .footer{max-width:1200px;margin:40px auto 20px;padding:12px 20px;color:#93a6d8;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between}
-    .note{font-size:12px;color:var(--muted)}
   </style>
 </head>
 <body>
   <header class="nav">
     <div class="logo">
-      <!-- NEW logo (your file): ./assets/reelo-logo.png -->
+      <!-- Your final logo file -->
       <img src="./assets/reelo-logo.png" alt="Reelo Visions LLC logo">
     </div>
     <nav class="nav-ctas">
@@ -82,7 +82,7 @@
       <p class="note" style="margin-top:10px">Already a customer? Use the Admin link above to manage your appointments.</p>
     </div>
 
-    <!-- Right side image (sleeping-man): ./assets/hero-sleep.png -->
+    <!-- Right side image (sleeping-man) -->
     <div class="hero-img panel" aria-label="AI receptionist working while you sleep">
       <img src="./assets/hero-sleep.png" alt="Robot assistant working at night while a person sleeps">
     </div>
@@ -107,17 +107,26 @@
   </section>
 
   <section id="contact" class="grid" style="padding-top:0">
+    <!-- Request a demo form wired to Supabase RPC -->
     <div class="panel">
-      <div class="tag">Contact</div>
-      <h3>Let’s talk</h3>
-      <p class="note">Tell us about crew size, service area, and your current CRM.</p>
-      <p>Email: <a href="mailto:hello@reelovisions.com">hello@reelovisions.com</a></p>
+      <div class="tag">Request a demo</div>
+      <form id="leadForm">
+        <label>Name<br><input name="name" required style="width:100%"></label><br><br>
+        <label>Email<br><input name="email" type="email" required style="width:100%"></label><br><br>
+        <label>Company (optional)<br><input name="company" style="width:100%"></label><br><br>
+        <label>Message (optional)<br><textarea name="message" rows="4" style="width:100%"></textarea></label><br><br>
+        <label>Phone (optional)<br><input name="phone" style="width:100%"></label><br><br>
+        <button class="btn btn-primary" type="submit">Send</button>
+        <span id="leadMsg" class="note" style="margin-left:8px"></span>
+      </form>
     </div>
+
     <div class="panel">
       <div class="tag">Docs</div>
       <p><a href="./admin/app.html">Admin App</a> · <a href="https://github.com/reelovisions/reelo-visions-site">GitHub</a></p>
       <p class="note">This site is static and deploys on every push.</p>
     </div>
+
     <div class="panel">
       <div class="tag">Status</div>
       <p>Uptime: <span class="tag">99.9%</span></p>
@@ -130,6 +139,52 @@
     <div class="note">Reelo is a trademark of Reelo Visions LLC.</div>
   </footer>
 
-  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+  <!-- === Supabase lead capture: uses your URL + anon key === -->
+  <script>
+    const SUPABASE_URL  = "https://yvjwajopxbcaedzofqww.supabase.co";
+    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2andham9weGJjYWVkem9mcXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODk0NjQsImV4cCI6MjA3NDk2NTQ2NH0.1VVEkgThCltfebpCWa-4DReb9qSO5zdt2a_83CfsBsY";
+
+    const form = document.getElementById('leadForm');
+    const msg  = document.getElementById('leadMsg');
+
+    function validEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+    form?.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const fd = new FormData(form);
+      const name = (fd.get('name')||'').toString().trim();
+      const email = (fd.get('email')||'').toString().trim();
+      if(!name){ msg.textContent="Name required"; return; }
+      if(!validEmail(email)){ msg.textContent="Enter a valid email"; return; }
+
+      msg.textContent = "Sending…";
+      try {
+        const body = {
+          p_name: name,
+          p_email: email,
+          p_company: (fd.get('company')||null),
+          p_message: (fd.get('message')||null),
+          p_phone: (fd.get('phone')||null)
+        };
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/create_lead`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON,
+            'Authorization': `Bearer ${SUPABASE_ANON}`
+          },
+          body: JSON.stringify(body)
+        });
+        if(!res.ok) throw new Error(await res.text());
+        form.reset();
+        msg.textContent = "Thanks! We’ll be in touch.";
+      } catch (e){
+        console.error(e);
+        msg.textContent = "Error — please email hello@reelovisions.com";
+      }
+    });
+
+    document.getElementById('y').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
