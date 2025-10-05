@@ -8,43 +8,57 @@
   <link rel="stylesheet" href="/css/main.css"/>
   <style>
     :root{--bg:#0b1220;--panel:#111827;--muted:#94a3b8;--text:#e5e7eb;--brand:#3b82f6;--line:#1f2937}
+    *{box-sizing:border-box}
     body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;margin:0}
     .wrap{max-width:1120px;margin:0 auto;padding:24px}
+
     header{display:flex;align-items:center;justify-content:space-between;padding:8px 0 20px 0}
-    header img{height:56px; width:auto;} /* bigger logo */
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand img{height:auto;max-height:84px;width:auto;object-fit:contain} /* keep logo readable; not forced tiny */
+    nav{display:flex;gap:10px}
+    nav a{color:#cbd5e1;text-decoration:none;border:1px solid var(--line);background:#0f172a;padding:8px 12px;border-radius:10px}
+    nav a:hover{border-color:#334155;color:#e5e7eb}
+    .cta{background:var(--brand);color:#fff}
+
     .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:center}
     @media(max-width:960px){.hero{grid-template-columns:1fr}}
     h1{font-size:42px;line-height:1.15;margin:6px 0 10px 0}
     .sub{color:#cbd5e1;margin:0 0 20px 0}
+
     .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px}
     label{display:block;color:#cbd5e1;font-size:14px;margin:0 0 6px 0}
     input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:var(--text)}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     @media(max-width:680px){.row{grid-template-columns:1fr}}
     button{background:var(--brand);color:#fff;border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
+
     .imgbox{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#0f172a}
-    .imgbox img{display:block;width:100%;height:auto;max-height:440px;object-fit:cover} /* slightly smaller hero image cap */
-    .badges{display:flex;gap:10px;margin-top:10px}
-    .badge{background:#0f172a;border:1px solid var(--line);border-radius:999px;color:#cbd5e1;padding:6px 10px;font-size:12px}
-    .pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:36px}
-    @media(max-width:960px){.pricing{grid-template-columns:1fr}}
-    .price{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px}
-    .price h3{margin:0 0 2px 0}
-    .muted{color:var(--muted)}
-    ul{margin:12px 0 18px 20px;color:#cbd5e1}
-    footer{color:#94a3b8;text-align:center;padding:24px 0}
+    .imgbox img{display:block;width:100%;height:auto;max-height:440px;object-fit:cover}
+
+    .crm{margin-top:14px;color:#cbd5e1}
+    .crm b{color:#e5e7eb}
+
+    section#features{margin-top:36px}
+    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    @media(max-width:960px){.features{grid-template-columns:1fr}}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px}
+    .card h3{margin:0 0 6px 0}
+
+    footer{color:#94a3b8;text-align:center;padding:32px 0;margin-top:40px;border-top:1px solid var(--line)}
     a{color:#93c5fd;text-decoration:none}
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <img src="/assets/reelo-logo.png" alt="Reelo Visions LLC">
-      <div class="badges">
-        <span class="badge">ZIP & radius controls</span>
-        <span class="badge">AI receptionist</span>
-        <span class="badge">CRM-ready</span>
+      <div class="brand">
+        <img src="/assets/reelo-logo.png" alt="Reelo Visions LLC">
       </div>
+      <nav>
+        <a href="#features">Features</a>
+        <a href="#contact">Contact</a>
+        <a class="cta" href="/admin/login.html">Admin Login</a>
+      </nav>
     </header>
 
     <section class="hero">
@@ -53,11 +67,11 @@
         <p class="sub">Book jobs fast, cut no-shows, and keep service areas under control. Reelo’s lightweight admin gives your team clarity without the bloat.</p>
 
         <div class="panel">
-          <form action="/demo/thank-you.html" method="get" id="lead-form">
+          <form action="/demo/thank-you.html" method="get" id="lead-form" novalidate>
             <div class="row">
               <div>
                 <label for="company">Company</label>
-                <input id="company" name="company" placeholder="e.g. Reelo Heating & Air" required>
+                <input id="company" name="company" placeholder="e.g. Reelo Heating &amp; Air" required>
               </div>
               <div>
                 <label for="email">Email</label>
@@ -69,16 +83,15 @@
                 <label for="phone">Phone (US)</label>
                 <input id="phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="612-555-0123" required>
               </div>
-              <div style="display:flex;align-items:flex-end;gap:12px">
+              <div style="display:flex;align-items:flex-end">
                 <button type="submit" style="min-width:170px">Try live demo</button>
-                <span class="muted">We’ll confirm your number on the next step.</span>
               </div>
             </div>
           </form>
         </div>
 
-        <p class="muted" style="margin-top:14px">
-          CRM compatibility roadmap: ServiceTitan, Jobber, Housecall Pro, FieldEdge, Service Fusion.
+        <p class="crm">
+          Built to work with your CRM: <b>ServiceTitan</b>, <b>Jobber</b>, <b>Housecall Pro</b>, <b>FieldEdge</b>, <b>Service Fusion</b>.
         </p>
       </div>
 
@@ -87,58 +100,51 @@
       </div>
     </section>
 
-    <section class="pricing">
-      <div class="price">
-        <h3>Basic</h3>
-        <div class="muted">Great for starting out</div>
-        <h2>$99<span class="muted">/mo</span></h2>
-        <div class="muted">or $999 annually</div>
-        <ul>
-          <li>60 call minutes included</li>
-          <li>AI receptionist + admin</li>
-          <li>ZIP & radius controls</li>
-        </ul>
-        <div class="muted">One-time setup: $399</div>
-      </div>
-
-      <div class="price">
-        <h3>Pro</h3>
-        <div class="muted">For busier teams</div>
-        <h2>$129<span class="muted">/mo</span></h2>
-        <div class="muted">or $1,389 annually</div>
-        <ul>
-          <li>120 call minutes included</li>
-          <li>AI receptionist + admin</li>
-          <li>ZIP & radius controls</li>
-        </ul>
-        <div class="muted">One-time setup: $399</div>
-      </div>
-
-      <div class="price">
-        <h3>Ultimate</h3>
-        <div class="muted">Multi-location ready</div>
-        <h2>$199<span class="muted">/mo</span></h2>
-        <div class="muted">or $1,949 annually</div>
-        <ul>
-          <li>250 call minutes included</li>
-          <li>Multiple locations</li>
-          <li>AI receptionist + admin</li>
-        </ul>
-        <div class="muted">One-time setup: $399</div>
+    <section id="features">
+      <div class="features">
+        <div class="card">
+          <h3>Fast intake</h3>
+          <p>Capture name, phone, address, and zip in a clean, structured flow—prepped for your CRM.</p>
+        </div>
+        <div class="card">
+          <h3>Service area controls</h3>
+          <p>Allowlist ZIPs or define a radius—every appointment is checked before it hits your calendar.</p>
+        </div>
+        <div class="card">
+          <h3>Admin + export</h3>
+          <p>Simple admin with CSV export, ready when you want to wire it into your CRM.</p>
+        </div>
       </div>
     </section>
 
-    <footer>
-      © Reelo Visions LLC • <a href="mailto:hello@reelovisions.com">hello@reelovisions.com</a>
-    </footer>
+    <section id="contact">
+      <footer>
+        © Reelo Visions LLC • <a href="mailto:hello@reelovisions.com">hello@reelovisions.com</a>
+      </footer>
+    </section>
   </div>
 
   <script>
+    // Normalize phone (US) and carry to thank-you page
     const form = document.getElementById('lead-form');
     const phone = document.getElementById('phone');
-    form.addEventListener('submit', () => {
-      const digits = (phone.value||'').replace(/\D/g,'');
-      if (/^\d{10}$/.test(digits)) phone.value = digits;
+    form.addEventListener('submit', (e) => {
+      const digits = (phone.value||'').replace(/\\D/g,'');
+      // Accept 10 digits, or 11 starting with 1
+      if (!/^\\d{10}$/.test(digits) && !(digits.length===11 && digits.startsWith('1'))) {
+        e.preventDefault();
+        phone.focus();
+        phone.setCustomValidity('Please enter a 10-digit US number');
+        phone.reportValidity();
+        setTimeout(()=>phone.setCustomValidity(''), 1000);
+        return;
+      }
+      // Compact to 10 digits for passing forward
+      if (digits.length === 11 && digits.startsWith('1')) {
+        phone.value = digits.slice(1);
+      } else {
+        phone.value = digits;
+      }
     });
   </script>
 </body>
