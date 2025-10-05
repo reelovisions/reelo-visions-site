@@ -1,245 +1,142 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Reelo Visions LLC — Smart Scheduling for HVAC</title>
-  <meta name="description" content="Reelo Visions LLC builds smart receptionist tools for HVAC companies — fast scheduling, clean admin, and service area controls.">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Reelo Visions — AI Receptionist for HVAC</title>
+  <link rel="preload" as="image" href="/assets/hero-sleep.png">
+  <link rel="stylesheet" href="/css/main.css"/>
   <style>
-    :root{
-      --bg:#0b1020;--card:#111a33;--ink:#eaf0ff;--muted:#9fb0e0;
-      --accent:#7aa2ff;--accent-2:#8affd3;--line:#1f2b52;
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    a{color:inherit;text-decoration:none}
-
-    /* NAV */
-    .nav{
-      max-width:1200px;margin:0 auto;
-      display:flex;align-items:center;justify-content:space-between;
-      padding:18px 20px;gap:16px;flex-wrap:wrap;
-    }
-    .logo{display:flex;align-items:center}
-    /* Render logo at its natural size */
-    .logo img{display:block;max-height:180px;height:auto;width:auto}
-
-    .nav a.btn{padding:10px 14px;border-radius:10px;background:var(--accent);color:#04122a;font-weight:700}
-
-    /* HERO */
-    .hero{
-      max-width:1200px;margin:0 auto;
-      padding:36px 20px 40px;
-      display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center;
-    }
-    @media (max-width:980px){ .hero{grid-template-columns:1fr} }
-    .kicker{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-    .h1{font-size:40px;line-height:1.06;margin:0 0 12px}
-    .h1 b{background:linear-gradient(135deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
-    .lead{color:var(--muted);font-size:18px;line-height:1.6;margin:0 0 22px}
-    .cta{display:flex;gap:12px;flex-wrap:wrap}
-    .btn{padding:12px 18px;border-radius:12px;border:1px solid var(--line);background:#13214a;color:var(--ink);font-weight:700;cursor:pointer}
-    .btn-primary{background:var(--accent);color:#04122a;border:0}
-
-    /* PANELS / GRID */
-    .panel{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:18px}
-    .grid{max-width:1200px;margin:0 auto;padding:30px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    @media (max-width:900px){ .grid{grid-template-columns:1fr} }
-    .tag{display:inline-block;padding:3px 8px;border-radius:999px;background:#10204b;color:#a8b9ea;font-size:12px;border:1px solid var(--line)}
-    .feat h3{margin:.2rem 0 .6rem}
-    .note{font-size:12px;color:var(--muted)}
-
-    /* HERO IMAGE (sleeping-man) */
-    .hero-img{border-radius:14px;border:1px solid var(--line);overflow:hidden;background:#0d1733}
-    .hero-img img{width:100%;height:auto;display:block}
-
-    /* FOOTER */
-    .footer{max-width:1200px;margin:40px auto 20px;padding:12px 20px;color:#93a6d8;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between}
+    :root{--bg:#0b1220;--panel:#111827;--muted:#94a3b8;--text:#e5e7eb;--brand:#3b82f6;--line:#1f2937}
+    body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;margin:0}
+    .wrap{max-width:1120px;margin:0 auto;padding:24px}
+    header{display:flex;align-items:center;justify-content:space-between;padding:8px 0 20px 0}
+    header img{height:38px}
+    .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:center}
+    @media(max-width:960px){.hero{grid-template-columns:1fr}}
+    h1{font-size:42px;line-height:1.15;margin:6px 0 10px 0}
+    .sub{color:#cbd5e1;margin:0 0 20px 0}
+    .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px}
+    label{display:block;color:#cbd5e1;font-size:14px;margin:0 0 6px 0}
+    input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:var(--text)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:680px){.row{grid-template-columns:1fr}}
+    button{background:var(--brand);color:#fff;border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
+    .imgbox{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#0f172a}
+    .imgbox img{display:block;width:100%;height:auto}
+    .badges{display:flex;gap:10px;margin-top:10px}
+    .badge{background:#0f172a;border:1px solid var(--line);border-radius:999px;color:#cbd5e1;padding:6px 10px;font-size:12px}
+    .pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:36px}
+    @media(max-width:960px){.pricing{grid-template-columns:1fr}}
+    .price{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px}
+    .price h3{margin:0 0 2px 0}
+    .muted{color:var(--muted)}
+    ul{margin:12px 0 18px 20px;color:#cbd5e1}
+    footer{color:#94a3b8;text-align:center;padding:24px 0}
+    a{color:#93c5fd;text-decoration:none}
   </style>
 </head>
 <body>
-  <header class="nav">
-    <div class="logo">
-      <!-- Your final logo file -->
-      <img src="./assets/reelo-logo.png" alt="Reelo Visions LLC logo">
-    </div>
-    <nav class="nav-ctas">
-      <a class="btn" href="#features">Features</a>
-      <a class="btn" href="#contact">Contact</a>
-      <a class="btn btn-primary" href="./admin/app.html">Admin Login</a>
-    </nav>
-  </header>
-
-  <section class="hero">
-    <div>
-      <p class="kicker">HVAC Scheduling</p>
-      <h1 class="h1">A smarter receptionist for <b>HVAC companies</b></h1>
-      <p class="lead">Book jobs fast, cut no-shows, and keep service areas under control. Reelo’s lightweight admin gives your team clarity without the bloat.</p>
-      <div class="cta">
-        <a class="btn btn-primary" href="#contact">Request a demo</a>
-        <a class="btn" href="./admin/app.html">Go to Admin</a>
+  <div class="wrap">
+    <header>
+      <img src="/assets/reelo-logo.png" alt="Reelo Visions LLC">
+      <div class="badges">
+        <span class="badge">Quarter-hour slots</span>
+        <span class="badge">ZIP & radius controls</span>
+        <span class="badge">CRM-ready</span>
       </div>
-      <p class="note" style="margin-top:10px">Already a customer? Use the Admin link above to manage your appointments.</p>
-    </div>
+    </header>
 
-    <!-- Right side image (sleeping-man) -->
-    <div class="hero-img panel" aria-label="AI receptionist working while you sleep">
-      <img src="./assets/hero-sleep.png" alt="Robot assistant working at night while a person sleeps">
-    </div>
-  </section>
+    <section class="hero">
+      <div>
+        <h1>A smarter receptionist for <span style="color:#93c5fd">HVAC</span> companies</h1>
+        <p class="sub">Book jobs fast, cut no-shows, and keep service areas under control. Reelo’s lightweight admin gives your team clarity without the bloat.</p>
 
-  <section id="features" class="grid">
-    <div class="panel feat">
-      <span class="tag">Fast Intake</span>
-      <h3>One-minute booking</h3>
-      <p>Quarter-hour slots, start/end windows, and structured customer fields that map cleanly to your CRM.</p>
-    </div>
-    <div class="panel feat">
-      <span class="tag">Service Area</span>
-      <h3>Zip & radius controls</h3>
-      <p>Allowlist ZIPs or define a radius from HQ. Every appointment is checked before it hits your calendar.</p>
-    </div>
-    <div class="panel feat">
-      <span class="tag">CRM-ready</span>
-      <h3>Built for Jobber & ServiceTitan</h3>
-      <p>Normalized schema available when you’re ready. Export CSV or connect your CRM adapter.</p>
-    </div>
-  </section>
+        <div class="panel">
+          <form action="/demo/thank-you.html" method="get" id="lead-form">
+            <div class="row">
+              <div>
+                <label for="company">Company</label>
+                <input id="company" name="company" placeholder="e.g. Reelo Heating & Air" required>
+              </div>
+              <div>
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" placeholder="you@company.com" required>
+              </div>
+            </div>
+            <div class="row">
+              <div>
+                <label for="phone">Phone (US)</label>
+                <input id="phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="612-555-0123" required>
+              </div>
+              <div style="display:flex;align-items:flex-end;gap:12px">
+                <button type="submit" style="min-width:170px">Try live demo</button>
+                <span class="muted">We’ll confirm your number on the next step.</span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
 
-  <section id="contact" class="grid" style="padding-top:0">
-    <!-- Request a demo form wired to Supabase RPC -->
-    <div class="panel">
-      <div class="tag">Request a demo</div>
-      <form id="leadForm">
-        <label>Name<br><input name="name" required style="width:100%"></label><br><br>
-        <label>Email<br><input name="email" type="email" required style="width:100%"></label><br><br>
-        <label>Company (optional)<br><input name="company" style="width:100%"></label><br><br>
-        <label>Message (optional)<br><textarea name="message" rows="4" style="width:100%"></textarea></label><br><br>
-        <label>Phone (optional)<br><input name="phone" style="width:100%"></label><br><br>
-        <button class="btn btn-primary" type="submit">Send</button>
-        <span id="leadMsg" class="note" style="margin-left:8px"></span>
-      </form>
-    </div>
+      <div class="imgbox">
+        <img src="/assets/hero-sleep.png" alt="AI receptionist working while you sleep">
+      </div>
+    </section>
 
-    <div class="panel">
-      <div class="tag">Docs</div>
-      <p><a href="./admin/app.html">Admin App</a> · <a href="https://github.com/reelovisions/reelo-visions-site">GitHub</a></p>
-      <p class="note">This site is static and deploys on every push.</p>
-    </div>
+    <section class="pricing">
+      <div class="price">
+        <h3>Basic</h3>
+        <div class="muted">Great for starting out</div>
+        <h2>$99<span class="muted">/mo</span></h2>
+        <div class="muted">or $999 annually</div>
+        <ul>
+          <li>60 call minutes included</li>
+          <li>AI receptionist + admin</li>
+          <li>ZIP & radius controls</li>
+        </ul>
+        <div class="muted">One-time setup: $399</div>
+      </div>
 
-    <div class="panel">
-      <div class="tag">Status</div>
-      <p>Uptime: <span class="tag">99.9%</span></p>
-      <p class="note">Postgres + Supabase auth. Data stored in UTC, rendered in local time.</p>
-    </div>
-  </section><!-- Reelo Demo: Call Me Now -->
-<section id="demo-call" style="margin-top: 24px;">
-  <div class="card" style="padding: 16px;">
-    <h3 style="margin-bottom: 8px;">Get a demo call</h3>
-    <p style="margin-top: 0;">Enter your phone and we’ll call you with a short interactive demo.</p>
+      <div class="price">
+        <h3>Pro</h3>
+        <div class="muted">For busier teams</div>
+        <h2>$129<span class="muted">/mo</span></h2>
+        <div class="muted">or $1,389 annually</div>
+        <ul>
+          <li>120 call minutes included</li>
+          <li>AI receptionist + admin</li>
+          <li>ZIP & radius controls</li>
+        </ul>
+        <div class="muted">One-time setup: $399</div>
+      </div>
 
-    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-      <input id="demoPhone" type="tel" placeholder="+1 612 840 6268"
-             style="padding:10px;border-radius:6px;border:1px solid #2c3e50;min-width:260px;">
-      <button id="demoCallBtn"
-              style="padding:10px 16px;border-radius:6px;border:none;background:#4f77ff;color:white;cursor:pointer;">
-        Call me now
-      </button>
-      <span id="demoStatus" style="margin-left:8px;color:#9fb4ff;"></span>
-    </div>
+      <div class="price">
+        <h3>Ultimate</h3>
+        <div class="muted">Multi-location ready</div>
+        <h2>$199<span class="muted">/mo</span></h2>
+        <div class="muted">or $1,949 annually</div>
+        <ul>
+          <li>250 call minutes included</li>
+          <li>Multiple locations</li>
+          <li>AI receptionist + admin</li>
+        </ul>
+        <div class="muted">One-time setup: $399</div>
+      </div>
+    </section>
+
+    <footer>
+      © Reelo Visions LLC • <a href="mailto:hello@reelovisions.com">hello@reelovisions.com</a>
+    </footer>
   </div>
-</section>
 
-<script>
-  (function () {
-    const btn = document.getElementById('demoCallBtn');
-    const phone = document.getElementById('demoPhone');
-    const statusEl = document.getElementById('demoStatus');
-
-    async function callDemo() {
-      statusEl.textContent = 'Calling…';
-      btn.disabled = true;
-
-      try {
-        const r = await fetch('/api/demo-call', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: phone.value })
-        });
-
-        const text = await r.text();
-        // Try to parse JSON, otherwise show raw
-        let out = text;
-        try { out = JSON.parse(text); } catch {}
-
-        if (r.ok) {
-          statusEl.textContent = 'Call placed. Answer to hear the demo!';
-        } else {
-          statusEl.textContent = 'Error: ' + (out.error || text);
-        }
-      } catch (err) {
-        statusEl.textContent = 'Network error: ' + err.message;
-      } finally {
-        btn.disabled = false;
-      }
-    }
-
-    btn.addEventListener('click', callDemo);
-  }());
-</script>
-
-
-  <footer class="footer">
-    <div>© <span id="y"></span> Reelo Visions LLC</div>
-    <div class="note">Reelo is a trademark of Reelo Visions LLC.</div>
-  </footer>
-
-  <!-- === Supabase lead capture: uses your URL + anon key === -->
   <script>
-    const SUPABASE_URL  = "https://yvjwajopxbcaedzofqww.supabase.co";
-    const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2andham9weGJjYWVkem9mcXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODk0NjQsImV4cCI6MjA3NDk2NTQ2NH0.1VVEkgThCltfebpCWa-4DReb9qSO5zdt2a_83CfsBsY";
-
-    const form = document.getElementById('leadForm');
-    const msg  = document.getElementById('leadMsg');
-
-    function validEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
-
-    form?.addEventListener('submit', async (ev) => {
-      ev.preventDefault();
-      const fd = new FormData(form);
-      const name = (fd.get('name')||'').toString().trim();
-      const email = (fd.get('email')||'').toString().trim();
-      if(!name){ msg.textContent="Name required"; return; }
-      if(!validEmail(email)){ msg.textContent="Enter a valid email"; return; }
-
-      msg.textContent = "Sending…";
-      try {
-        const body = {
-          p_name: name,
-          p_email: email,
-          p_company: (fd.get('company')||null),
-          p_message: (fd.get('message')||null),
-          p_phone: (fd.get('phone')||null)
-        };
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/create_lead`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': SUPABASE_ANON,
-            'Authorization': `Bearer ${SUPABASE_ANON}`
-          },
-          body: JSON.stringify(body)
-        });
-        if(!res.ok) throw new Error(await res.text());
-        form.reset();
-        msg.textContent = "Thanks! We’ll be in touch.";
-      } catch (e){
-        console.error(e);
-        msg.textContent = "Error — please email hello@reelovisions.com";
-      }
+    // Optional: normalize phone before sending to thank-you page (we’ll also normalize there)
+    const form = document.getElementById('lead-form');
+    const phone = document.getElementById('phone');
+    form.addEventListener('submit', () => {
+      const digits = (phone.value||'').replace(/\\D/g,'');
+      if (/^\\d{10}$/.test(digits)) phone.value = digits;
     });
-
-    document.getElementById('y').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
