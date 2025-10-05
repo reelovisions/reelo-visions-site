@@ -1,0 +1,112 @@
+﻿<!doctype html>
+<html lang='en'>
+<head>
+  <meta charset='utf-8'/>
+  <meta name='viewport' content='width=device-width,initial-scale=1'/>
+  <title>Thanks — Get Your Demo Call</title>
+  <style>
+    body { background:#0b1220; color:#dbe7ff; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; }
+    .wrap { max-width: 980px; margin: 48px auto; padding: 0 16px; }
+    .card { background:#0f172a; border:1px solid #1e293b; border-radius:12px; padding:20px; margin-bottom:16px; }
+    .row { display:flex; gap:16px; flex-wrap:wrap; }
+    .col { flex:1 1 360px; }
+    label { display:block; margin:8px 0 6px; font-size:.95rem; color:#9fb4ff; }
+    input, select, textarea { width:100%; background:#0b1220; color:#eaf1ff; border:1px solid #23324d; border-radius:8px; padding:10px 12px; }
+    button { background:#375dfb; color:#fff; border:0; border-radius:10px; padding:10px 14px; font-weight:600; cursor:pointer; }
+    button:disabled { opacity:.5; cursor:not-allowed; }
+    .hint { font-size:.86rem; color:#8aa2ff; margin-top:6px; }
+    .toast { margin-top:10px; font-size:.95rem; }
+    .ok { color:#6ee7a0; }
+    .err { color:#ff8a8a; }
+    a { color:#9fc6ff; }
+  </style>
+</head>
+<body>
+  <div class='wrap'>
+    <h1>Thanks! One more step to hear the demo 👇</h1>
+    <p class='hint'>Enter your phone number in any US format. We’ll normalize it automatically.</p>
+
+    <div class='row'>
+      <div class='col'>
+        <div class='card'>
+          <h2>Get a demo call</h2>
+          <label for='phone'>Your phone (US)</label>
+          <input id='phone' type='tel' inputmode='tel' placeholder='e.g. 612-555-1212'/>
+          <div class='hint'>No need to enter “+1” — just type your number.</div>
+          <div style='margin-top:12px'>
+            <button id='btnCall'>Call me now</button>
+          </div>
+          <div id='callMsg' class='toast'></div>
+        </div>
+      </div>
+
+      <div class='col'>
+        <div class='card'>
+          <h2>Quick feedback (optional)</h2>
+          <label for='rating'>How was the demo?</label>
+          <select id='rating'>
+            <option value=''>Choose…</option>
+            <option value='great'>Super clear — loved it</option>
+            <option value='good'>Pretty good</option>
+            <option value='confusing'>A bit confusing</option>
+            <option value='broken'>Didn’t work</option>
+          </select>
+
+          <label for='notes'>Any notes or ideas?</label>
+          <textarea id='notes' rows='4' placeholder='Tell us what you’d change…'></textarea>
+
+          <div style='margin-top:12px'>
+            <button id='btnFeedback'>Send feedback</button>
+          </div>
+          <div id='fbMsg' class='toast'></div>
+        </div>
+      </div>
+    </div>
+
+    <p class='hint'>Already a customer? <a href='/admin/app.html'>Go to Admin</a>.</p>
+  </div>
+
+  <script>
+    async function postJSON(url, data) {
+      const r = await fetch(url, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(data) });
+      const t = await r.text(); let j = {}; try { j = JSON.parse(t); } catch {}
+      if (!r.ok || j.ok === false) throw new Error(j.error || t || r.statusText);
+      return j;
+    }
+
+    const phoneEl = document.getElementById('phone');
+    const btnCall = document.getElementById('btnCall');
+    const callMsg = document.getElementById('callMsg');
+
+    btnCall.addEventListener('click', async () => {
+      callMsg.textContent = ''; btnCall.disabled = true;
+      try {
+        const raw = (phoneEl.value || '').trim();
+        if (!raw) throw new Error('Enter your number.');
+        await postJSON('/api/demo-call', { to: raw });
+        callMsg.innerHTML = '<span class="ok">✅ Calling now — answer to hear the demo.</span>';
+      } catch (err) {
+        callMsg.innerHTML = '<span class="err">❌ ' + (err.message || 'Failed to start call') + '</span>';
+      } finally { btnCall.disabled = false; }
+    });
+
+    const ratingEl = document.getElementById('rating');
+    const notesEl  = document.getElementById('notes');
+    const btnFb    = document.getElementById('btnFeedback');
+    const fbMsg    = document.getElementById('fbMsg');
+
+    btnFb.addEventListener('click', async () => {
+      fbMsg.textContent = ''; btnFb.disabled = true;
+      try {
+        const rating = ratingEl.value || '';
+        const notes  = notesEl.value || '';
+        console.log('Feedback:', { rating, notes });
+        fbMsg.innerHTML = '<span class="ok">✅ Thanks — feedback received.</span>';
+        ratingEl.value = ''; notesEl.value = '';
+      } catch (err) {
+        fbMsg.innerHTML = '<span class="err">❌ ' + (err.message || 'Could not send feedback') + '</span>';
+      } finally { btnFb.disabled = false; }
+    });
+  </script>
+</body>
+</html>
