@@ -1,48 +1,59 @@
-﻿(() => {
-  const form   = document.getElementById("demo-form");
-  const phoneI = document.getElementById("phone");
-  const status = document.getElementById("status");
+﻿// /demo/js/demo-call.js
+(function () {
+  const form   = document.getElementById('demo-form');
+  const input  = document.getElementById('phone');
+  const status = document.getElementById('status');
 
-  const fmt = (raw) => {
-    const d = (raw || "").replace(/\D/g, "");
-    if (d.length < 10) return null;
-    return "+1" + d.slice(-10);
-  };
+  // prefill from ?phone= if present (10 digits only)
+  try {
+    const qp = new URLSearchParams(location.search);
+    const fromQuery = (qp.get('phone') || '').replace(/\D/g, '');
+    if (/^\d{10}$/.test(fromQuery) && input && !input.value) {
+      input.value = fromQuery.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+    }
+  } catch {}
 
-  const setMsg = (m, ok=false) => {
-    status.textContent = m || "";
-    status.style.color = ok ? "#22c55e" : "#f87171";
-  };
+  function msg(t, good) {
+    if (!status) return;
+    status.textContent = t;
+    status.style.color = good ? '#34d399' : '#f87171';
+  }
 
-  form?.addEventListener("submit", async (ev) => {
-    ev.preventDefault();
-    setMsg("");
+  async function callNow(e) {
+    e.preventDefault();
+    if (!input) return;
 
-    const normalized = fmt(phoneI?.value);
-    if (!normalized) {
-      setMsg("Enter a valid 10-digit US number (e.g., 612-555-0123)");
+    // Normalize to 10 digits → +1E.164
+    const raw    = (input.value || '').toString();
+    const digits = raw.replace(/\D/g, '');
+
+    if (digits.length !== 10) {
+      msg('Enter a valid 10-digit US number.', false);
       return;
     }
 
+    const e164 = '+1' + digits;
+    msg('Dialing…', true);
+
     try {
-      setMsg("Calling…");
-      const resp = await fetch("/api/demo-call", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to: normalized,
-          secret: "RV-DEMO-2025-10-06"   // must match REELO_SECRET env var
-        })
+      const res = await fetch('/api/demo-call', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ phone: e164 })
       });
 
-      const data = await resp.json().catch(() => ({}));
-      if (resp.ok && data?.ok !== false) {
-        setMsg("We’re ringing you now. If you have iOS Silence Unknown Callers or Live Voicemail, check the banner.", true);
+      const data = await res.json().catch(() => ({}));
+
+      if (res.ok && data && data.ok) {
+        msg('Calling now. If your phone shows “Call Reason”, tap Accept.', true);
       } else {
-        setMsg(`Call failed: ${data?.error || resp.statusText}`);
+        msg(data?.error || 'Call failed. Please try again.', false);
       }
-    } catch (e) {
-      setMsg(`Network error: ${String(e)}`);
+    } catch (err) {
+      msg('Network error. Please try again.', false);
+      console.error('demo-call error:', err);
     }
-  });
+  }
+
+  if (form) form.addEventListener('submit', callNow);
 })();
