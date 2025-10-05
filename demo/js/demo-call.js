@@ -5,9 +5,10 @@
     return r.json();
   }
   function normalizeUS(v){
-    const d = (v||"").replace(/\\D/g,"");
-    if(!/^\\d{10}$/.test(d)) return null;
-    return "+1"+d;
+    const d = (v||"").replace(/\D/g,"");
+    if (d.length === 10) return "+1"+d;
+    if (d.length === 11 && d.startsWith("1")) return "+1"+d.slice(1);
+    return null;
   }
   document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("demo-form");
@@ -22,18 +23,20 @@
       btn.disabled = true;
       try{
         const cfg = await getConfig();
-        const body = new URLSearchParams({ to: e164, secret: cfg.REEL0_SECRET });
+        const body = new URLSearchParams({ to: e164, secret: cfg.REEL0_SECRET || cfg.REELO_SECRET || cfg.REEL_O_SECRET });
         const resp = await fetch(cfg.TWILIO_DEMO_DOMAIN + "/reelo-make-call", {
           method:"POST",
           headers:{"Content-Type":"application/x-www-form-urlencoded"},
           body
         });
-        const data = await resp.json().catch(()=>({}));
-        if(resp.ok && data && data.ok){
+        const text = await resp.text();
+        let data = {};
+        try{ data = JSON.parse(text); }catch(_){ data = { raw:text }; }
+        if(resp.ok && data && (data.ok === true || data.sid)){
           status.textContent = "Calling… check your phone!";
           status.style.color = "#22c55e";
         }else{
-          status.textContent = (data && data.error) ? data.error : "Call failed.";
+          status.textContent = (data && (data.error || data.message)) ? (data.error || data.message) : "Call failed.";
           status.style.color = "#f87171";
         }
       }catch(err){

@@ -11,7 +11,7 @@
     body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;margin:0}
     .wrap{max-width:1120px;margin:0 auto;padding:24px}
     header{display:flex;align-items:center;justify-content:space-between;padding:8px 0 20px 0}
-    header img{height:38px}
+    header img{height:56px; width:auto;} /* bigger logo */
     .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:center}
     @media(max-width:960px){.hero{grid-template-columns:1fr}}
     h1{font-size:42px;line-height:1.15;margin:6px 0 10px 0}
@@ -23,7 +23,7 @@
     @media(max-width:680px){.row{grid-template-columns:1fr}}
     button{background:var(--brand);color:#fff;border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
     .imgbox{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#0f172a}
-    .imgbox img{display:block;width:100%;height:auto}
+    .imgbox img{display:block;width:100%;height:auto;max-height:440px;object-fit:cover} /* slightly smaller hero image cap */
     .badges{display:flex;gap:10px;margin-top:10px}
     .badge{background:#0f172a;border:1px solid var(--line);border-radius:999px;color:#cbd5e1;padding:6px 10px;font-size:12px}
     .pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:36px}
@@ -41,8 +41,8 @@
     <header>
       <img src="/assets/reelo-logo.png" alt="Reelo Visions LLC">
       <div class="badges">
-        <span class="badge">Quarter-hour slots</span>
         <span class="badge">ZIP & radius controls</span>
+        <span class="badge">AI receptionist</span>
         <span class="badge">CRM-ready</span>
       </div>
     </header>
@@ -76,6 +76,10 @@
             </div>
           </form>
         </div>
+
+        <p class="muted" style="margin-top:14px">
+          CRM compatibility roadmap: ServiceTitan, Jobber, Housecall Pro, FieldEdge, Service Fusion.
+        </p>
       </div>
 
       <div class="imgbox">
@@ -130,12 +134,11 @@
   </div>
 
   <script>
-    // Optional: normalize phone before sending to thank-you page (we’ll also normalize there)
     const form = document.getElementById('lead-form');
     const phone = document.getElementById('phone');
     form.addEventListener('submit', () => {
-      const digits = (phone.value||'').replace(/\\D/g,'');
-      if (/^\\d{10}$/.test(digits)) phone.value = digits;
+      const digits = (phone.value||'').replace(/\D/g,'');
+      if (/^\d{10}$/.test(digits)) phone.value = digits;
     });
   </script>
 </body>
