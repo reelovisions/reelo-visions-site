@@ -1,0 +1,64 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Reelo Visions — Verbal SMS Consent Script</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="robots" content="noindex,follow" />
+  <style>
+    :root{--bg:#0b1220;--panel:#0f1629;--text:#e6eefb;--muted:#b9c4e1;--link:#8ab4ff;--accent:#7dd3fc}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.55}
+    header,main,footer{max-width:900px;margin:0 auto;padding:24px}
+    h1,h2{line-height:1.2;margin:0 0 .5rem}
+    p{margin:.5rem 0}
+    pre,code{background:var(--panel);color:#dfe7ff;border-radius:.5rem;padding:.75rem;white-space:pre-wrap}
+    .card{background:var(--panel);border-radius:12px;padding:20px;margin:16px 0}
+    a{color:var(--link);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .tag{display:inline-block;background:#15213c;color:#cfe1ff;border:1px solid #1a2a4a;padding:.2rem .5rem;border-radius:999px;font-size:.8rem}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Verbal SMS Consent — Script</h1>
+    <p class="tag">Brand: Reelo Visions LLC · HVAC receptionist</p>
+  </header>
+  <main>
+    <section class="card">
+      <h2>Exact script (read verbatim on every intake call)</h2>
+      <pre>“Before I schedule your appointment, may we send you text messages about your appointment and service updates from {HVAC Company Name} at this number {repeat caller’s number}?
+Messages may include confirmations, reminders, arrival updates, and follow-ups. Message &amp; data rates may apply. Message frequency varies.
+You can reply STOP to opt out at any time, and HELP for help.
+We’ll never share or sell your number.
+Do I have your permission to send texts to this number?”</pre>
+    </section>
+    <section class="card">
+      <h2>If caller says “Yes” (required follow-up)</h2>
+      <pre>“Thank you. I’m noting your verbal consent. You’ll get a confirmation text in a moment. Please reply YES to confirm. You can reply STOP any time to opt out.”</pre>
+    </section>
+    <section class="card">
+      <h2>Double opt-in (first confirmation SMS)</h2>
+      <pre>{HVAC Company Name}: You agreed to receive SMS for scheduling &amp; updates at {phone}.
+Reply YES to confirm. Msg&amp;Data rates may apply. Freq varies. Reply STOP to opt out, HELP for help.
+Terms: https://reelovisions.com/sms-terms  Privacy: https://reelovisions.com/privacy</pre>
+    </section>
+    <section class="card">
+      <h2>How consent is stored</h2>
+      <p>We log for each consent: phone (E.164), call SID or recording URL, timestamps, agent/AI ID, script version, yes/no result,
+        and the double opt-in result (“YES”) with timestamp. Data retained up to 10 years. STOP/HELP supported on every message; opt-outs are honored immediately and also
+        saved in our suppression list. START/UNSTOP are honored per Twilio compliance.</p>
+    </section>
+    <section class="card">
+      <h2>Links</h2>
+      <ul>
+        <li><a href="/sms-terms.html">SMS Terms</a></li>
+        <li><a href="/privacy.html">Privacy Policy</a></li>
+      </ul>
+    </section>
+  </main>
+  <footer>
+    <p style="color:#b9c4e1">© Reelo Visions LLC</p>
+  </footer>
+</body>
+</html>
