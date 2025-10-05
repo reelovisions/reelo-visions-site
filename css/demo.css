@@ -1,0 +1,21 @@
+﻿/* (content pasted from section B above) */
+:root{--bg:#0b1220; --panel:#111827; --line:#1f2937; --text:#e5e7eb; --muted:#94a3b8; --brand:#3b82f6;}
+.rv-bg{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;margin:0}
+.rv-wrap{max-width:960px;margin:0 auto;padding:24px}
+.rv-top{margin-bottom:16px}
+.rv-link{color:#93c5fd;text-decoration:none}
+.rv-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px}
+.rv-h1{margin:0 0 8px 0;font-size:28px;line-height:1.2}
+.rv-muted{color:var(--muted);margin:0 0 12px 0}
+.rv-form{display:block}
+.rv-label{display:block;color:#cbd5e1;font-size:14px;margin:0 0 6px 0}
+.rv-input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:var(--text)}
+.rv-gap{height:12px}
+.rv-btn{display:inline-flex;align-items:center;gap:10px;background:var(--brand);color:#fff;border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
+.rv-btn[disabled]{opacity:.7;cursor:not-allowed}
+.rv-spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;display:none;animation:rvspin .8s linear infinite}
+.rv-btn.loading .rv-spinner{display:inline-block}
+@keyframes rvspin{to{transform:rotate(360deg)}}
+.rv-status{margin-top:10px;color:var(--muted);min-height:1.2em}
+.rv-status.ok{color:#7ee787}
+.rv-status.err{color:#f87171}

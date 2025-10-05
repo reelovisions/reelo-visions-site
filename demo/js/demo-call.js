@@ -1,90 +1,58 @@
-/* /demo/js/demo-call.js
-   - Normalizes to +1E.164
-   - Disables button while dialing
-   - Shows green/red toasts
-*/
-(function () {
-  const form   = document.getElementById('demo-form');
-  const input  = document.getElementById('phone');
-  const status = document.getElementById('status');     // keeps inline text for a11y
-  const btn    = document.getElementById('callBtn');
+Ôªø(() => {
+  const $ = s => document.querySelector(s);
+  const fmt = s => (s||"").replace(/\D/g,"").slice(-10);
 
-  // Prefill from ?phone= if present
-  try {
-    const qp = new URLSearchParams(location.search);
-    const fromQuery = (qp.get('phone') || '').replace(/\D/g, '');
-    if (/^\d{10}$/.test(fromQuery) && input && !input.value) {
-      input.value = fromQuery.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
-    }
-  } catch {}
+  const qp = new URLSearchParams(location.search);
+  const company = qp.get("company") || "";
+  const email   = qp.get("email")   || "";
+  const phone10 = fmt(qp.get("phone"));
 
-  function setInlineMsg(t, good) {
-    if (!status) return;
-    status.textContent = t || '';
-    status.style.color = good ? '#34d399' : '#f87171';
+  const summary = $("#summary");
+  const phoneEl = $("#phone");
+  const btn     = $("#callBtn");
+  const status  = $("#status");
+
+  if (summary) {
+    summary.textContent = (company || email)
+      ? `We‚Äôll ring you with a short demo for ${company} (${email}).`
+      : "Enter your number and we‚Äôll ring you now.";
+  }
+  if (phone10 && phone10.length === 10) {
+    phoneEl.value = phone10.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
   }
 
-  // Lightweight toast helper (no inline styles beyond the CSS you added)
-  function toast(text, ok = true) {
-    const el = document.createElement('div');
-    el.className = 'toast ' + (ok ? 'toast--ok' : 'toast--err');
-    el.textContent = text;
-    document.body.appendChild(el);
-    // auto-remove after 4s
-    setTimeout(() => el.remove(), 4000);
-    return el;
-  }
+  const setStatus = (msg, cls="") => {
+    status.className = `rv-status ${cls}`;
+    status.textContent = msg;
+  };
 
-  function normalizeUS10(value) {
-    const d = (value || '').replace(/\D/g, '');
-    return d.length === 10 ? '+1' + d : null;
-  }
-
-  async function handleSubmit(e) {
+  $("#demo-form")?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    if (!input || !btn) return;
+    const raw = fmt(phoneEl.value);
+    if (raw.length < 10) { setStatus("Enter a valid 10-digit US number", "err"); return; }
 
-    const e164 = normalizeUS10(input.value);
-    if (!e164) {
-      setInlineMsg('Enter a valid 10-digit US number.', false);
-      toast('Please enter a valid 10-digit US number.', false);
-      return;
-    }
-
-    // Guard against double-clicks
-    btn.disabled = true;
-    btn.setAttribute('aria-busy', 'true');
-    const original = btn.textContent;
-    btn.textContent = 'DialingÖ';
-    setInlineMsg('DialingÖ', true);
+    btn.classList.add("loading");
+    btn.setAttribute("disabled", "true");
+    setStatus("Placing your demo call‚Ä¶");
 
     try {
-      const res = await fetch('/api/demo-call', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ phone: e164 })
+      const res = await fetch("/api/demo-call", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: `+1${raw}` })
       });
-
       const data = await res.json().catch(() => ({}));
 
-      if (res.ok && data && data.ok) {
-        setInlineMsg('Calling now. If iOS shows ìCall Reasonî, tap Accept.', true);
-        toast('Calling now. If iOS shows ìCall Reasonî, tap Accept.', true);
+      if (!res.ok || !data?.ok) {
+        setStatus(data?.error || `Call failed (HTTP ${res.status}). Check number & try again.`, "err");
       } else {
-        const msg = data?.error || 'Call failed. Please try again.';
-        setInlineMsg(msg, false);
-        toast(msg, false);
+        setStatus("Calling now! If iOS shows ‚ÄúCall Reason‚Äù Preview, tap Accept.", "ok");
       }
-    } catch (err) {
-      console.error('demo-call error:', err);
-      setInlineMsg('Network error. Please try again.', false);
-      toast('Network error. Please try again.', false);
+    } catch {
+      setStatus("Network error ‚Äì please try again.", "err");
     } finally {
-      btn.disabled = false;
-      btn.removeAttribute('aria-busy');
-      btn.textContent = original;
+      btn.classList.remove("loading");
+      btn.removeAttribute("disabled");
     }
-  }
-
-  if (form) form.addEventListener('submit', handleSubmit);
+  });
 })();
