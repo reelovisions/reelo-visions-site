@@ -1,8 +1,13 @@
-Ôªø// /demo/js/demo-call.js
+/* /demo/js/demo-call.js
+   - Normalizes to +1E.164
+   - Disables button while dialing
+   - Shows green/red toasts
+*/
 (function () {
   const form   = document.getElementById('demo-form');
   const input  = document.getElementById('phone');
-  const status = document.getElementById('status');
+  const status = document.getElementById('status');     // keeps inline text for a11y
+  const btn    = document.getElementById('callBtn');
 
   // Prefill from ?phone= if present
   try {
@@ -13,25 +18,45 @@
     }
   } catch {}
 
-  function msg(t, good) {
+  function setInlineMsg(t, good) {
     if (!status) return;
-    status.textContent = t;
+    status.textContent = t || '';
     status.style.color = good ? '#34d399' : '#f87171';
   }
 
-  async function callNow(e) {
-    e.preventDefault();
-    if (!input) return;
+  // Lightweight toast helper (no inline styles beyond the CSS you added)
+  function toast(text, ok = true) {
+    const el = document.createElement('div');
+    el.className = 'toast ' + (ok ? 'toast--ok' : 'toast--err');
+    el.textContent = text;
+    document.body.appendChild(el);
+    // auto-remove after 4s
+    setTimeout(() => el.remove(), 4000);
+    return el;
+  }
 
-    // Normalize to +1E.164
-    const digits = (input.value || '').replace(/\D/g, '');
-    if (digits.length !== 10) {
-      msg('Enter a valid 10-digit US number.', false);
+  function normalizeUS10(value) {
+    const d = (value || '').replace(/\D/g, '');
+    return d.length === 10 ? '+1' + d : null;
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!input || !btn) return;
+
+    const e164 = normalizeUS10(input.value);
+    if (!e164) {
+      setInlineMsg('Enter a valid 10-digit US number.', false);
+      toast('Please enter a valid 10-digit US number.', false);
       return;
     }
-    const e164 = '+1' + digits;
 
-    msg('Dialing‚Ä¶', true);
+    // Guard against double-clicks
+    btn.disabled = true;
+    btn.setAttribute('aria-busy', 'true');
+    const original = btn.textContent;
+    btn.textContent = 'DialingÖ';
+    setInlineMsg('DialingÖ', true);
 
     try {
       const res = await fetch('/api/demo-call', {
@@ -43,15 +68,23 @@
       const data = await res.json().catch(() => ({}));
 
       if (res.ok && data && data.ok) {
-        msg('Calling now. If iOS shows ‚ÄúCall Reason‚Äù, tap Accept.', true);
+        setInlineMsg('Calling now. If iOS shows ìCall Reasonî, tap Accept.', true);
+        toast('Calling now. If iOS shows ìCall Reasonî, tap Accept.', true);
       } else {
-        msg(data?.error || 'Call failed. Please try again.', false);
+        const msg = data?.error || 'Call failed. Please try again.';
+        setInlineMsg(msg, false);
+        toast(msg, false);
       }
     } catch (err) {
       console.error('demo-call error:', err);
-      msg('Network error. Please try again.', false);
+      setInlineMsg('Network error. Please try again.', false);
+      toast('Network error. Please try again.', false);
+    } finally {
+      btn.disabled = false;
+      btn.removeAttribute('aria-busy');
+      btn.textContent = original;
     }
   }
 
-  if (form) form.addEventListener('submit', callNow);
+  if (form) form.addEventListener('submit', handleSubmit);
 })();
