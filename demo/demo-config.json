@@ -1,4 +1,4 @@
 ﻿{
-  "TWILIO_DEMO_DOMAIN": "https://reelo-demo-service-2156.twil.io",
-  "REEL0_SECRET": "RV-DEMO-2025-10-06"
+  "twilioDemoDomain": "https://reelo-demo-service-2156.twil.io",
+  "secret": "RV-DEMO-2025-10-06"
 }
