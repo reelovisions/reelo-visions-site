@@ -132,7 +132,62 @@
       <p>Uptime: <span class="tag">99.9%</span></p>
       <p class="note">Postgres + Supabase auth. Data stored in UTC, rendered in local time.</p>
     </div>
-  </section>
+  </section><!-- Reelo Demo: Call Me Now -->
+<section id="demo-call" style="margin-top: 24px;">
+  <div class="card" style="padding: 16px;">
+    <h3 style="margin-bottom: 8px;">Get a demo call</h3>
+    <p style="margin-top: 0;">Enter your phone and we’ll call you with a short interactive demo.</p>
+
+    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+      <input id="demoPhone" type="tel" placeholder="+1 612 840 6268"
+             style="padding:10px;border-radius:6px;border:1px solid #2c3e50;min-width:260px;">
+      <button id="demoCallBtn"
+              style="padding:10px 16px;border-radius:6px;border:none;background:#4f77ff;color:white;cursor:pointer;">
+        Call me now
+      </button>
+      <span id="demoStatus" style="margin-left:8px;color:#9fb4ff;"></span>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    const btn = document.getElementById('demoCallBtn');
+    const phone = document.getElementById('demoPhone');
+    const statusEl = document.getElementById('demoStatus');
+
+    async function callDemo() {
+      statusEl.textContent = 'Calling…';
+      btn.disabled = true;
+
+      try {
+        const r = await fetch('/api/demo-call', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: phone.value })
+        });
+
+        const text = await r.text();
+        // Try to parse JSON, otherwise show raw
+        let out = text;
+        try { out = JSON.parse(text); } catch {}
+
+        if (r.ok) {
+          statusEl.textContent = 'Call placed. Answer to hear the demo!';
+        } else {
+          statusEl.textContent = 'Error: ' + (out.error || text);
+        }
+      } catch (err) {
+        statusEl.textContent = 'Network error: ' + err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    btn.addEventListener('click', callDemo);
+  }());
+</script>
+
 
   <footer class="footer">
     <div>© <span id="y"></span> Reelo Visions LLC</div>
