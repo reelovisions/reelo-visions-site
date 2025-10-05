@@ -4,7 +4,7 @@
   const input  = document.getElementById('phone');
   const status = document.getElementById('status');
 
-  // prefill from ?phone= if present (10 digits only)
+  // Prefill from ?phone= if present
   try {
     const qp = new URLSearchParams(location.search);
     const fromQuery = (qp.get('phone') || '').replace(/\D/g, '');
@@ -23,16 +23,14 @@
     e.preventDefault();
     if (!input) return;
 
-    // Normalize to 10 digits → +1E.164
-    const raw    = (input.value || '').toString();
-    const digits = raw.replace(/\D/g, '');
-
+    // Normalize to +1E.164
+    const digits = (input.value || '').replace(/\D/g, '');
     if (digits.length !== 10) {
       msg('Enter a valid 10-digit US number.', false);
       return;
     }
-
     const e164 = '+1' + digits;
+
     msg('Dialing…', true);
 
     try {
@@ -45,13 +43,13 @@
       const data = await res.json().catch(() => ({}));
 
       if (res.ok && data && data.ok) {
-        msg('Calling now. If your phone shows “Call Reason”, tap Accept.', true);
+        msg('Calling now. If iOS shows “Call Reason”, tap Accept.', true);
       } else {
         msg(data?.error || 'Call failed. Please try again.', false);
       }
     } catch (err) {
-      msg('Network error. Please try again.', false);
       console.error('demo-call error:', err);
+      msg('Network error. Please try again.', false);
     }
   }
 
