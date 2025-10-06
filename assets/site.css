@@ -68,3 +68,26 @@ button.secondary{background:linear-gradient(180deg,#2a3a52,#1b2a40)}
   .hero-media img{max-height:260px}
   .grid{grid-template-columns:1fr}
 }
+
+/* Promo pill under Integrations */
+.promo-card{
+  margin-top:12px;
+  background:#0e141d;
+  border:1px solid #1b2534;
+  border-radius:14px;
+  padding:14px;
+}
+.promo-card .media{
+  border-radius:10px;
+  overflow:hidden;
+  border:1px solid #1b2534;
+}
+.promo-card .media img{
+  display:block;
+  width:100%;
+  height:180px;            /* desktop height */
+  object-fit:cover;        /* fill without distortion */
+}
+@media (max-width:980px){
+  .promo-card .media img{ height:140px; }  /* smaller on mobile */
+}
