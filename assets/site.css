@@ -1,5 +1,6 @@
 ﻿:root{
   --bg:#0b0f14; --card:#121821; --muted:#7f8da3; --text:#e7eefc; --brand:#57a6ff;
+  --danger:#e53935; /* bright red for Pricing */
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
@@ -10,12 +11,15 @@ a{color:var(--brand);text-decoration:none}
 header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .brand{display:flex;align-items:center;gap:12px}
 .brand .name{font-weight:800;letter-spacing:.2px;font-size:20px}
-.brand img{height:68px;width:auto;display:block;filter: drop-shadow(0 0 8px rgba(0,0,0,.55))} /* was 56 -> 68 (~+20%) */
+.brand img{height:56px;width:auto;display:block;filter: drop-shadow(0 0 6px rgba(0,0,0,.5))}
 .nav-actions{display:flex;gap:10px;align-items:center}
 .btn{display:inline-block;background:linear-gradient(180deg,var(--brand),#357ce0);color:#fff;border:none;border-radius:12px;padding:10px 14px;font-weight:800}
-.btn-outline{display:inline-block;background:transparent;color:var(--text);border:1px solid #2a3a52;border-radius:12px;padding:9px 14px;font-weight:700}
+.btn-outline{display:inline-block;background:transparent;color:#fff;border:1px solid #2a3a52;border-radius:12px;padding:9px 14px;font-weight:700}
+/* NEW: non-clickable demo pill + red pricing */
+.badge-demo{display:inline-block;background:linear-gradient(180deg,#6aa8ff,#3a79e5);color:#fff;border-radius:12px;padding:10px 14px;font-weight:800}
+.btn-pricing{display:inline-block;background:var(--danger);color:#fff;border-radius:12px;padding:10px 16px;font-weight:900;border:1px solid #b71c1c}
 
-/* Hero: fixed right rail so the form never falls off */
+/* Hero */
 .hero{
   border:1px solid #1b2534;background:linear-gradient(180deg,#0e141d,#0b0f14);
   border-radius:18px;padding:32px;margin-top:12px;
@@ -35,12 +39,16 @@ button.secondary{background:linear-gradient(180deg,#2a3a52,#1b2a40)}
 .note{color:#9fb1cc;font-size:12px}
 .helper{color:#cfe0ff;font-size:12px;margin-top:6px}
 
-/* Integrations */
-.integrations{margin-top:10px;border:1px solid #1b2534;border-radius:14px;padding:14px;background:#0e141d}
-.crm-logos{display:flex;flex-wrap:wrap;gap:24px;margin-top:12px;align-items:center}
-.crm-logos img{height:48px;max-width:220px;object-fit:contain;display:inline-block;opacity:.98}
+/* Integrations — match the height of the image area and grow logos */
+.integrations{
+  margin-top:10px;border:1px solid #1b2534;border-radius:14px;padding:14px;background:#0e141d;
+  min-height:260px; /* lines up visually with the photo under the form */
+  display:flex;flex-direction:column;justify-content:flex-start;
+}
+.crm-logos{display:flex;flex-wrap:wrap;gap:28px;margin-top:14px;align-items:center}
+.crm-logos img{height:54px;max-width:240px;object-fit:contain;display:inline-block;opacity:.98}
 
-/* Right-rail hero image */
+/* Right-rail image */
 .hero-media{border-radius:14px;overflow:hidden;border:1px solid #1b2534;background:#0a0f16;margin-top:12px}
 .hero-media img{display:block;width:100%;height:auto;max-height:220px;object-fit:cover}
 
@@ -63,5 +71,6 @@ button.secondary{background:linear-gradient(180deg,#2a3a52,#1b2a40)}
   .hero{grid-template-columns:1fr}
   .row{grid-template-columns:1fr}
   .hero-media img{max-height:260px}
+  .integrations{min-height:auto}
   .grid{grid-template-columns:1fr}
 }
