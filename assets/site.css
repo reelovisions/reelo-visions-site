@@ -10,7 +10,7 @@ a{color:var(--brand);text-decoration:none}
 header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .brand{display:flex;align-items:center;gap:12px}
 .brand .name{font-weight:800;letter-spacing:.2px;font-size:20px}
-.brand img{height:38px;width:auto;display:none}
+.brand img{height:40px;width:auto;display:block}
 .pill{padding:6px 10px;border:1px solid #263246;border-radius:10px;color:#9fb1cc;font-size:12px}
 
 /* Hero: fixed right rail so the form never falls off */
@@ -36,14 +36,14 @@ button.secondary{background:linear-gradient(180deg,#2a3a52,#1b2a40)}
 /* Integrations + body logo */
 .integrations{margin-top:10px;border:1px solid #1b2534;border-radius:14px;padding:14px;background:#0e141d}
 .badges{display:flex;flex-wrap:wrap;gap:8px}
-.badge{font-size:12px;padding:6px 10px;border:1px solid #263246;border-radius:999px;background:#0a0f16;color:#cfe0ff}
+.badge{font-size:12px;padding:6px 10px;border:1px solid #263246;border-radius:999px;background:#0a0f16;color:#9fb1cc}
 
 #logoBlock{margin-top:12px;display:flex;align-items:center;gap:10px}
 #logoBlock img{max-height:80px;width:auto;display:none;border-radius:8px}
 
 
-.crm-logos{display:flex;flex-wrap:wrap;gap:14px;margin-top:6px}
-.crm-logos img{height:28px;max-width:160px;object-fit:contain;display:inline-block;filter:none}
+.crm-logos{display:flex;flex-wrap:wrap;gap:18px;margin-top:8px;align-items:center}
+.crm-logos img{height:32px;max-width:160px;object-fit:contain;display:inline-block;opacity:.95}
 
 /* Right-rail hero image: capped */
 .hero-media{border-radius:14px;overflow:hidden;border:1px solid #1b2534;background:#0a0f16;margin-top:12px}
@@ -72,9 +72,10 @@ button.secondary{background:linear-gradient(180deg,#2a3a52,#1b2a40)}
 }
 
 /* CRM logos: grid with consistent height; images contain without distortion */
-.crm-logos{display:flex;flex-wrap:wrap;gap:16px;margin-top:6px;align-items:center}
+.crm-logos{display:flex;flex-wrap:wrap;gap:18px;margin-top:8px;align-items:center}
 .crm-logos picture{display:inline-flex;align-items:center;justify-content:center;height:28px}
-.crm-logos img{height:28px;max-width:160px;object-fit:contain;display:inline-block;filter:none}
+.crm-logos img{height:32px;max-width:160px;object-fit:contain;display:inline-block;opacity:.95}
 
 /* Optional: keep text badges as a fallback under the logos */
+
 
