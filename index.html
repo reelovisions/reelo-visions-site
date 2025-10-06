@@ -152,18 +152,7 @@
         t.src = el.src + '?v=' + Date.now();
       });
     })();
-
-    // Show CRM logos only if the files actually exist
-    (function(){
-      const ids = ['logo-servicetitan','logo-jobber','logo-housecallpro','logo-fieldedge','logo-servicefusion'];
-      ids.forEach(id=>{
-        const el = document.getElementById(id); if(!el) return;
-        const t=new Image(); t.onload=()=>{ el.style.display='block' }; t.onerror=()=>{ el.remove() };
-        t.src = el.src + '?v=' + Date.now();
-      });
-    })();
-
-    // Lead form behavior
+// Lead form behavior
     const leadForm = document.getElementById('lead-form');
     leadForm.addEventListener('submit', (e) => {
       const fd = new FormData(leadForm);
@@ -188,3 +177,4 @@
   </script>
 </body>
 </html>
+
