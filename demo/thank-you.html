@@ -1,36 +1,104 @@
 ﻿<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Thanks — Let’s run your demo</title>
-  <link rel="stylesheet" href="/css/main.css"/>
-  <link rel="stylesheet" href="/css/demo.css"/>
+  <meta charset="utf-8" />
+  <title>Thanks — Your demo call is on the way</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 connect-src 'self' https://*.twil.io https://*.supabase.co;
+                 img-src 'self' data:;
+                 style-src 'self' 'unsafe-inline';
+                 script-src 'self' 'unsafe-inline';
+                 base-uri 'self'">
+  <style>
+    body{margin:0;background:#0b0f14;color:#e7eefc;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
+    .shell{max-width:800px;margin:0 auto;padding:24px}
+    .card{background:#121821;border:1px solid #1b2534;border-radius:14px;padding:18px}
+    input,select,textarea{width:100%;background:#0a0f16;border:1px solid #243044;color:#e7eefc;border-radius:10px;padding:12px}
+    button{cursor:pointer;background:linear-gradient(180deg,#57a6ff,#357ce0);border:none;border-radius:12px;color:white;font-weight:700;padding:12px 14px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .muted{color:#7f8da3}
+    .ok{color:#49d48a}
+    .err{color:#ff6b6b}
+  </style>
 </head>
-<body class="rv-bg">
-  <div class="rv-wrap">
-    <nav class="rv-top">
-      <a class="rv-link" href="/">← Back to site</a>
-    </nav>
+<body>
+  <div class="shell">
+    <h1>You're set ✅</h1>
+    <p class="muted">We’ll ring <span id="p"></span> right now. If you don’t get a call in ~30s, check your phone format and try again.</p>
 
-    <section class="rv-card">
-      <h1 class="rv-h1">Thanks — you’re almost there</h1>
-      <p class="rv-muted" id="summary"></p>
-
-      <form id="demo-form" class="rv-form">
-        <label class="rv-label" for="phone">Confirm your phone (US)</label>
-        <input class="rv-input" id="phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="612-555-0123" required/>
-        <div class="rv-gap"></div>
-
-        <button id="callBtn" type="submit" class="rv-btn">
-          <span class="rv-btn-text">Call me now</span>
-          <span class="rv-spinner" aria-hidden="true"></span>
-        </button>
-
-        <div id="status" class="rv-status" role="status" aria-live="polite"></div>
+    <div class="card" style="margin-top:14px">
+      <h2>Post-demo feedback (10 seconds)</h2>
+      <form id="fb">
+        <div class="row">
+          <select name="rating" required>
+            <option value="" disabled selected>How did the demo go?</option>
+            <option>Great demo</option>
+            <option>Okay</option>
+            <option>Confusing</option>
+            <option>Didn't work</option>
+          </select>
+          <select name="call_result" required>
+            <option value="" disabled selected>Did the call connect?</option>
+            <option>Yes, connected</option>
+            <option>No, didn’t connect</option>
+          </select>
+        </div>
+        <textarea name="comments" rows="4" placeholder="Anything we should improve?"></textarea>
+        <input type="hidden" name="phone" />
+        <input type="hidden" name="email" />
+        <input type="hidden" name="company" />
+        <div style="margin-top:10px;display:flex;gap:10px;align-items:center">
+          <button type="submit">Send feedback</button>
+          <span id="status" class="muted"></span>
+        </div>
       </form>
-    </section>
+    </div>
   </div>
-  <script src="/demo/js/demo-call.js" defer></script>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const phone = params.get('phone') || localStorage.getItem('rv_phone') || '';
+    const email = localStorage.getItem('rv_email') || '';
+    const company = localStorage.getItem('rv_company') || '';
+    document.getElementById('p').textContent = phone ? phone : '(no phone provided)';
+    const fb = document.getElementById('fb');
+    fb.elements['phone'].value = phone;
+    fb.elements['email'].value = email;
+    fb.elements['company'].value = company;
+
+    fb.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = fb.querySelector('button');
+      const status = document.getElementById('status');
+      btn.disabled = true; status.textContent = 'Sending...';
+
+      const payload = {
+        rating: fb.elements['rating'].value,
+        call_result: fb.elements['call_result'].value,
+        comments: fb.elements['comments'].value,
+        phone: fb.elements['phone'].value,
+        email: fb.elements['email'].value,
+        company: fb.elements['company'].value,
+        user_agent: navigator.userAgent || '',
+        url: location.href
+      };
+      try{
+        const res = await fetch('/api/feedback', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify(payload)
+        });
+        if(!res.ok){ throw new Error('Bad response'); }
+        status.textContent = 'Thanks for the feedback!'; status.className = 'ok';
+        fb.reset();
+      }catch(err){
+        status.textContent = 'Error sending feedback. Please try again.'; status.className = 'err';
+      }finally{
+        btn.disabled = false;
+      }
+    });
+  </script>
 </body>
 </html>
