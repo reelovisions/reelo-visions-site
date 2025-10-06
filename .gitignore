@@ -1,0 +1,16 @@
+﻿# === keep local env files secret ===
+.env*
+!.env.example
+
+# node / next / build
+node_modules/
+.next/
+out/
+dist/
+
+# logs/cache
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+.cache/
+.DS_Store

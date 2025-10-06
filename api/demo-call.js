@@ -1,48 +1,45 @@
-﻿export default async function handler(req, res) {
+﻿/**
+ * Vercel Serverless Function: /api/demo-call
+ * Takes {company, email, phone} from the website, injects REELO_SECRET on the server,
+ * and forwards to your Twilio Function endpoint. No secrets in the browser.
+ */
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ ok: false, error: "method not allowed" });
+  }
+
   try {
-    if (req.method !== 'POST') {
-      return res.status(405).json({ ok: false, error: 'method not allowed' });
+    // Accept JSON or form posts
+    const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : (req.body || {});
+    const { company, email, phone } = body;
+
+    if (!company || !email || !phone) {
+      return res.status(400).json({ ok: false, error: "missing fields: company/email/phone" });
     }
 
-    let body = {};
-    try { body = req.body ?? {}; } catch {}
-    if (!body || typeof body !== 'object') {
-      const chunks = [];
-      for await (const c of req) chunks.push(c);
-      const raw = Buffer.concat(chunks).toString('utf8') || '{}';
-      body = JSON.parse(raw);
+    // Env vars (set in Vercel UI). NEXT_PUBLIC_* can be read on client if needed.
+    const TWILIO_FUNCTION_URL = process.env.NEXT_PUBLIC_REELO_DEMO_URL || "https://reelo-demo-service-2156.twil.io/reelo-make-call";
+    const REELO_SECRET = (process.env.REELO_SECRET || "").trim();
+
+    if (!REELO_SECRET) {
+      return res.status(500).json({ ok: false, error: "server config missing REELO_SECRET" });
     }
 
-    const phoneRaw = String(body.phone || '').replace(/\D/g, '');
-    if (phoneRaw.length !== 10) {
-      return res.status(400).json({ ok: false, error: 'invalid phone' });
-    }
-    const phone = `+1${phoneRaw}`;
-
-    const incomingSecret =
-      req.headers['x-reelo-secret'] ||
-      req.headers['x-reel0-secret'] ||
-      process.env.REELO_SECRET;
-
-    if (!incomingSecret || incomingSecret !== process.env.REELO_SECRET) {
-      return res.status(401).json({ ok: false, error: 'unauthorized' });
-    }
-
-    const domain = process.env.TWILIO_DEMO_DOMAIN;
-    if (!domain) {
-      return res.status(500).json({ ok: false, error: 'server env missing: TWILIO_DEMO_DOMAIN' });
-    }
-
-    const url = `${domain.replace(/\/+$/, '')}/reelo-make-call`;
-    const forward = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ to: phone, secret: incomingSecret })
+    // Forward to Twilio Function with secret in BODY (proven reliable)
+    const r = await fetch(TWILIO_FUNCTION_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        to: phone,
+        email,
+        company,
+        secret: REELO_SECRET
+      }),
     });
 
-    const data = await forward.json().catch(() => ({}));
-    return res.status(forward.ok ? 200 : 500).json(data);
+    const data = await r.json().catch(() => ({}));
+    return res.status(r.ok ? 200 : 400).json(data);
   } catch (err) {
-    return res.status(500).json({ ok: false, error: err?.message || 'server error' });
+    return res.status(500).json({ ok: false, error: "server error", detail: String(err?.message || err) });
   }
 }
