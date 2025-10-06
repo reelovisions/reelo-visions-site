@@ -8,22 +8,12 @@
         content="default-src 'self';
                  connect-src 'self' https://*.twil.io https://*.supabase.co;
                  img-src 'self' data:;
-                 style-src 'self' 'unsafe-inline';
+                 style-src 'self';
                  script-src 'self' 'unsafe-inline';
                  base-uri 'self'">
-  <style>
-    body{margin:0;background:#0b0f14;color:#e7eefc;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
-    .shell{max-width:800px;margin:0 auto;padding:24px}
-    .card{background:#121821;border:1px solid #1b2534;border-radius:14px;padding:18px}
-    input,select,textarea{width:100%;background:#0a0f16;border:1px solid #243044;color:#e7eefc;border-radius:10px;padding:12px}
-    button{cursor:pointer;background:linear-gradient(180deg,#57a6ff,#357ce0);border:none;border-radius:12px;color:white;font-weight:700;padding:12px 14px}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .muted{color:#7f8da3}
-    .ok{color:#49d48a}
-    .err{color:#ff6b6b}
-  </style>
+  <link rel="stylesheet" href="/assets/site.css" />
 </head>
-<body>
+<body class="thankyou">
   <div class="shell">
     <h1>You're set ✅</h1>
     <p class="muted">We’ll ring <span id="p"></span> right now. If you don’t get a call in ~30s, check your phone format and try again.</p>
