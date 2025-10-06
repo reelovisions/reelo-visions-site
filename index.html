@@ -18,10 +18,11 @@
   <div class="shell">
     <header>
       <div class="brand">
-        <img id="brandLogo" alt="Reelo Visions logo" />
+        <!-- DIRECT logo path you confirmed; hidden by CSS until it loads -->
+        <img id="brandLogoHeader" src="/assets/reelo-logo.png" alt="Reelo Visions logo" />
         <div class="name">Reelo Visions <span class="pill">AI Receptionist</span></div>
       </div>
-      <a href="#try">Start Free AI Demo Call</a>
+      <a href="#try">Demo AI — Click to Connect Now</a>
     </header>
 
     <section class="hero">
@@ -31,6 +32,17 @@
 
         <div class="integrations">
           <h3>Integrates with your tools</h3>
+
+          <!-- Optional CRM logos (drop files in /assets/crm/ to auto-show) -->
+          <div class="crm-logos">
+            <img id="logo-servicetitan" src="/assets/crm/servicetitan.svg" alt="ServiceTitan">
+            <img id="logo-jobber" src="/assets/crm/jobber.svg" alt="Jobber">
+            <img id="logo-housecallpro" src="/assets/crm/housecallpro.svg" alt="Housecall Pro">
+            <img id="logo-fieldedge" src="/assets/crm/fieldedge.svg" alt="FieldEdge">
+            <img id="logo-servicefusion" src="/assets/crm/servicefusion.svg" alt="Service Fusion">
+          </div>
+
+          <!-- Text badges remain as fallback -->
           <div class="badges">
             <span class="badge">ServiceTitan</span>
             <span class="badge">Jobber</span>
@@ -40,6 +52,11 @@
             <span class="badge">…and more</span>
           </div>
           <div class="note">All plans include integration support for most CRMs.</div>
+
+          <!-- Big in-body logo (uses same file; shows once loaded) -->
+          <div id="logoBlock">
+            <img id="brandLogoBody" src="/assets/reelo-logo.png" alt="Reelo Visions logo (large)">
+          </div>
         </div>
       </div>
 
@@ -54,7 +71,7 @@
               <input type="email" name="email" placeholder="Work email" required />
               <input type="tel" name="phone" placeholder="Mobile (for demo call)" required />
             </div>
-            <button type="submit">Start Free AI Demo Call →</button>
+            <button type="submit">Demo AI — Click to Connect Now →</button>
             <div class="helper">Our AI will call your phone in ~60 seconds. No credit card. No commitment.</div>
             <div class="note">By continuing, you agree to our <a href="/consent.html">Consent & SMS terms</a>.</div>
           </form>
@@ -94,7 +111,7 @@
           <div class="feat">60 receptionist minutes</div>
           <div class="feat">IVR + call triage</div>
           <div class="feat">KB answers + SMS confirm</div>
-          <a class="cta" href="#try"><button class="secondary">Start Free AI Demo Call</button></a>
+          <a class="cta" href="#try"><button class="secondary">Demo AI — Click to Connect Now</button></a>
         </div>
         <div class="pcard">
           <h3>Pro</h3>
@@ -102,7 +119,7 @@
           <div class="feat">120 receptionist minutes</div>
           <div class="feat">Priority support</div>
           <div class="feat">CRM integration help</div>
-          <a class="cta" href="#try"><button class="secondary">Start Free AI Demo Call</button></a>
+          <a class="cta" href="#try"><button class="secondary">Demo AI — Click to Connect Now</button></a>
         </div>
         <div class="pcard">
           <h3>Ultimate</h3>
@@ -110,7 +127,7 @@
           <div class="feat">250 receptionist minutes</div>
           <div class="feat">Multi-location routing</div>
           <div class="feat">Custom workflows</div>
-          <a class="cta" href="#try"><button class="secondary">Start Free AI Demo Call</button></a>
+          <a class="cta" href="#try"><button class="secondary">Demo AI — Click to Connect Now</button></a>
         </div>
       </div>
       <div class="setup">One-time setup: <strong>$399</strong>. Overage billed per-minute.</div>
@@ -119,36 +136,50 @@
 
     <footer class="shell" style="padding-left:0;padding-right:0;margin-top:30px;color:#7f8da3;font-size:12px">
       © <span id="y"></span> Reelo Visions LLC · <a href="/consent.html">Consent</a>
-      <div class="note">All trademarks/logos are property of their respective owners. “Integrates with” indicates connector/API/workflow support.</div>
     </footer>
   </div>
 
   <script>
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // Robust logo: try a few common filenames in /assets and use the first that loads
+    // Show logos only after successful load (prevents broken icon)
     (function(){
-      const candidates = [
-        "/assets/logo.svg",
-        "/assets/logo.png",
-        "/assets/reelo-logo.svg",
-        "/assets/reelo-logo.png",
-        "/assets/logo-dark.png"
-      ];
-      const el = document.getElementById("brandLogo");
-      let i = 0;
-      const tryNext = () => {
-        if (i >= candidates.length) { el.style.display = "none"; return; }
-        const src = candidates[i++];
+      const imgs = [document.getElementById('brandLogoHeader'), document.getElementById('brandLogoBody')];
+      imgs.forEach(el => {
+        if (!el) return;
         const probe = new Image();
-        probe.onload = () => { el.src = src; };
-        probe.onerror = tryNext;
-        probe.src = src + "?v=" + Date.now(); // bust stale cache
-      };
-      tryNext();
+        probe.onload = () => { el.style.display = "block"; };
+        probe.onerror = () => {
+          // fallback candidates if the direct file ever moves
+          const alts = ["/assets/logo.svg","/assets/logo.png","/assets/reelo-logo.svg","/assets/logo-dark.png"];
+          let i = 0;
+          const tryNext = () => {
+            if (i >= alts.length) return;
+            const test = new Image();
+            const src = alts[i++] + "?v=" + Date.now();
+            test.onload = () => { el.src = src; el.style.display = "block"; };
+            test.onerror = tryNext;
+            test.src = src;
+          };
+          tryNext();
+        };
+        // kick probe
+        probe.src = el.getAttribute("src") + "?v=" + Date.now();
+      });
     })();
 
-    // Lead form → thank-you with phone in query; keep localStorage for prefill
+    // CRM logos: show only if file exists
+    (function(){
+      ["logo-servicetitan","logo-jobber","logo-housecallpro","logo-fieldedge","logo-servicefusion"].forEach(id => {
+        const el = document.getElementById(id); if (!el) return;
+        const probe = new Image();
+        probe.onload = () => { el.style.display = "inline-block"; };
+        probe.onerror = () => { el.remove(); };
+        probe.src = el.src + "?v=" + Date.now();
+      });
+    })();
+
+    // Lead form
     const leadForm = document.getElementById('lead-form');
     leadForm.addEventListener('submit', (e) => {
       const fd = new FormData(leadForm);
