@@ -8,7 +8,7 @@ a{color:var(--brand);text-decoration:none}
 header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .brand{display:flex;align-items:center;gap:12px}
 .brand .name{font-weight:800;letter-spacing:.2px;font-size:20px}
-.brand img{height:38px;width:auto;display:block} /* bigger logo */
+.brand img{height:38px;width:auto;display:none} /* bigger logo */
 .pill{padding:6px 10px;border:1px solid #263246;border-radius:10px;color:#9fb1cc;font-size:12px}
 
 .hero{border:1px solid #1b2534;background:linear-gradient(180deg,#0e141d,#0b0f14);border-radius:18px;padding:32px;margin-top:12px;display:grid;grid-template-columns:1.1fr .9fr;gap:28px}
@@ -52,3 +52,4 @@ button:disabled{opacity:.6;cursor:not-allowed}
   .row{grid-template-columns:1fr}
   .grid{grid-template-columns:1fr}
 }
+
