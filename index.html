@@ -1,150 +1,154 @@
 ﻿<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Reelo Visions — AI Receptionist for HVAC</title>
-  <link rel="preload" as="image" href="/assets/hero-sleep.png">
-  <link rel="stylesheet" href="/css/main.css"/>
+  <meta charset="utf-8" />
+  <title>Reelo Visions – AI Receptionist for Home Services</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 connect-src 'self' https://*.twil.io https://*.supabase.co;
+                 img-src 'self' data:;
+                 style-src 'self' 'unsafe-inline';
+                 script-src 'self' 'unsafe-inline';
+                 base-uri 'self';
+                 form-action 'self'">
   <style>
-    :root{--bg:#0b1220;--panel:#111827;--muted:#94a3b8;--text:#e5e7eb;--brand:#3b82f6;--line:#1f2937}
+    :root{
+      --bg:#0b0f14; --card:#121821; --muted:#7f8da3; --text:#e7eefc; --brand:#57a6ff; --brand-2:#49d48a;
+      --ring:0 0 0 3px rgba(87,166,255,.25);
+    }
     *{box-sizing:border-box}
-    body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;margin:0}
-    .wrap{max-width:1120px;margin:0 auto;padding:24px}
-
-    header{display:flex;align-items:center;justify-content:space-between;padding:8px 0 20px 0}
-    .brand{display:flex;align-items:center;gap:12px}
-    .brand img{height:auto;max-height:84px;width:auto;object-fit:contain} /* keep logo readable; not forced tiny */
-    nav{display:flex;gap:10px}
-    nav a{color:#cbd5e1;text-decoration:none;border:1px solid var(--line);background:#0f172a;padding:8px 12px;border-radius:10px}
-    nav a:hover{border-color:#334155;color:#e5e7eb}
-    .cta{background:var(--brand);color:#fff}
-
-    .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:28px;align-items:center}
-    @media(max-width:960px){.hero{grid-template-columns:1fr}}
-    h1{font-size:42px;line-height:1.15;margin:6px 0 10px 0}
-    .sub{color:#cbd5e1;margin:0 0 20px 0}
-
-    .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px}
-    label{display:block;color:#cbd5e1;font-size:14px;margin:0 0 6px 0}
-    input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:var(--text)}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    @media(max-width:680px){.row{grid-template-columns:1fr}}
-    button{background:var(--brand);color:#fff;border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
-
-    .imgbox{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#0f172a}
-    .imgbox img{display:block;width:100%;height:auto;max-height:440px;object-fit:cover}
-
-    .crm{margin-top:14px;color:#cbd5e1}
-    .crm b{color:#e5e7eb}
-
-    section#features{margin-top:36px}
-    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-    @media(max-width:960px){.features{grid-template-columns:1fr}}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px}
-    .card h3{margin:0 0 6px 0}
-
-    footer{color:#94a3b8;text-align:center;padding:32px 0;margin-top:40px;border-top:1px solid var(--line)}
-    a{color:#93c5fd;text-decoration:none}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
+    a{color:var(--brand);text-decoration:none}
+    .shell{max-width:1120px;margin:0 auto;padding:24px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .logo{display:flex;gap:10px;align-items:center;font-weight:700;letter-spacing:.2px}
+    .pill{padding:6px 10px;border:1px solid #263246;border-radius:10px;color:var(--muted);font-size:12px}
+    .hero{border:1px solid #1b2534;background:linear-gradient(180deg,#0e141d, #0b0f14);border-radius:18px;padding:32px;margin-top:12px;display:grid;grid-template-columns:1.1fr .9fr;gap:28px}
+    .hero h1{font-size:36px;line-height:1.1;margin:0 0 8px}
+    .hero p{color:var(--muted);margin:0 0 18px}
+    .card{background:var(--card);border:1px solid #1b2534;border-radius:14px;padding:18px}
+    form.try{display:grid;gap:10px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    input,select,textarea{width:100%;background:#0a0f16;border:1px solid #243044;color:var(--text);border-radius:10px;padding:12px}
+    input:focus,textarea:focus,select:focus{outline:none;box-shadow:var(--ring);border-color:#35507a}
+    button{cursor:pointer;background:linear-gradient(180deg,var(--brand),#357ce0);border:none;border-radius:12px;color:white;font-weight:700;padding:12px 14px}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .note{color:var(--muted);font-size:12px}
+    .spacer{height:18px}
+    #pricing{margin-top:36px}
+    .pricing-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .toggle{display:flex;gap:8px;align-items:center}
+    .toggle button{background:#0c131c;border:1px solid #263246;padding:8px 10px;border-radius:10px}
+    .toggle button.active{background:linear-gradient(180deg,#2a3a52,#1b2a40);border-color:#35507a}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .pcard{background:var(--card);border:1px solid #1b2534;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px}
+    .pcard h3{margin:0}
+    .price{font-size:28px;font-weight:800}
+    .feat{color:var(--muted);font-size:14px}
+    .pcard .cta{margin-top:auto}
+    .small{font-size:12px;color:var(--muted)}
+    .setup{margin-top:6px;color:var(--muted)}
+    @media (max-width:920px){
+      .hero{grid-template-columns:1fr}
+      .row{grid-template-columns:1fr}
+      .grid{grid-template-columns:1fr}
+    }
   </style>
 </head>
 <body>
-  <div class="wrap">
+  <div class="shell">
     <header>
-      <div class="brand">
-        <img src="/assets/reelo-logo.png" alt="Reelo Visions LLC">
-      </div>
-      <nav>
-        <a href="#features">Features</a>
-        <a href="#contact">Contact</a>
-        <a class="cta" href="/admin/login.html">Admin Login</a>
-      </nav>
+      <div class="logo">🤖 Reelo Visions <span class="pill">AI Receptionist</span></div>
+      <a href="#try">Try Now</a>
     </header>
 
     <section class="hero">
       <div>
-        <h1>A smarter receptionist for <span style="color:#93c5fd">HVAC</span> companies</h1>
-        <p class="sub">Book jobs fast, cut no-shows, and keep service areas under control. Reelo’s lightweight admin gives your team clarity without the bloat.</p>
-
-        <div class="panel">
-          <form action="/demo/thank-you.html" method="get" id="lead-form" novalidate>
-            <div class="row">
-              <div>
-                <label for="company">Company</label>
-                <input id="company" name="company" placeholder="e.g. Reelo Heating &amp; Air" required>
-              </div>
-              <div>
-                <label for="email">Email</label>
-                <input id="email" name="email" type="email" placeholder="you@company.com" required>
-              </div>
-            </div>
-            <div class="row">
-              <div>
-                <label for="phone">Phone (US)</label>
-                <input id="phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="612-555-0123" required>
-              </div>
-              <div style="display:flex;align-items:flex-end">
-                <button type="submit" style="min-width:170px">Try live demo</button>
-              </div>
-            </div>
-          </form>
-        </div>
-
-        <p class="crm">
-          Built to work with your CRM: <b>ServiceTitan</b>, <b>Jobber</b>, <b>Housecall Pro</b>, <b>FieldEdge</b>, <b>Service Fusion</b>.
-        </p>
+        <h1>Answer every call. Book more jobs. <span style="color:var(--brand)">Demo it in 60 seconds.</span></h1>
+        <p>Human-sounding AI that greets callers, triages issues, answers FAQs from your KB, and books appointments. Built for HVAC & home-service teams.</p>
+        <div class="spacer"></div>
+        <div class="note">No credit card. Demo dials your phone immediately.</div>
       </div>
 
-      <div class="imgbox">
-        <img src="/assets/hero-sleep.png" alt="AI receptionist working while you sleep">
+      <div class="card" id="try">
+        <form class="try" id="lead-form" action="/demo/thank-you" method="GET">
+          <input type="text" name="company" placeholder="Company name" required />
+          <div class="row">
+            <input type="email" name="email" placeholder="Work email" required />
+            <input type="tel" name="phone" placeholder="Mobile (for demo call)" required />
+          </div>
+          <button type="submit">Try Now →</button>
+          <div class="note">By continuing, you agree to our <a href="/consent.html">Consent & SMS terms</a>.</div>
+        </form>
       </div>
     </section>
 
-    <section id="features">
-      <div class="features">
-        <div class="card">
-          <h3>Fast intake</h3>
-          <p>Capture name, phone, address, and zip in a clean, structured flow—prepped for your CRM.</p>
-        </div>
-        <div class="card">
-          <h3>Service area controls</h3>
-          <p>Allowlist ZIPs or define a radius—every appointment is checked before it hits your calendar.</p>
-        </div>
-        <div class="card">
-          <h3>Admin + export</h3>
-          <p>Simple admin with CSV export, ready when you want to wire it into your CRM.</p>
+    <section id="pricing">
+      <div class="pricing-head">
+        <h2>Simple pricing that scales with you</h2>
+        <div class="toggle" aria-label="Billing cycle">
+          <button type="button" id="billMonthly" class="active">Monthly</button>
+          <button type="button" id="billAnnual">Annual (save ~15%)</button>
         </div>
       </div>
+      <div class="grid">
+        <div class="pcard">
+          <h3>Basic</h3>
+          <div class="price" data-month="$99/mo" data-annual="$84/mo">$99/mo</div>
+          <div class="feat">60 receptionist minutes</div>
+          <div class="feat">IVR + call triage</div>
+          <div class="feat">KB answers + SMS confirm</div>
+          <a class="cta" href="#try"><button>Start with Basic</button></a>
+        </div>
+        <div class="pcard">
+          <h3>Pro</h3>
+          <div class="price" data-month="$129/mo" data-annual="$109/mo">$129/mo</div>
+          <div class="feat">120 receptionist minutes</div>
+          <div class="feat">Priority support</div>
+          <div class="feat">Calendar/dispatch hooks</div>
+          <a class="cta" href="#try"><button>Start with Pro</button></a>
+        </div>
+        <div class="pcard">
+          <h3>Ultimate</h3>
+          <div class="price" data-month="$199/mo" data-annual="$169/mo">$199/mo</div>
+          <div class="feat">250 receptionist minutes</div>
+          <div class="feat">Multi-location routing</div>
+          <div class="feat">Custom workflows</div>
+          <a class="cta" href="#try"><button>Start with Ultimate</button></a>
+        </div>
+      </div>
+      <div class="setup">One-time setup: <strong>$399</strong>. Overage billed per-minute.</div>
+      <div class="small">Annual billing shows effective monthly equivalent.</div>
     </section>
 
-    <section id="contact">
-      <footer>
-        © Reelo Visions LLC • <a href="mailto:hello@reelovisions.com">hello@reelovisions.com</a>
-      </footer>
-    </section>
+    <footer class="shell" style="padding-left:0;padding-right:0;margin-top:30px;color:#7f8da3;font-size:12px">
+      © <span id="y"></span> Reelo Visions LLC · <a href="/consent.html">Consent</a>
+    </footer>
   </div>
 
   <script>
-    // Normalize phone (US) and carry to thank-you page
-    const form = document.getElementById('lead-form');
-    const phone = document.getElementById('phone');
-    form.addEventListener('submit', (e) => {
-      const digits = (phone.value||'').replace(/\\D/g,'');
-      // Accept 10 digits, or 11 starting with 1
-      if (!/^\\d{10}$/.test(digits) && !(digits.length===11 && digits.startsWith('1'))) {
-        e.preventDefault();
-        phone.focus();
-        phone.setCustomValidity('Please enter a 10-digit US number');
-        phone.reportValidity();
-        setTimeout(()=>phone.setCustomValidity(''), 1000);
-        return;
-      }
-      // Compact to 10 digits for passing forward
-      if (digits.length === 11 && digits.startsWith('1')) {
-        phone.value = digits.slice(1);
-      } else {
-        phone.value = digits;
-      }
+    document.getElementById('y').textContent = new Date().getFullYear();
+
+    const leadForm = document.getElementById('lead-form');
+    leadForm.addEventListener('submit', (e) => {
+      const fd = new FormData(leadForm);
+      localStorage.setItem('rv_company', fd.get('company') || '');
+      localStorage.setItem('rv_email', fd.get('email') || '');
+      localStorage.setItem('rv_phone', fd.get('phone') || '');
+      leadForm.action = `/demo/thank-you?phone=${encodeURIComponent(fd.get('phone')||'')}`;
+    });
+
+    const monthlyBtn = document.getElementById('billMonthly');
+    const annualBtn  = document.getElementById('billAnnual');
+    const prices = [...document.querySelectorAll('.price')];
+    monthlyBtn.addEventListener('click', () => {
+      monthlyBtn.classList.add('active'); annualBtn.classList.remove('active');
+      prices.forEach(p => p.textContent = p.getAttribute('data-month'));
+    });
+    annualBtn.addEventListener('click', () => {
+      annualBtn.classList.add('active'); monthlyBtn.classList.remove('active');
+      prices.forEach(p => p.textContent = p.getAttribute('data-annual'));
     });
   </script>
 </body>
