@@ -41,7 +41,7 @@ button.secondary{background:linear-gradient(180deg,#2a3a52,#1b2a40)}
 #logoBlock{margin-top:12px;display:flex;align-items:center;gap:10px}
 #logoBlock img{max-height:80px;width:auto;display:none;border-radius:8px}
 
-/* CRM logos: hidden until verified loaded by JS */
+
 .crm-logos{display:flex;flex-wrap:wrap;gap:14px;margin-top:6px}
 .crm-logos img{height:22px;display:none}
 
@@ -70,3 +70,10 @@ button.secondary{background:linear-gradient(180deg,#2a3a52,#1b2a40)}
   .hero-media img{max-height:260px}
   .grid{grid-template-columns:1fr}
 }
+
+/* CRM logos: grid with consistent height; images contain without distortion */
+.crm-logos{display:flex;flex-wrap:wrap;gap:16px;margin-top:6px;align-items:center}
+.crm-logos picture{display:inline-flex;align-items:center;justify-content:center;height:28px}
+.crm-logos img{height:28px;max-width:160px;object-fit:contain;display:none;filter:none}
+
+/* Optional: keep text badges as a fallback under the logos */
