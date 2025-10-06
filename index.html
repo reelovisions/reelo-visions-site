@@ -25,6 +25,7 @@
     </header>
 
     <section class="hero">
+      <!-- LEFT: copy + integrations -->
       <div>
         <h1>Answer every call. Book more jobs.</h1>
         <p>Put an AI receptionist on your phones in under a minute. Try a real demo call right now—no salesperson, no commitment.</p>
@@ -32,27 +33,25 @@
         <div class="integrations">
           <h3>Integrates with your tools</h3>
 
-          <!-- REAL CRM LOGOS -->
+          <!-- CRM logos (40px tall, use all width) -->
           <div class="crm-logos">
-            <picture><img id="logo-servicetitan" src="/assets/crm/servicetitan.png" alt="ServiceTitan"></picture>
-            <picture><img id="logo-jobber" src="/assets/crm/jobber.png" alt="Jobber"></picture>
-            <picture><img id="logo-housecallpro" src="/assets/crm/housecallpro.png" alt="Housecall Pro"></picture>
-            <picture><img id="logo-fieldedge" src="/assets/crm/fieldedge.png" alt="FieldEdge"></picture>
-            <picture>
-              <source srcset="/assets/crm/servicefusion.webp" type="image/webp">
-              <img id="logo-servicefusion" src="/assets/crm/servicefusion.webp" alt="Service Fusion">
-            </picture>
+            <img src="/assets/crm/servicetitan.jpg"  alt="ServiceTitan">
+            <img src="/assets/crm/jobber.png"        alt="Jobber">
+            <img src="/assets/crm/housecallpro.png"  alt="Housecall Pro">
+            <img src="/assets/crm/fieldedge.png"     alt="FieldEdge">
+            <img src="/assets/crm/servicefusion.webp" alt="Service Fusion">
           </div>
 
-          <!-- Text fallbacks (stay, but visually secondary) -->
           <div class="note">All plans include integration support for most CRMs.</div>
 
-          <div id="logoBlock" style="margin-top:12px">
-            <img id="brandLogoBody" src="/assets/reelo-logo.png" alt="Reelo Visions logo (large)" >
+          <!-- Big in-body logo for readability -->
+          <div id="logoBlock">
+            <img id="brandLogoBody" src="/assets/reelo-logo.png" alt="Reelo Visions">
           </div>
         </div>
       </div>
 
+      <!-- RIGHT: call card then hero image -->
       <div>
         <div class="card" id="try">
           <form class="try" id="lead-form" action="/demo/thank-you" method="GET">
@@ -135,16 +134,7 @@
   <script>
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // Show brand logos only after successful load (prevents broken icons)
-    (function(){
-      const ids = ['brandLogoHeader','brandLogoBody'];
-      ids.forEach(id=>{
-        const el = document.getElementById(id); if(!el) return;
-        const t=new Image(); t.onload=()=>{ el.style.display='block' }; t.onerror=()=>{ el.style.display='none' };
-        t.src = el.src + '?v=' + Date.now();
-      });
-    })();
-// Lead form behavior
+    // Lead form → thank-you with phone in query
     const leadForm = document.getElementById('lead-form');
     leadForm.addEventListener('submit', (e) => {
       const fd = new FormData(leadForm);
@@ -153,21 +143,6 @@
       localStorage.setItem('rv_phone', fd.get('phone') || '');
       leadForm.action = `/demo/thank-you?phone=${encodeURIComponent(fd.get('phone')||'')}`;
     });
-
-    // Pricing toggle
-    const monthlyBtn = document.getElementById('billMonthly');
-    const annualBtn  = document.getElementById('billAnnual');
-    const prices = [...document.querySelectorAll('.price')];
-    monthlyBtn.addEventListener('click', () => {
-      monthlyBtn.classList.add('active'); annualBtn.classList.remove('active');
-      prices.forEach(p => p.textContent = p.getAttribute('data-month'));
-    });
-    annualBtn.addEventListener('click', () => {
-      annualBtn.classList.add('active'); monthlyBtn.classList.remove('active');
-      prices.forEach(p => p.textContent = p.getAttribute('data-annual'));
-    });
   </script>
 </body>
 </html>
-
-
