@@ -19,11 +19,11 @@
     <header>
       <div class="brand">
         <img id="brandLogoHeader" src="/assets/reelo-logo.png" alt="Reelo Visions logo" />
-        <div class="name">Reelo Visions <span class="pill">AI Receptionist</span></div>
+        <div class="name">Reelo Visions AI Receptionist</div>
       </div>
       <div class="nav-actions">
-        <a class="btn-outline" href="#pricing">Pricing</a>
-        <a class="btn" href="#try">Demo AI — Click to Connect Now</a>
+        <a class="btn-pricing" href="#pricing">Pricing</a>
+        <span class="badge-demo">Demo AI — Click to Connect Now</span> <!-- non-clickable -->
       </div>
     </header>
 
@@ -35,8 +35,6 @@
 
         <div class="integrations">
           <h3>Integrates with your tools</h3>
-
-          <!-- CRM logos (now 48px tall to use the space) -->
           <div class="crm-logos">
             <img src="/assets/crm/servicetitan.jpg"   alt="ServiceTitan">
             <img src="/assets/crm/jobber.png"         alt="Jobber">
@@ -44,9 +42,7 @@
             <img src="/assets/crm/fieldedge.png"      alt="FieldEdge">
             <img src="/assets/crm/servicefusion.webp" alt="Service Fusion">
           </div>
-
           <div class="note">All plans include integration support for most CRMs.</div>
-          <!-- Removed the in-hero Reelo logo block to avoid duplication -->
         </div>
       </div>
 
@@ -141,7 +137,7 @@
       localStorage.setItem('rv_phone', fd.get('phone') || '');
       leadForm.action = `/demo/thank-you?phone=${encodeURIComponent(fd.get('phone')||'')}`;
     });
-    // Pricing buttons scroll
+    // Smooth scroll for Pricing
     document.querySelectorAll('a[href="#pricing"]').forEach(a => {
       a.addEventListener('click', e => { e.preventDefault(); document.getElementById('pricing').scrollIntoView({behavior:'smooth'}); });
     });
