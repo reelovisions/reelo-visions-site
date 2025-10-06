@@ -25,7 +25,6 @@
     </header>
 
     <section class="hero">
-      <!-- LEFT: copy, integrations, body logo -->
       <div>
         <h1>Answer every call. Book more jobs.</h1>
         <p>Put an AI receptionist on your phones in under a minute. Try a real demo call right now—no salesperson, no commitment.</p>
@@ -33,16 +32,19 @@
         <div class="integrations">
           <h3>Integrates with your tools</h3>
 
-          <!-- CRM logos (hidden until JS verifies file exists) -->
+          <!-- REAL CRM LOGOS -->
           <div class="crm-logos">
-            <img id="logo-servicetitan" src="/assets/crm/servicetitan.svg" alt="ServiceTitan" style="display:none">
-            <img id="logo-jobber" src="/assets/crm/jobber.svg" alt="Jobber" style="display:none">
-            <img id="logo-housecallpro" src="/assets/crm/housecallpro.svg" alt="Housecall Pro" style="display:none">
-            <img id="logo-fieldedge" src="/assets/crm/fieldedge.svg" alt="FieldEdge" style="display:none">
-            <img id="logo-servicefusion" src="/assets/crm/servicefusion.svg" alt="Service Fusion" style="display:none">
+            <picture><img id="logo-servicetitan" src="/assets/crm/servicetitan.png" alt="ServiceTitan"></picture>
+            <picture><img id="logo-jobber" src="/assets/crm/jobber.png" alt="Jobber"></picture>
+            <picture><img id="logo-housecallpro" src="/assets/crm/housecallpro.png" alt="Housecall Pro"></picture>
+            <picture><img id="logo-fieldedge" src="/assets/crm/fieldedge.png" alt="FieldEdge"></picture>
+            <picture>
+              <source srcset="/assets/crm/servicefusion.webp" type="image/webp">
+              <img id="logo-servicefusion" src="/assets/crm/servicefusion.webp" alt="Service Fusion">
+            </picture>
           </div>
 
-          <!-- Text badges fallback -->
+          <!-- Text fallbacks (stay, but visually secondary) -->
           <div class="badges">
             <span class="badge">ServiceTitan</span>
             <span class="badge">Jobber</span>
@@ -53,14 +55,12 @@
           </div>
           <div class="note">All plans include integration support for most CRMs.</div>
 
-          <!-- Body logo (capped height) -->
-          <div id="logoBlock">
-            <img id="brandLogoBody" src="/assets/reelo-logo.png" alt="Reelo Visions logo (large)">
+          <div id="logoBlock" style="margin-top:12px">
+            <img id="brandLogoBody" src="/assets/reelo-logo.png" alt="Reelo Visions logo (large)" style="max-height:80px;display:none;border-radius:8px">
           </div>
         </div>
       </div>
 
-      <!-- RIGHT (fixed width): CALL CARD first, then hero image -->
       <div>
         <div class="card" id="try">
           <form class="try" id="lead-form" action="/demo/thank-you" method="GET">
@@ -143,20 +143,27 @@
   <script>
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // Show logos only after successful load (prevents broken icons)
+    // Show brand logos only after successful load (prevents broken icons)
     (function(){
-      const ids = ['brandLogoHeader','brandLogoBody','logo-servicetitan','logo-jobber','logo-housecallpro','logo-fieldedge','logo-servicefusion'];
+      const ids = ['brandLogoHeader','brandLogoBody'];
       ids.forEach(id=>{
-        const el = document.getElementById(id);
-        if(!el) return;
-        const test = new Image();
-        test.onload = ()=>{ el.style.display = (id.startsWith('logo-')?'inline-block':'block'); };
-        test.onerror = ()=>{ if(id.startsWith('logo-')) el.remove(); else el.style.display='none'; };
-        test.src = el.src + '?v=' + Date.now();
+        const el = document.getElementById(id); if(!el) return;
+        const t=new Image(); t.onload=()=>{ el.style.display='block' }; t.onerror=()=>{ el.style.display='none' };
+        t.src = el.src + '?v=' + Date.now();
       });
     })();
 
-    // Lead form
+    // Show CRM logos only if the files actually exist
+    (function(){
+      const ids = ['logo-servicetitan','logo-jobber','logo-housecallpro','logo-fieldedge','logo-servicefusion'];
+      ids.forEach(id=>{
+        const el = document.getElementById(id); if(!el) return;
+        const t=new Image(); t.onload=()=>{ el.style.display='block' }; t.onerror=()=>{ el.remove() };
+        t.src = el.src + '?v=' + Date.now();
+      });
+    })();
+
+    // Lead form behavior
     const leadForm = document.getElementById('lead-form');
     leadForm.addEventListener('submit', (e) => {
       const fd = new FormData(leadForm);
