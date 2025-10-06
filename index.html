@@ -18,7 +18,6 @@
   <div class="shell">
     <header>
       <div class="brand">
-        <!-- DIRECT logo path you confirmed; hidden by CSS until it loads -->
         <img id="brandLogoHeader" src="/assets/reelo-logo.png" alt="Reelo Visions logo" />
         <div class="name">Reelo Visions <span class="pill">AI Receptionist</span></div>
       </div>
@@ -26,6 +25,7 @@
     </header>
 
     <section class="hero">
+      <!-- LEFT: copy, integrations, body logo -->
       <div>
         <h1>Answer every call. Book more jobs.</h1>
         <p>Put an AI receptionist on your phones in under a minute. Try a real demo call right now—no salesperson, no commitment.</p>
@@ -33,16 +33,16 @@
         <div class="integrations">
           <h3>Integrates with your tools</h3>
 
-          <!-- Optional CRM logos (drop files in /assets/crm/ to auto-show) -->
+          <!-- CRM logos (hidden until JS verifies file exists) -->
           <div class="crm-logos">
-            <img id="logo-servicetitan" src="/assets/crm/servicetitan.svg" alt="ServiceTitan">
-            <img id="logo-jobber" src="/assets/crm/jobber.svg" alt="Jobber">
-            <img id="logo-housecallpro" src="/assets/crm/housecallpro.svg" alt="Housecall Pro">
-            <img id="logo-fieldedge" src="/assets/crm/fieldedge.svg" alt="FieldEdge">
-            <img id="logo-servicefusion" src="/assets/crm/servicefusion.svg" alt="Service Fusion">
+            <img id="logo-servicetitan" src="/assets/crm/servicetitan.svg" alt="ServiceTitan" style="display:none">
+            <img id="logo-jobber" src="/assets/crm/jobber.svg" alt="Jobber" style="display:none">
+            <img id="logo-housecallpro" src="/assets/crm/housecallpro.svg" alt="Housecall Pro" style="display:none">
+            <img id="logo-fieldedge" src="/assets/crm/fieldedge.svg" alt="FieldEdge" style="display:none">
+            <img id="logo-servicefusion" src="/assets/crm/servicefusion.svg" alt="Service Fusion" style="display:none">
           </div>
 
-          <!-- Text badges remain as fallback -->
+          <!-- Text badges fallback -->
           <div class="badges">
             <span class="badge">ServiceTitan</span>
             <span class="badge">Jobber</span>
@@ -53,18 +53,16 @@
           </div>
           <div class="note">All plans include integration support for most CRMs.</div>
 
-          <!-- Big in-body logo (uses same file; shows once loaded) -->
+          <!-- Body logo (capped height) -->
           <div id="logoBlock">
             <img id="brandLogoBody" src="/assets/reelo-logo.png" alt="Reelo Visions logo (large)">
           </div>
         </div>
       </div>
 
+      <!-- RIGHT (fixed width): CALL CARD first, then hero image -->
       <div>
-        <div class="hero-media">
-          <img src="/assets/hero-sleep.png" alt="AI receptionist handling calls while you sleep">
-        </div>
-        <div class="card" id="try" style="margin-top:12px">
+        <div class="card" id="try">
           <form class="try" id="lead-form" action="/demo/thank-you" method="GET">
             <input type="text" name="company" placeholder="Company name" required />
             <div class="row">
@@ -75,6 +73,9 @@
             <div class="helper">Our AI will call your phone in ~60 seconds. No credit card. No commitment.</div>
             <div class="note">By continuing, you agree to our <a href="/consent.html">Consent & SMS terms</a>.</div>
           </form>
+        </div>
+        <div class="hero-media">
+          <img src="/assets/hero-sleep.png" alt="AI receptionist handling calls while you sleep">
         </div>
       </div>
     </section>
@@ -142,40 +143,16 @@
   <script>
     document.getElementById('y').textContent = new Date().getFullYear();
 
-    // Show logos only after successful load (prevents broken icon)
+    // Show logos only after successful load (prevents broken icons)
     (function(){
-      const imgs = [document.getElementById('brandLogoHeader'), document.getElementById('brandLogoBody')];
-      imgs.forEach(el => {
-        if (!el) return;
-        const probe = new Image();
-        probe.onload = () => { el.style.display = "block"; };
-        probe.onerror = () => {
-          // fallback candidates if the direct file ever moves
-          const alts = ["/assets/logo.svg","/assets/logo.png","/assets/reelo-logo.svg","/assets/logo-dark.png"];
-          let i = 0;
-          const tryNext = () => {
-            if (i >= alts.length) return;
-            const test = new Image();
-            const src = alts[i++] + "?v=" + Date.now();
-            test.onload = () => { el.src = src; el.style.display = "block"; };
-            test.onerror = tryNext;
-            test.src = src;
-          };
-          tryNext();
-        };
-        // kick probe
-        probe.src = el.getAttribute("src") + "?v=" + Date.now();
-      });
-    })();
-
-    // CRM logos: show only if file exists
-    (function(){
-      ["logo-servicetitan","logo-jobber","logo-housecallpro","logo-fieldedge","logo-servicefusion"].forEach(id => {
-        const el = document.getElementById(id); if (!el) return;
-        const probe = new Image();
-        probe.onload = () => { el.style.display = "inline-block"; };
-        probe.onerror = () => { el.remove(); };
-        probe.src = el.src + "?v=" + Date.now();
+      const ids = ['brandLogoHeader','brandLogoBody','logo-servicetitan','logo-jobber','logo-housecallpro','logo-fieldedge','logo-servicefusion'];
+      ids.forEach(id=>{
+        const el = document.getElementById(id);
+        if(!el) return;
+        const test = new Image();
+        test.onload = ()=>{ el.style.display = (id.startsWith('logo-')?'inline-block':'block'); };
+        test.onerror = ()=>{ if(id.startsWith('logo-')) el.remove(); else el.style.display='none'; };
+        test.src = el.src + '?v=' + Date.now();
       });
     })();
 
