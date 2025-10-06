@@ -8,13 +8,11 @@ a{color:var(--brand);text-decoration:none}
 .shell{max-width:1180px;margin:0 auto;padding:24px}
 
 /* Header */
-header{
-  display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;
-  min-height:72px; /* match logo height */
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;min-height:94px; /* match logo height */
 }
 .brand{display:flex;align-items:center;gap:12px}
 .brand .name{font-weight:800;letter-spacing:.2px;font-size:20px}
-.brand img{height:72px;width:auto;display:block;filter: drop-shadow(0 0 6px rgba(0,0,0,.5))}
+.brand img{height:94px;width:auto;display:block;filter: drop-shadow(0 0 6px rgba(0,0,0,.5))}
 .nav-actions{display:flex;gap:10px;align-items:center}
 
 /* Buttons / pills */
@@ -31,3 +29,4 @@ header{
 .btn-pricing{display:inline-block;background:var(--danger);color:#fff;border-radius:12px;padding:10px 16px;font-weight:900;border:1px solid #b71c1c}
 
 /* Hero + rest (unchanged except what you already have) */
+
