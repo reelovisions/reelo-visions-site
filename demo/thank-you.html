@@ -1,94 +1,46 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Thanks — Your demo call is on the way</title>
+  <title>Thanks — Start Your Demo Call</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self';
-                 connect-src 'self' https://*.twil.io https://*.supabase.co;
-                 img-src 'self' data:;
-                 style-src 'self';
-                 script-src 'self' 'unsafe-inline';
-                 base-uri 'self'">
   <link rel="stylesheet" href="/assets/site.css" />
+  <style>
+    .wrap { max-width: 720px; margin: 40px auto; padding: 16px; }
+    .muted { color: #7f8da3; }
+    .row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; }
+    .btn { padding: 10px 14px; border-radius: 8px; background:#0a66ff; color:#fff; border:0; cursor:pointer; }
+    .btn[disabled] { opacity:.6; cursor:wait; }
+    .input { width: 100%; padding: 10px 12px; border:1px solid #ccd3e0; border-radius:8px; font-size:16px; }
+    .note { font-size: 12px; color:#7f8da3; margin-top:8px; }
+    .ok { color:#0a8a3a; }
+    .err { color:#c62828; }
+  </style>
 </head>
-<body class="thankyou">
-  <div class="shell">
-    <h1>You're set ✅</h1>
-    <p class="muted">We’ll ring <span id="p"></span> right now. If you don’t get a call in ~30s, check your phone format and try again.</p>
+<body>
+  <div class="wrap">
+    <h1>You're set. Let's place your demo call.</h1>
+    <p class="muted">We pre-filled your number from the last step. Click the button to start the call.</p>
 
-    <div class="card" style="margin-top:14px">
-      <h2>Post-demo feedback (10 seconds)</h2>
-      <form id="fb">
-        <div class="row">
-          <select name="rating" required>
-            <option value="" disabled selected>How did the demo go?</option>
-            <option>Great demo</option>
-            <option>Okay</option>
-            <option>Confusing</option>
-            <option>Didn't work</option>
-          </select>
-          <select name="call_result" required>
-            <option value="" disabled selected>Did the call connect?</option>
-            <option>Yes, connected</option>
-            <option>No, didn’t connect</option>
-          </select>
-        </div>
-        <textarea name="comments" rows="4" placeholder="Anything we should improve?"></textarea>
-        <input type="hidden" name="phone" />
-        <input type="hidden" name="email" />
-        <input type="hidden" name="company" />
-        <div style="margin-top:10px;display:flex;gap:10px;align-items:center">
-          <button type="submit">Send feedback</button>
-          <span id="status" class="muted"></span>
-        </div>
-      </form>
+    <div class="card">
+      <label for="phone">Mobile number (E.164, e.g. +16125551234)</label>
+      <div class="row" style="margin-top:6px">
+        <input id="phone" class="input" type="tel" inputmode="tel" />
+        <button id="startCall" class="btn">Start Demo Call</button>
+      </div>
+      <div id="status" class="note" role="status" aria-live="polite"></div>
+    </div>
+
+    <p class="note">By continuing, you agree to our <a href="/consent.html">Consent & SMS terms</a>.</p>
+
+    <div style="margin-top:24px">
+      <details>
+        <summary class="muted">Why two steps?</summary>
+        <p class="muted">To reduce spam. The homepage just collects details; the call only starts here when you click.</p>
+      </details>
     </div>
   </div>
 
-  <script>
-    const params = new URLSearchParams(location.search);
-    const phone = params.get('phone') || localStorage.getItem('rv_phone') || '';
-    const email = localStorage.getItem('rv_email') || '';
-    const company = localStorage.getItem('rv_company') || '';
-    document.getElementById('p').textContent = phone ? phone : '(no phone provided)';
-    const fb = document.getElementById('fb');
-    fb.elements['phone'].value = phone;
-    fb.elements['email'].value = email;
-    fb.elements['company'].value = company;
-
-    fb.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = fb.querySelector('button');
-      const status = document.getElementById('status');
-      btn.disabled = true; status.textContent = 'Sending...';
-
-      const payload = {
-        rating: fb.elements['rating'].value,
-        call_result: fb.elements['call_result'].value,
-        comments: fb.elements['comments'].value,
-        phone: fb.elements['phone'].value,
-        email: fb.elements['email'].value,
-        company: fb.elements['company'].value,
-        user_agent: navigator.userAgent || '',
-        url: location.href
-      };
-      try{
-        const res = await fetch('/api/feedback', {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify(payload)
-        });
-        if(!res.ok){ throw new Error('Bad response'); }
-        status.textContent = 'Thanks for the feedback!'; status.className = 'ok';
-        fb.reset();
-      }catch(err){
-        status.textContent = 'Error sending feedback. Please try again.'; status.className = 'err';
-      }finally{
-        btn.disabled = false;
-      }
-    });
-  </script>
+  <script src="/demo/js/demo-call.js" defer></script>
 </body>
 </html>
