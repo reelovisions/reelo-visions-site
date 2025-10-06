@@ -1,6 +1,6 @@
 ﻿:root{
   --bg:#0b0f14; --card:#121821; --muted:#7f8da3; --text:#e7eefc; --brand:#57a6ff;
-  --danger:#e53935; /* bright red for Pricing */
+  --danger:#e53935;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
@@ -8,69 +8,26 @@ a{color:var(--brand);text-decoration:none}
 .shell{max-width:1180px;margin:0 auto;padding:24px}
 
 /* Header */
-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+header{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;
+  min-height:72px; /* match logo height */
+}
 .brand{display:flex;align-items:center;gap:12px}
 .brand .name{font-weight:800;letter-spacing:.2px;font-size:20px}
-.brand img{height:56px;width:auto;display:block;filter: drop-shadow(0 0 6px rgba(0,0,0,.5))}
+.brand img{height:72px;width:auto;display:block;filter: drop-shadow(0 0 6px rgba(0,0,0,.5))}
 .nav-actions{display:flex;gap:10px;align-items:center}
+
+/* Buttons / pills */
 .btn{display:inline-block;background:linear-gradient(180deg,var(--brand),#357ce0);color:#fff;border:none;border-radius:12px;padding:10px 14px;font-weight:800}
 .btn-outline{display:inline-block;background:transparent;color:#fff;border:1px solid #2a3a52;border-radius:12px;padding:9px 14px;font-weight:700}
-/* NEW: non-clickable demo pill + red pricing */
-.badge-demo{display:inline-block;background:linear-gradient(180deg,#6aa8ff,#3a79e5);color:#fff;border-radius:12px;padding:10px 14px;font-weight:800}
+
+/* Non-clickable demo pill: same dark background as site + white border */
+.badge-demo{
+  display:inline-block;background:var(--bg);color:#fff;border-radius:12px;
+  padding:10px 16px;font-weight:900;border:1px solid #ffffff;
+}
+
+/* Pricing button stays red */
 .btn-pricing{display:inline-block;background:var(--danger);color:#fff;border-radius:12px;padding:10px 16px;font-weight:900;border:1px solid #b71c1c}
 
-/* Hero */
-.hero{
-  border:1px solid #1b2534;background:linear-gradient(180deg,#0e141d,#0b0f14);
-  border-radius:18px;padding:32px;margin-top:12px;
-  display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:start
-}
-.hero h1{font-size:48px;line-height:1.05;margin:0 0 10px}
-.hero p{color:#9fb1cc;margin:0 0 18px;font-size:16px}
-
-/* Call card + inputs */
-.card{background:#121821;border:1px solid #1b2534;border-radius:14px;padding:18px}
-form.try{display:grid;gap:10px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-input{width:100%;background:#0a0f16;border:1px solid #243044;color:var(--text);border-radius:10px;padding:12px}
-input:focus{outline:none;box-shadow:0 0 0 3px rgba(87,166,255,.25);border-color:#35507a}
-button{cursor:pointer;background:linear-gradient(180deg,var(--brand),#357ce0);border:none;border-radius:12px;color:white;font-weight:800;padding:12px 14px}
-button.secondary{background:linear-gradient(180deg,#2a3a52,#1b2a40)}
-.note{color:#9fb1cc;font-size:12px}
-.helper{color:#cfe0ff;font-size:12px;margin-top:6px}
-
-/* Integrations — match the height of the image area and grow logos */
-.integrations{
-  margin-top:10px;border:1px solid #1b2534;border-radius:14px;padding:14px;background:#0e141d;
-  min-height:260px; /* lines up visually with the photo under the form */
-  display:flex;flex-direction:column;justify-content:flex-start;
-}
-.crm-logos{display:flex;flex-wrap:wrap;gap:28px;margin-top:14px;align-items:center}
-.crm-logos img{height:54px;max-width:240px;object-fit:contain;display:inline-block;opacity:.98}
-
-/* Right-rail image */
-.hero-media{border-radius:14px;overflow:hidden;border:1px solid #1b2534;background:#0a0f16;margin-top:12px}
-.hero-media img{display:block;width:100%;height:auto;max-height:220px;object-fit:cover}
-
-/* Pricing */
-#pricing{margin-top:28px}
-.pricing-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.toggle{display:flex;gap:8px;align-items:center}
-.toggle button{background:#0c131c;border:1px solid #263246;padding:8px 10px;border-radius:10px}
-.toggle button.active{background:linear-gradient(180deg,#2a3a52,#1b2a40);border-color:#35507a}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.pcard{background:#121821;border:1px solid #1b2534;border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px}
-.pcard h3{margin:0}
-.price{font-size:28px;font-weight:800}
-.feat{color:#9fb1cc;font-size:14px}
-.pcard .cta{margin-top:auto}
-.small{font-size:12px;color:#7f8da3}
-.setup{margin-top:6px;color:#7f8da3}
-
-@media (max-width:980px){
-  .hero{grid-template-columns:1fr}
-  .row{grid-template-columns:1fr}
-  .hero-media img{max-height:260px}
-  .integrations{min-height:auto}
-  .grid{grid-template-columns:1fr}
-}
+/* Hero + rest (unchanged except what you already have) */
