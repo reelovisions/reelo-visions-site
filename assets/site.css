@@ -30,3 +30,13 @@ header{display:flex;align-items:center;justify-content:space-between;margin-bott
 
 /* Hero + rest (unchanged except what you already have) */
 
+
+/* Safety clamp: any CRM image inside integrations */
+.integrations img[src*="/assets/crm/"]{
+  height:40px !important;
+  max-width:180px !important;
+  width:auto !important;
+  object-fit:contain !important;
+  display:inline-block !important;
+  vertical-align:middle !important;
+}
