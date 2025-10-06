@@ -17,28 +17,65 @@
 <body>
   <div class="shell">
     <header>
-      <div class="logo">🤖 Reelo Visions <span class="pill">AI Receptionist</span></div>
-      <a href="#try">Try Now</a>
+      <div class="brand">
+        <img src="/assets/logo.svg" alt="Reelo Visions logo" onerror="this.style.display='none'">
+        <div class="name">Reelo Visions <span class="pill">AI Receptionist</span></div>
+      </div>
+      <a href="#try">Call Me Now</a>
     </header>
 
     <section class="hero">
       <div>
-        <h1>Answer every call. Book more jobs. <span style="color:var(--brand)">Demo it in 60 seconds.</span></h1>
-        <p>Human-sounding AI that greets callers, triages issues, answers FAQs from your KB, and books appointments. Built for HVAC & home-service teams.</p>
+        <h1>Answer every call. Book more jobs. <span style="color:var(--brand)">Try a real demo call now.</span></h1>
+        <p>Human-sounding AI that greets callers, triages issues, answers from your knowledge base, and books appointments. Built for HVAC & home-service teams.</p>
+        <div class="integrations">
+          <h3>Integrates with your tools</h3>
+          <div class="badges">
+            <span class="badge">ServiceTitan</span>
+            <span class="badge">Jobber</span>
+            <span class="badge">Housecall Pro</span>
+            <span class="badge">FieldEdge</span>
+            <span class="badge">Service Fusion</span>
+            <span class="badge">…and more</span>
+          </div>
+          <div class="note">All plans include integration support for most CRMs.</div>
+        </div>
         <div class="spacer"></div>
-        <div class="note">No credit card. Demo dials your phone immediately.</div>
+        <div class="note">No credit card. We’ll place a demo call to your phone immediately.</div>
       </div>
 
-      <div class="card" id="try">
-        <form class="try" id="lead-form" action="/demo/thank-you" method="GET">
-          <input type="text" name="company" placeholder="Company name" required />
-          <div class="row">
-            <input type="email" name="email" placeholder="Work email" required />
-            <input type="tel" name="phone" placeholder="Mobile (for demo call)" required />
-          </div>
-          <button type="submit">Try Now →</button>
-          <div class="note">By continuing, you agree to our <a href="/consent.html">Consent & SMS terms</a>.</div>
-        </form>
+      <div>
+        <div class="hero-media">
+          <img src="/assets/hero-sleep.png" alt="AI receptionist handling calls while you sleep">
+        </div>
+        <div class="card" id="try" style="margin-top:12px">
+          <form class="try" id="lead-form" action="/demo/thank-you" method="GET">
+            <input type="text" name="company" placeholder="Company name" required />
+            <div class="row">
+              <input type="email" name="email" placeholder="Work email" required />
+              <input type="tel" name="phone" placeholder="Mobile (for demo call)" required />
+            </div>
+            <button type="submit">Call Me Now →</button>
+            <div class="note">By continuing, you agree to our <a href="/consent.html">Consent & SMS terms</a>.</div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="shell" style="padding-left:0;padding-right:0;margin-top:24px">
+      <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:14px">
+        <div class="pcard">
+          <h3>Smarter triage</h3>
+          <div class="feat">Detects emergencies vs. quotes vs. general questions. Routes accordingly, 24/7.</div>
+        </div>
+        <div class="pcard">
+          <h3>KB “How-to’s”</h3>
+          <div class="feat">Extensive knowledge base with simple step-by-steps (e.g., change a clogged filter) to cut avoidable truck rolls.</div>
+        </div>
+        <div class="pcard">
+          <h3>Instant follow-ups</h3>
+          <div class="feat">SMS/email summaries after each call so nothing slips through the cracks.</div>
+        </div>
       </div>
     </section>
 
@@ -57,15 +94,15 @@
           <div class="feat">60 receptionist minutes</div>
           <div class="feat">IVR + call triage</div>
           <div class="feat">KB answers + SMS confirm</div>
-          <a class="cta" href="#try"><button>Start with Basic</button></a>
+          <a class="cta" href="#try"><button class="secondary">Call Me Now</button></a>
         </div>
         <div class="pcard">
           <h3>Pro</h3>
           <div class="price" data-month="$129/mo" data-annual="$109/mo">$129/mo</div>
           <div class="feat">120 receptionist minutes</div>
           <div class="feat">Priority support</div>
-          <div class="feat">Calendar/dispatch hooks</div>
-          <a class="cta" href="#try"><button>Start with Pro</button></a>
+          <div class="feat">CRM integration help</div>
+          <a class="cta" href="#try"><button class="secondary">Call Me Now</button></a>
         </div>
         <div class="pcard">
           <h3>Ultimate</h3>
@@ -73,7 +110,7 @@
           <div class="feat">250 receptionist minutes</div>
           <div class="feat">Multi-location routing</div>
           <div class="feat">Custom workflows</div>
-          <a class="cta" href="#try"><button>Start with Ultimate</button></a>
+          <a class="cta" href="#try"><button class="secondary">Call Me Now</button></a>
         </div>
       </div>
       <div class="setup">One-time setup: <strong>$399</strong>. Overage billed per-minute.</div>
@@ -82,6 +119,7 @@
 
     <footer class="shell" style="padding-left:0;padding-right:0;margin-top:30px;color:#7f8da3;font-size:12px">
       © <span id="y"></span> Reelo Visions LLC · <a href="/consent.html">Consent</a>
+      <div class="note">All trademarks/logos are property of their respective owners. “Integrates with” indicates connector/API/workflow support.</div>
     </footer>
   </div>
 
@@ -95,6 +133,8 @@
       localStorage.setItem('rv_phone', fd.get('phone') || '');
       leadForm.action = `/demo/thank-you?phone=${encodeURIComponent(fd.get('phone')||'')}`;
     });
+
+    // Pricing toggle
     const monthlyBtn = document.getElementById('billMonthly');
     const annualBtn  = document.getElementById('billAnnual');
     const prices = [...document.querySelectorAll('.price')];
