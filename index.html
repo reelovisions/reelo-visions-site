@@ -18,16 +18,17 @@
   <div class="shell">
     <header>
       <div class="brand">
-        <img src="/assets/logo.svg" alt="Reelo Visions logo" onerror="this.style.display='none'">
+        <img id="brandLogo" alt="Reelo Visions logo" />
         <div class="name">Reelo Visions <span class="pill">AI Receptionist</span></div>
       </div>
-      <a href="#try">Call Me Now</a>
+      <a href="#try">Start Free AI Demo Call</a>
     </header>
 
     <section class="hero">
       <div>
-        <h1>Answer every call. Book more jobs. <span style="color:var(--brand)">Try a real demo call now.</span></h1>
-        <p>Human-sounding AI that greets callers, triages issues, answers from your knowledge base, and books appointments. Built for HVAC & home-service teams.</p>
+        <h1>Answer every call. Book more jobs.</h1>
+        <p>Put an AI receptionist on your phones in under a minute. Try a real demo call right now—no salesperson, no commitment.</p>
+
         <div class="integrations">
           <h3>Integrates with your tools</h3>
           <div class="badges">
@@ -40,8 +41,6 @@
           </div>
           <div class="note">All plans include integration support for most CRMs.</div>
         </div>
-        <div class="spacer"></div>
-        <div class="note">No credit card. We’ll place a demo call to your phone immediately.</div>
       </div>
 
       <div>
@@ -55,7 +54,8 @@
               <input type="email" name="email" placeholder="Work email" required />
               <input type="tel" name="phone" placeholder="Mobile (for demo call)" required />
             </div>
-            <button type="submit">Call Me Now →</button>
+            <button type="submit">Start Free AI Demo Call →</button>
+            <div class="helper">Our AI will call your phone in ~60 seconds. No credit card. No commitment.</div>
             <div class="note">By continuing, you agree to our <a href="/consent.html">Consent & SMS terms</a>.</div>
           </form>
         </div>
@@ -66,11 +66,11 @@
       <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:14px">
         <div class="pcard">
           <h3>Smarter triage</h3>
-          <div class="feat">Detects emergencies vs. quotes vs. general questions. Routes accordingly, 24/7.</div>
+          <div class="feat">Detects emergencies vs. quotes vs. questions and routes accordingly—24/7.</div>
         </div>
         <div class="pcard">
           <h3>KB “How-to’s”</h3>
-          <div class="feat">Extensive knowledge base with simple step-by-steps (e.g., change a clogged filter) to cut avoidable truck rolls.</div>
+          <div class="feat">Extensive knowledge base with simple step-by-steps (e.g., fix a clogged filter) to cut avoidable truck rolls.</div>
         </div>
         <div class="pcard">
           <h3>Instant follow-ups</h3>
@@ -94,7 +94,7 @@
           <div class="feat">60 receptionist minutes</div>
           <div class="feat">IVR + call triage</div>
           <div class="feat">KB answers + SMS confirm</div>
-          <a class="cta" href="#try"><button class="secondary">Call Me Now</button></a>
+          <a class="cta" href="#try"><button class="secondary">Start Free AI Demo Call</button></a>
         </div>
         <div class="pcard">
           <h3>Pro</h3>
@@ -102,7 +102,7 @@
           <div class="feat">120 receptionist minutes</div>
           <div class="feat">Priority support</div>
           <div class="feat">CRM integration help</div>
-          <a class="cta" href="#try"><button class="secondary">Call Me Now</button></a>
+          <a class="cta" href="#try"><button class="secondary">Start Free AI Demo Call</button></a>
         </div>
         <div class="pcard">
           <h3>Ultimate</h3>
@@ -110,7 +110,7 @@
           <div class="feat">250 receptionist minutes</div>
           <div class="feat">Multi-location routing</div>
           <div class="feat">Custom workflows</div>
-          <a class="cta" href="#try"><button class="secondary">Call Me Now</button></a>
+          <a class="cta" href="#try"><button class="secondary">Start Free AI Demo Call</button></a>
         </div>
       </div>
       <div class="setup">One-time setup: <strong>$399</strong>. Overage billed per-minute.</div>
@@ -125,6 +125,30 @@
 
   <script>
     document.getElementById('y').textContent = new Date().getFullYear();
+
+    // Robust logo: try a few common filenames in /assets and use the first that loads
+    (function(){
+      const candidates = [
+        "/assets/logo.svg",
+        "/assets/logo.png",
+        "/assets/reelo-logo.svg",
+        "/assets/reelo-logo.png",
+        "/assets/logo-dark.png"
+      ];
+      const el = document.getElementById("brandLogo");
+      let i = 0;
+      const tryNext = () => {
+        if (i >= candidates.length) { el.style.display = "none"; return; }
+        const src = candidates[i++];
+        const probe = new Image();
+        probe.onload = () => { el.src = src; };
+        probe.onerror = tryNext;
+        probe.src = src + "?v=" + Date.now(); // bust stale cache
+      };
+      tryNext();
+    })();
+
+    // Lead form → thank-you with phone in query; keep localStorage for prefill
     const leadForm = document.getElementById('lead-form');
     leadForm.addEventListener('submit', (e) => {
       const fd = new FormData(leadForm);
