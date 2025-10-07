@@ -2,60 +2,144 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Reelo Visions – AI Receptionist for Home Services</title>
-  <link rel="stylesheet" href="/css/styles.css" />
-  <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;margin:0;color:#111}
-    .wrap{max-width:1024px;margin:0 auto;padding:32px}
-    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
-    .brand{display:flex;align-items:center;gap:10px;font-weight:700}
-    .hero{display:grid;grid-template-columns:1.2fr 1fr;gap:32px;align-items:start}
-    .card{border:1px solid #e5e7eb;border-radius:12px;padding:18px}
-    form.try{display:grid;gap:12px}
-    form.try .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    input,textarea{width:100%;padding:12px 14px;border:1px solid #cbd5e1;border-radius:10px;font-size:16px}
-    button{all:unset;display:inline-block;background:#2563eb;color:#fff;padding:12px 16px;border-radius:10px;font-weight:600;cursor:pointer;text-align:center}
-    .helper{font-size:12px;color:#6b7280}
-    @media (max-width:900px){.hero{grid-template-columns:1fr}}
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 connect-src 'self' https://*.twil.io https://*.supabase.co;
+                 img-src 'self' data:;
+                 style-src 'self';
+                 script-src 'self' 'unsafe-inline';
+                 base-uri 'self';
+                 form-action 'self'">
+  <link rel="stylesheet" href="/assets/site.css" />
 </head>
 <body>
-  <div class="wrap">
+  <div class="shell">
     <header>
-      <div class="brand">Reelo Visions</div>
+      <div class="brand">
+        <img id="brandLogoHeader" src="/assets/reelo-logo.png" alt="Reelo Visions logo" />
+        <div class="name">Small Business Solutions</div>
+      </div>
+      <div class="nav-actions">
+        <a class="btn-pricing" href="#pricing">Pricing</a>
+        <span class="badge-demo">Demo AI — Connect Now</span>
+      </div>
     </header>
 
     <section class="hero">
+      <!-- LEFT -->
       <div>
         <h1>Answer every call. Book more jobs.</h1>
-        <p>Try a real demo call right now—no salesperson, no commitment.</p>
+        <p>Put an AI receptionist on your phones in under a minute. Try a real demo call right now—no salesperson, no commitment.</p>
+
+        <div class="integrations">
+          <h3>Integrates with your tools</h3>
+          <div class="crm-logos">
+            <img src="/assets/crm/servicetitan.jpg"   alt="ServiceTitan"    title="ServiceTitan" />
+            <img src="/assets/crm/jobber.png"         alt="Jobber"          title="Jobber" />
+            <img src="/assets/crm/housecallpro.png"   alt="Housecall Pro"   title="Housecall Pro" />
+            <img src="/assets/crm/fieldedge.png"      alt="FieldEdge"       title="FieldEdge" />
+            <img src="/assets/crm/servicefusion.webp" alt="Service Fusion"  title="Service Fusion" />
+          </div>
+          <div class="note">All plans include integration support for most CRMs.</div>
+        </div>
       </div>
 
-      <div class="card">
-        <!-- IMPORTANT: this must include .html -->
-        <form id="lead-form" class="try" method="GET" action="/demo/thank-you.html">
-          <input type="text"   name="company" placeholder="Company name" required />
-          <div class="row">
-            <input type="email" name="email"   placeholder="Work email" required />
-            <input type="tel"   name="phone"   placeholder="Mobile (for demo call)" required />
-          </div>
-          <button type="submit">Demo AI — Click to Connect Now →</button>
-          <div class="helper">We’ll pass your number to the call page to start the demo.</div>
-        </form>
+      <!-- RIGHT -->
+      <div>
+        <div class="card" id="try">
+          <form class="try" id="lead-form" action="/demo/thank-you" method="GET">
+            <input type="text" name="company" placeholder="Company name" required />
+            <div class="row">
+              <input type="email" name="email" placeholder="Work email" required />
+              <input type="tel" name="phone" placeholder="Mobile (for demo call)" required />
+            </div>
+            <button type="submit">Demo AI — Click to Connect Now →</button>
+            <div class="helper">Our AI will call your phone in ~60 seconds. No credit card. No commitment.</div>
+            <div class="note">By continuing, you agree to our <a href="/consent.html">Consent & SMS terms</a>.</div>
+          </form>
+        </div>
+        <div class="hero-media">
+          <img src="/assets/hero-sleep.png" alt="AI receptionist handling calls while you sleep">
+        </div>
       </div>
     </section>
+
+    <section id="features" class="shell" style="padding-left:0;padding-right:0;margin-top:24px">
+      <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:14px">
+        <div class="pcard">
+          <h3>Smarter triage</h3>
+          <div class="feat">Detects emergencies vs. quotes vs. questions and routes accordingly—24/7.</div>
+        </div>
+        <div class="pcard">
+          <h3>Knowledge Base “How-to’s”</h3>
+          <div class="feat">Extensive knowledge base with simple step-by-steps (e.g., fix a clogged filter) to cut avoidable truck rolls.</div>
+        </div>
+        <div class="pcard">
+          <h3>Instant follow-ups</h3>
+          <div class="feat">SMS/email summaries after each call so nothing slips through the cracks.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing">
+      <div class="pricing-head">
+        <h2>Simple pricing that scales with you</h2>
+        <div class="toggle" aria-label="Billing cycle">
+          <button type="button" id="billMonthly" class="active">Monthly</button>
+          <button type="button" id="billAnnual">Annual (save ~15%)</button>
+        </div>
+      </div>
+      <div class="grid">
+        <div class="pcard">
+          <h3>Basic</h3>
+          <div class="price" data-month="$99/mo" data-annual="$84/mo">$99/mo</div>
+          <div class="feat">60 receptionist minutes</div>
+          <div class="feat">IVR + call triage</div>
+          <div class="feat">KB answers + SMS confirm</div>
+          <a class="cta" href="#try"><button class="secondary">Demo AI — Click to Connect Now</button></a>
+        </div>
+        <div class="pcard">
+          <h3>Pro</h3>
+          <div class="price" data-month="$129/mo" data-annual="$109/mo">$129/mo</div>
+          <div class="feat">120 receptionist minutes</div>
+          <div class="feat">Priority support</div>
+          <div class="feat">CRM integration help</div>
+          <a class="cta" href="#try"><button class="secondary">Demo AI — Click to Connect Now</button></a>
+        </div>
+        <div class="pcard">
+          <h3>Ultimate</h3>
+          <div class="price" data-month="$199/mo" data-annual="$169/mo">$199/mo</div>
+          <div class="feat">250 receptionist minutes</div>
+          <div class="feat">Multi-location routing</div>
+          <div class="feat">Custom workflows</div>
+          <a class="cta" href="#try"><button class="secondary">Demo AI — Click to Connect Now</button></a>
+        </div>
+      </div>
+      <div class="setup">One-time setup: <strong>$399</strong>. Overage billed per-minute.</div>
+      <div class="small">Annual billing shows effective monthly equivalent.</div>
+    </section>
+
+    <footer class="shell" style="padding-left:0;padding-right:0;margin-top:30px;color:#7f8da3;font-size:12px">
+      © <span id="y"></span> Reelo Visions LLC · <a href="/consent.html">Consent</a>
+    </footer>
   </div>
 
   <script>
-    // (Optional) persist values locally so they’re prefilled on the thank-you page
-    const f = document.getElementById('lead-form');
-    f.addEventListener('submit', () => {
-      const fd = new FormData(f);
+    document.getElementById('y').textContent = new Date().getFullYear();
+    // Lead form → thank-you with phone in query
+    const leadForm = document.getElementById('lead-form');
+    leadForm.addEventListener('submit', (e) => {
+      const fd = new FormData(leadForm);
       localStorage.setItem('rv_company', fd.get('company') || '');
-      localStorage.setItem('rv_email',   fd.get('email')   || '');
-      localStorage.setItem('rv_phone',   fd.get('phone')   || '');
-      // action already points to /demo/thank-you.html (don’t change it)
+      localStorage.setItem('rv_email', fd.get('email') || '');
+      localStorage.setItem('rv_phone', fd.get('phone') || '');
+      leadForm.action = `/demo/thank-you?phone=${encodeURIComponent(fd.get('phone')||'')}`;
+    });
+    // Smooth scroll for Pricing
+    document.querySelectorAll('a[href="#pricing"]').forEach(a => {
+      a.addEventListener('click', e => { e.preventDefault(); document.getElementById('pricing').scrollIntoView({behavior:'smooth'}); });
     });
   </script>
 </body>
