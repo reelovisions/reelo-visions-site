@@ -2,45 +2,147 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Thanks — Start Your Demo Call</title>
+  <title>Thanks — Your demo call</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="/assets/site.css" />
   <style>
-    .wrap { max-width: 720px; margin: 40px auto; padding: 16px; }
-    .muted { color: #7f8da3; }
-    .row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; }
-    .btn { padding: 10px 14px; border-radius: 8px; background:#0a66ff; color:#fff; border:0; cursor:pointer; }
-    .btn[disabled] { opacity:.6; cursor:wait; }
-    .input { width: 100%; padding: 10px 12px; border:1px solid #ccd3e0; border-radius:8px; font-size:16px; }
-    .note { font-size: 12px; color:#7f8da3; margin-top:8px; }
-    .ok { color:#0a8a3a; }
-    .err { color:#c62828; }
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; }
+    .wrap { max-width: 780px; margin: 48px auto; padding: 0 20px; }
+    h1 { font-size: clamp(1.4rem, 2.5vw, 2rem); margin: 0 0 8px; }
+    p.lead { color: #6b7280; margin: 0 0 24px; }
+    .card { background: rgba(255,255,255,.06); border: 1px solid rgba(0,0,0,.1);
+            border-radius: 12px; padding: 18px; }
+    label { display:block; font-size: .95rem; margin: 8px 0 6px; color:#6b7280; }
+    input[type="tel"] { width: 100%; font-size: 1rem; padding: 12px 14px;
+      border: 1px solid #cbd5e1; border-radius: 10px; outline: none; }
+    input[type="tel"]:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.15); }
+    .row { display:flex; gap: 10px; align-items: center; margin-top: 12px; }
+    button { white-space: nowrap; padding: 12px 16px; border-radius: 10px; border: 0;
+      background: #2563eb; color: #fff; font-weight: 600; cursor: pointer; }
+    button[disabled] { opacity: .6; cursor: not-allowed; }
+    .muted { color:#6b7280; font-size: .9rem; margin-top: 10px; }
+    .msg { margin-top: 14px; font-size: .95rem; min-height: 1.2em; }
+    .ok { color: #059669; } .err { color: #dc2626; }
+    details { margin-top: 16px; }
+    .fine { font-size:.8rem; color:#6b7280; margin-top: 18px; }
   </style>
 </head>
 <body>
-  <div class="wrap">
+  <main class="wrap">
     <h1>You're set. Let's place your demo call.</h1>
-    <p class="muted">We pre-filled your number from the last step. Click the button to start the call.</p>
+    <p class="lead">We pre-filled your number from the last step. Click the button to start the call.</p>
 
     <div class="card">
       <label for="phone">Mobile number (E.164, e.g. +16125551234)</label>
-      <div class="row" style="margin-top:6px">
-        <input id="phone" class="input" type="tel" inputmode="tel" />
-        <button id="startCall" class="btn">Start Demo Call</button>
+      <div class="row">
+        <input id="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="+1 612-555-1234" />
+        <button id="startBtn">Start Demo Call</button>
       </div>
-      <div id="status" class="note" role="status" aria-live="polite"></div>
-    </div>
 
-    <p class="note">By continuing, you agree to our <a href="/consent.html">Consent & SMS terms</a>.</p>
+      <p id="formMsg" class="msg" role="status" aria-live="polite"></p>
+      <p class="fine">By continuing, you agree to our <a href="/consent.html">Consent &amp; SMS terms</a>.</p>
 
-    <div style="margin-top:24px">
       <details>
-        <summary class="muted">Why two steps?</summary>
-        <p class="muted">To reduce spam. The homepage just collects details; the call only starts here when you click.</p>
+        <summary>Why two steps?</summary>
+        <p class="muted">Step 1 collects your contact so we can personalize the demo. Step 2 places the call to your phone through our secure function.</p>
       </details>
     </div>
-  </div>
+  </main>
 
-  <script src="/demo/js/demo-call.js" defer></script>
+  <script>
+    // ====== CONFIG — change later if needed ======
+    const TWILIO_URL   = "https://reelo-demo-service-2156.twil.io/reelo-make-call";
+    const REELO_SECRET = "10062025R"; // Body secret (matches Twilio ENV REELO_SECRET)
+    // =============================================
+
+    // Grab elements
+    const phoneInput = document.getElementById('phone');
+    const startBtn   = document.getElementById('startBtn');
+    const formMsg    = document.getElementById('formMsg');
+
+    // Helper: read query params
+    function getQuery() {
+      return Object.fromEntries(new URL(location.href).searchParams.entries());
+    }
+
+    // Helper: normalize to E.164 (US defaults)
+    function toE164(raw) {
+      if (!raw) return '';
+      let digits = raw.replace(/\D/g, '');
+      if (digits.length === 10) return '+1' + digits;
+      if (digits.length === 11 && digits.startsWith('1')) return '+' + digits;
+      if (raw.startsWith('+')) return raw; // already E.164-ish
+      return '+' + digits; // last resort
+    }
+
+    // Prefill phone from query (?phone=) or localStorage
+    (function prefill() {
+      const q = getQuery();
+      const fromQ = q.phone || '';
+      const fromLS = localStorage.getItem('rv_phone') || '';
+      phoneInput.value = (fromQ || fromLS || '').trim();
+      phoneInput.focus();
+    })();
+
+    // Pull optional context saved earlier on the first page
+    function getLeadContext() {
+      const q = getQuery();
+      return {
+        email:   (q.email   || localStorage.getItem('rv_email')   || '').trim(),
+        company: (q.company || localStorage.getItem('rv_company') || '').trim()
+      };
+    }
+
+    function setMsg(text, ok=false) {
+      formMsg.textContent = text || '';
+      formMsg.className = 'msg ' + (ok ? 'ok' : 'err');
+    }
+
+    async function startCall() {
+      setMsg('');
+      const { email, company } = getLeadContext();
+
+      // Validate phone
+      const raw = (phoneInput.value || '').trim();
+      const to  = toE164(raw);
+      const justDigits = to.replace(/\D/g, '');
+      if (!justDigits || justDigits.length < 11) {
+        setMsg('Please enter a valid mobile number (e.g., +16125551234).');
+        phoneInput.focus();
+        return;
+      }
+
+      // Disable UI while calling
+      startBtn.disabled = true; startBtn.textContent = 'Starting…';
+
+      try {
+        const res = await fetch(TWILIO_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            secret: REELO_SECRET,   // we’re using BODY auth (simple + reliable)
+            to,
+            email,
+            company
+          })
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok || !data.ok) {
+          throw new Error((data && data.error) || 'Could not start the call.');
+        }
+
+        setMsg(data.msg || 'Call started — watch your phone!', true);
+      } catch (err) {
+        console.error(err);
+        setMsg(err.message || 'Something went wrong.');
+      } finally {
+        startBtn.disabled = false; startBtn.textContent = 'Start Demo Call';
+      }
+    }
+
+    startBtn.addEventListener('click', (e) => { e.preventDefault(); startCall(); });
+  </script>
 </body>
 </html>
