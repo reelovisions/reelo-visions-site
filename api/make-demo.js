@@ -1,4 +1,5 @@
-// api/make-demo.js (CommonJS)
+// CommonJS serverless function for Vercel
+// Sends application/x-www-form-urlencoded so Twilio Function sees event.to, event.email, event.company
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
@@ -15,20 +16,31 @@ module.exports = async (req, res) => {
       return res.status(500).json({ ok: false, error: 'server not configured' });
     }
 
-    // Node 18+ has global fetch; if your project runs on Node 16 this would fail.
+    // Build form-encoded body so Twilio Function gets event.to, etc.
+    const form = new URLSearchParams();
+    form.set('secret', SECRET);
+    form.set('to', phone);
+    if (email) form.set('email', email);
+    if (company) form.set('company', company);
+
     const r = await fetch(TWILIO_FN_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        secret: SECRET,
-        to: phone,
-        email: email || '',
-        company: company || ''
-      })
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: form.toString()
     });
 
-    const data = await r.json().catch(() => ({}));
-    return res.status(r.ok ? 200 : r.status).json(data);
+    // Twilio Functions sometimes return text. Try JSON, otherwise text.
+    let data;
+    const txt = await r.text();
+    try { data = JSON.parse(txt); } catch { data = { message: txt }; }
+
+    // Normalize shape
+    const payload = typeof data === 'object' ? data : { message: String(data) };
+    if (r.ok && payload.ok !== false) {
+      return res.status(200).json({ ok: true, ...payload });
+    } else {
+      return res.status(r.status).json({ ok: false, ...payload });
+    }
   } catch (err) {
     return res.status(500).json({ ok: false, error: String(err) });
   }
