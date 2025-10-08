@@ -8,11 +8,12 @@ const ONE_DAY = 24 * ONE_HOUR;
 
 const LIMITS = {
   perIp: { max: 3, window: ONE_HOUR },
-  perPhoneBurst: { minGapMs: 30 * ONE_MIN },
+  perPhoneBurst: { minGapMs: 30 * ONE_MIN }, // 1 per 30m
   perPhoneDaily: { max: 5, window: ONE_DAY },
   globalDaily: { max: 200, window: ONE_DAY },
 };
 
+// in-memory (per lambda instance)
 const ipHits = new Map();
 const phoneHits = new Map();
 let globalHits = [];
@@ -28,16 +29,16 @@ function getClientIp(req) {
   if (typeof xff === 'string' && xff.length) return xff.split(',')[0].trim();
   return (req.socket && req.socket.remoteAddress) || 'unknown';
 }
-function isAllowlisted(ip) {
-  const raw = process.env.ALLOWLIST_IPS;
-  if (!raw) return false;
-  return raw.split(',').map(s => s.trim()).filter(Boolean).includes(ip);
-}
 function getCountry(req) {
   const h1 = req.headers['x-vercel-ip-country'];
   const h2 = req.headers['cf-ipcountry'];
   const c = (h1 || h2 || '').toString().trim().toUpperCase();
   return c || 'XX';
+}
+function isAllowlisted(ip) {
+  const raw = process.env.ALLOWLIST_IPS;
+  if (!raw) return false;
+  return raw.split(',').map(s => s.trim()).filter(Boolean).includes(ip);
 }
 function isCountryAllowed(req) {
   const raw = (process.env.ALLOW_COUNTRIES || 'US,CA')
@@ -52,28 +53,24 @@ function normalizeUS(input) {
   if (/^\+1\d{10}$/.test(String(input).trim())) return { ok: true, e164: String(input).trim() };
   return { ok: false, error: 'Only US/CA numbers are allowed (must be +1 followed by 10 digits).' };
 }
-function sha256(s) {
-  return crypto.createHash('sha256').update(String(s)).digest('hex');
-}
+const sha256 = (s) => crypto.createHash('sha256').update(String(s)).digest('hex');
 
 async function logToSupabase(row) {
   try {
     const url = process.env.SUPABASE_URL;
     const key = process.env.SUPABASE_SERVICE_ROLE;
-    if (!url || !key) return; // logging is best-effort
-    const r = await fetch(`${url}/rest/v1/demo_calls`, {
+    if (!url || !key) return; // best-effort logging
+    await fetch(`${url}/rest/v1/demo_calls`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'apikey': key,
-        'Authorization': `Bearer ${key}`,
-        'Prefer': 'return=minimal'
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        Prefer: 'return=minimal',
       },
-      body: JSON.stringify([row])
-    });
-    // swallow errors; we don't want logging to affect UX
-    await r.text().catch(() => {});
-  } catch (_) { /* ignore */ }
+      body: JSON.stringify([row]),
+    }).then(r => r.text()).catch(() => {});
+  } catch (_) {}
 }
 
 async function callTwilioFn({ secret, url, phone, email, company }) {
@@ -82,13 +79,11 @@ async function callTwilioFn({ secret, url, phone, email, company }) {
   form.set('to', phone);
   if (email) form.set('email', String(email));
   if (company) form.set('company', String(company));
-
   const r = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: form.toString(),
   });
-
   const text = await r.text();
   let data; try { data = JSON.parse(text); } catch { data = { message: text }; }
   return { ok: r.ok && !(data && data.ok === false), status: r.status, data };
@@ -101,28 +96,25 @@ module.exports = async (req, res) => {
   }
 
   const ip = getClientIp(req);
-  const ua = req.headers['user-agent'] || '';
   const country = getCountry(req);
+  const ua = req.headers['user-agent'] || '';
   const allowlisted = isAllowlisted(ip);
 
-  // helper to send response + log
   async function send(status, body, log) {
     const row = {
       ts: new Date().toISOString(),
-      ip,
-      country,
-      phone_hash: log?.phone_hash || null,
-      phone_last4: log?.phone_last4 || null,
-      email: log?.email || null,
-      company: log?.company || null,
-      status: log?.status || 'error',
-      error: log?.error || null,
-      tw_sid: log?.tw_sid || null,
-      rl_scope: log?.rl_scope || null,
+      ip, country, user_agent: ua,
+      phone_hash: log?.phone_hash ?? null,
+      phone_last4: log?.phone_last4 ?? null,
+      email: log?.email ?? null,
+      company: log?.company ?? null,
+      status: log?.status ?? 'error',
+      error: log?.error ?? null,
+      tw_sid: log?.tw_sid ?? null,
+      rl_scope: log?.rl_scope ?? null,
       rl_retry_after_seconds: log?.rl_retry_after_seconds ?? null,
-      user_agent: ua
     };
-    logToSupabase(row); // fire-and-forget
+    logToSupabase(row);
     return res.status(status).json(body);
   }
 
@@ -132,7 +124,6 @@ module.exports = async (req, res) => {
       return send(400, { ok: false, error: 'missing phone' }, { status: 'bad_input' });
     }
 
-    // Geo allowlist
     if (!allowlisted && !isCountryAllowed(req)) {
       return send(403,
         { ok: false, error: 'geo blocked', hint: 'Only US/CA are allowed for this demo.', country },
@@ -140,7 +131,6 @@ module.exports = async (req, res) => {
       );
     }
 
-    // Phone validation
     const norm = normalizeUS(rawPhone);
     if (!norm.ok) {
       return send(400,
@@ -152,7 +142,6 @@ module.exports = async (req, res) => {
     const phone_hash = sha256(phone);
     const phone_last4 = phone.slice(-4);
 
-    // Env
     const SECRET = process.env.REELO_SECRET;
     const TWILIO_FN_URL = process.env.TWILIO_MAKE_CALL;
     if (!SECRET || !TWILIO_FN_URL) {
@@ -161,9 +150,7 @@ module.exports = async (req, res) => {
       });
     }
 
-    // Rate limits (skip if allowlisted)
     if (!allowlisted) {
-      // Global
       globalHits = prune(globalHits, LIMITS.globalDaily.window);
       if (globalHits.length >= LIMITS.globalDaily.max) {
         const retry = Math.ceil(LIMITS.globalDaily.window / 1000);
@@ -172,7 +159,6 @@ module.exports = async (req, res) => {
           { status: 'rate_limited', rl_scope: 'global', rl_retry_after_seconds: retry, phone_hash, phone_last4, email, company }
         );
       }
-      // IP
       const ipArr = prune(ipHits.get(ip) || [], LIMITS.perIp.window);
       if (ipArr.length >= LIMITS.perIp.max) {
         const retry = Math.ceil((ipArr[0] + LIMITS.perIp.window - now()) / 1000);
@@ -181,7 +167,6 @@ module.exports = async (req, res) => {
           { status: 'rate_limited', rl_scope: 'ip', rl_retry_after_seconds: Math.max(1, retry), phone_hash, phone_last4, email, company }
         );
       }
-      // Phone
       const pArr = phoneHits.get(phone) || [];
       prune(pArr, LIMITS.perPhoneDaily.window);
       if (pArr.length >= LIMITS.perPhoneDaily.max) {
@@ -206,10 +191,10 @@ module.exports = async (req, res) => {
       // record hits
       globalHits.push(now());
       ipArr.push(now()); ipHits.set(ip, ipArr);
-      pArr.push(now()); phoneHits.set(phone, pArr);
+      const pArr2 = phoneHits.get(phone) || [];
+      pArr2.push(now()); phoneHits.set(phone, pArr2);
     }
 
-    // Forward to Twilio Function
     const tw = await callTwilioFn({ secret: SECRET, url: TWILIO_FN_URL, phone, email, company });
     if (!tw.ok) {
       return send(tw.status || 502,
