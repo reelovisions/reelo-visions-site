@@ -1,27 +1,30 @@
-// no template strings anywhere (Windows-safe, backtick-free)
-export default async function handler(req, res) {
-  const aiUrl = process.env.AI_WEBHOOK_URL
+﻿/**
+ * /api/ai-entrypoint-safe
+ * Emits TwiML that Redirects to your AI receptionist, preserving From/To/CallSid.
+ * Exported as ESM default to match Vercel’s expectations.
+ */
+export default function handler(req, res) {
+  const { From = "", To = "", CallSid = "" } = req.query ?? {};
+
+  // Your AI receptionist webhook base URL (adjust if you ever change it)
+  const aiUrl = process.env.AI_REDIRECT_URL
     || "https://reelo-receptionist-8uql.onrender.com/voice";
 
-  const From = req.query.From || "";
-  const To = req.query.To || "";
-  const CallSid = req.query.CallSid || "";
+  // Encode the phone params for safety
+  const enc = encodeURIComponent;
+  const rawUrl = `${aiUrl}?From=${enc(From)}&To=${enc(To)}&CallSid=${enc(CallSid)}`;
 
-  const redirectPlain =
-    aiUrl +
-    "?From=" + encodeURIComponent(From) +
-    "&To=" + encodeURIComponent(To) +
-    "&CallSid=" + encodeURIComponent(CallSid);
+  // TwiML needs &amp; not &
+  const escapeAmp = (s) => s.replace(/&/g, "&amp;");
 
-  function escapeAmp(s) { return String(s).replace(/&/g, "&amp;"); }
-  const redirectUrl = escapeAmp(redirectPlain);
+  const redirectUrl = escapeAmp(rawUrl);
 
   res.setHeader("Content-Type", "application/xml; charset=utf-8");
   res.end(
-    '<?xml version="1.0" encoding="UTF-8"?>'
-    + '<Response>'
-    +   '<!-- ai-entrypoint-safe v1 -->'
-    +   '<Redirect method="GET">' + redirectUrl + '</Redirect>'
-    + '</Response>'
+    `<?xml version="1.0" encoding="UTF-8"?>` +
+    `<Response>` +
+      `<Pause length="2"/>` +
+      `<Redirect method="GET">${redirectUrl}</Redirect>` +
+    `</Response>`
   );
 }
