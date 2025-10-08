@@ -1,34 +1,32 @@
-﻿// Minimal TwiML entrypoint that *only* redirects to your AI receptionist.
-// CommonJS export so Vercel’s Node runtime picks it up.
+﻿// No template literals in this file on purpose (to avoid Windows/PowerShell backtick issues)
 
-const escapeAmp = (s) => s.replace(/&/g, '&amp;');
+export default async function handler(req, res) {
+  const aiUrl =
+    process.env.AI_WEBHOOK_URL ||
+    "https://reelo-receptionist-8uql.onrender.com/voice";
 
-module.exports = async function aiEntrypoint(req, res) {
-  try {
-    // If you later set AI_VOICE_URL in Vercel, we’ll use it.
-    const aiUrl =
-      process.env.AI_VOICE_URL ||
-      'https://reelo-receptionist-8uql.onrender.com/voice';
+  const From = req.query.From || "";
+  const To = req.query.To || "";
+  const CallSid = req.query.CallSid || "";
 
-    // Twilio will substitute these placeholders when it calls your webhook.
-    const url = `${aiUrl}?From={From}&To={To}&CallSid={CallSid}`;
+  // Build query without backticks
+  const redirectPlain =
+    aiUrl +
+    "?From=" + encodeURIComponent(From) +
+    "&To=" + encodeURIComponent(To) +
+    "&CallSid=" + encodeURIComponent(CallSid);
 
-    // Build TwiML — no <Say/>, just a GET Redirect.
-    const twiml =
-      `<?xml version="1.0" encoding="UTF-8"?>` +
-      `<Response>` +
-      `<Redirect method="GET">${escapeAmp(url)}</Redirect>` +
-      `</Response>`;
-
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-    res.end(twiml);
-  } catch (err) {
-    // Worst case: return a tiny valid TwiML so Twilio doesn't retry-loop.
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-    res.end(
-      `<?xml version="1.0" encoding="UTF-8"?><Response><Say>Temporary server error.</Say></Response>`
-    );
+  // TwiML requires &amp; in XML
+  function escapeAmp(s) {
+    return String(s).replace(/&/g, "&amp;");
   }
-};
+  const redirectUrl = escapeAmp(redirectPlain);
+
+  res.setHeader("Content-Type", "application/xml; charset=utf-8");
+  res.end(
+    '<?xml version="1.0" encoding="UTF-8"?>' +
+      "<Response>" +
+        '<Redirect method="GET">' + redirectUrl + "</Redirect>" +
+      "</Response>"
+  );
+}
