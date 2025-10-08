@@ -1,14 +1,11 @@
-// Vercel Serverless Function: TwiML Greeting (no IVR)
-// Pause ~3s, then immediately connect to AI receptionist target.
-export default async function handler(req, res) {
+﻿export default async function handler(req, res) {
   const method = (req.method || 'GET').toUpperCase();
   if (method !== 'POST' && method !== 'GET') {
     res.status(405).send('Method Not Allowed');
     return;
   }
-
-  const target = process.env.RECEPTIONIST_TARGET_E164 || '+16128406268'; // temporary default
-  const callerId = process.env.TWILIO_CALLER_ID || ''; // optional; if empty Twilio uses the inbound number
+  const target = process.env.RECEPTIONIST_TARGET_E164 || '+16128406268';
+  const callerId = process.env.TWILIO_CALLER_ID || '';
 
   const twiml = [
     '<?xml version="1.0" encoding="UTF-8"?>',
