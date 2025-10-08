@@ -42,7 +42,6 @@ module.exports = (req, res) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     res.end(twiml);
   } catch (e) {
-    // Always return valid TwiML so Twilio doesn’t fall over
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
     res.end(`<?xml version="1.0" encoding="UTF-8"?><Response><Say>Temporary server error.</Say></Response>`);
