@@ -1,13 +1,8 @@
 ﻿/**
- * Minimal smoke test for /api/ai-entrypoint
- * Returns a simple TwiML document.
+ * Minimal smoke test for /api/ai-entrypoint (CommonJS only)
  */
-const handler = (req, res) => {
+module.exports = (req, res) => {
   res.setHeader("Content-Type", "application/xml; charset=utf-8");
   res.statusCode = 200;
-  res.end(
-    `<?xml version="1.0" encoding="UTF-8"?><Response><Say>ok</Say></Response>`
-  );
+  res.end('<?xml version="1.0" encoding="UTF-8"?><Response><Say>ok</Say></Response>');
 };
-export default handler;
-module.exports = handler;
