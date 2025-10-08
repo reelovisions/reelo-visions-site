@@ -1,4 +1,4 @@
-// api/make-demo.js — validation + geo-allowlist + rate limits + Supabase logging + Twilio forward (no debug)
+// api/make-demo.js — validation + geo-allowlist + rate limits + Supabase logging + Twilio forward (logs full phone)
 
 const crypto = require('crypto');
 
@@ -107,6 +107,7 @@ module.exports = async (req, res) => {
       ip, country, user_agent: ua,
       phone_hash: log?.phone_hash ?? null,
       phone_last4: log?.phone_last4 ?? null,
+      phone_e164: log?.phone_e164 ?? null,   // NEW: store full phone
       email: log?.email ?? null,
       company: log?.company ?? null,
       status: log?.status ?? 'error',
@@ -147,7 +148,7 @@ module.exports = async (req, res) => {
     const TWILIO_FN_URL = process.env.TWILIO_MAKE_CALL;
     if (!SECRET || !TWILIO_FN_URL) {
       return send(500, { ok: false, error: 'server not configured' }, {
-        status: 'error', error: 'server_misconfig', phone_hash, phone_last4, email, company
+        status: 'error', error: 'server_misconfig', phone_hash, phone_last4, phone_e164: phone, email, company
       });
     }
 
@@ -157,7 +158,7 @@ module.exports = async (req, res) => {
         const retry = Math.ceil(LIMITS.globalDaily.window / 1000);
         return send(429,
           { ok: false, error: 'daily call limit reached', scope: 'global', limit: LIMITS.globalDaily.max },
-          { status: 'rate_limited', rl_scope: 'global', rl_retry_after_seconds: retry, phone_hash, phone_last4, email, company }
+          { status: 'rate_limited', rl_scope: 'global', rl_retry_after_seconds: retry, phone_hash, phone_last4, phone_e164: phone, email, company }
         );
       }
       const ipArr = prune(ipHits.get(ip) || [], LIMITS.perIp.window);
@@ -165,7 +166,7 @@ module.exports = async (req, res) => {
         const retry = Math.ceil((ipArr[0] + LIMITS.perIp.window - now()) / 1000);
         return send(429,
           { ok: false, error: 'too many requests from this IP', scope: 'ip', limit: LIMITS.perIp.max, windowSec: LIMITS.perIp.window / 1000 },
-          { status: 'rate_limited', rl_scope: 'ip', rl_retry_after_seconds: Math.max(1, retry), phone_hash, phone_last4, email, company }
+          { status: 'rate_limited', rl_scope: 'ip', rl_retry_after_seconds: Math.max(1, retry), phone_hash, phone_last4, phone_e164: phone, email, company }
         );
       }
       const pArr = phoneHits.get(phone) || [];
@@ -175,7 +176,7 @@ module.exports = async (req, res) => {
         const retry = Math.ceil((first + LIMITS.perPhoneDaily.window - now()) / 1000);
         return send(429,
           { ok: false, error: 'daily call limit for this number reached', scope: 'phone', limit: LIMITS.perPhoneDaily.max, windowSec: LIMITS.perPhoneDaily.window / 1000 },
-          { status: 'rate_limited', rl_scope: 'phone_daily', rl_retry_after_seconds: Math.max(1, retry), phone_hash, phone_last4, email, company }
+          { status: 'rate_limited', rl_scope: 'phone_daily', rl_retry_after_seconds: Math.max(1, retry), phone_hash, phone_last4, phone_e164: phone, email, company }
         );
       }
       if (pArr.length) {
@@ -185,7 +186,7 @@ module.exports = async (req, res) => {
           const retry = Math.ceil((LIMITS.perPhoneBurst.minGapMs - gap) / 1000);
           return send(429,
             { ok: false, error: 'please wait before calling this number again', scope: 'phone', minGapSec: LIMITS.perPhoneBurst.minGapMs / 1000, retryAfterSec: retry },
-            { status: 'rate_limited', rl_scope: 'phone_gap', rl_retry_after_seconds: Math.max(1, retry), phone_hash, phone_last4, email, company }
+            { status: 'rate_limited', rl_scope: 'phone_gap', rl_retry_after_seconds: Math.max(1, retry), phone_hash, phone_last4, phone_e164: phone, email, company }
           );
         }
       }
@@ -200,14 +201,15 @@ module.exports = async (req, res) => {
     if (!tw.ok) {
       return send(tw.status || 502,
         { ok: false, error: (tw.data && (tw.data.error || tw.data.message)) || 'twilio function error' },
-        { status: 'error', error: (tw.data && (tw.data.error || tw.data.message)) || 'twilio function error', phone_hash, phone_last4, email, company }
+        { status: 'error', error: (tw.data && (tw.data.error || tw.data.message)) || 'twilio function error',
+          phone_hash, phone_last4, phone_e164: phone, email, company }
       );
     }
 
     const sid = (tw.data && (tw.data.sid || tw.data.Sid)) || null;
     return send(200,
       { ok: true, ...(typeof tw.data === 'object' ? tw.data : { message: String(tw.data) }) },
-      { status: 'ok', tw_sid: sid, phone_hash, phone_last4, email, company }
+      { status: 'ok', tw_sid: sid, phone_hash, phone_last4, phone_e164: phone, email, company }
     );
 
   } catch (err) {
