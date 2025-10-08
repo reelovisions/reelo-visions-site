@@ -1,51 +1,34 @@
-﻿"use strict";
-/** ai-entrypoint version: fix-escape-2 */
+﻿// Minimal TwiML entrypoint that *only* redirects to your AI receptionist.
+// CommonJS export so Vercel’s Node runtime picks it up.
 
-function getParam(req, key) {
+const escapeAmp = (s) => s.replace(/&/g, '&amp;');
+
+module.exports = async function aiEntrypoint(req, res) {
   try {
-    if (req.body && key in req.body) return String(req.body[key]);
-    if (req.query && key in req.query) return String(req.query[key]);
-  } catch {}
-  return "";
-}
-
-function escapeAmp(s) {
-  return String(s).replace(/&/g, "&amp;");
-}
-
-module.exports = (req, res) => {
-  try {
-    // Your AI webhook (Render)
+    // If you later set AI_VOICE_URL in Vercel, we’ll use it.
     const aiUrl =
-      process.env.AI_WEBHOOK_URL ||
-      "https://reelo-receptionist-8uql.onrender.com/voice";
+      process.env.AI_VOICE_URL ||
+      'https://reelo-receptionist-8uql.onrender.com/voice';
 
-    const From = getParam(req, "From");
-    const To = getParam(req, "To");
-    const CallSid = getParam(req, "CallSid");
+    // Twilio will substitute these placeholders when it calls your webhook.
+    const url = `${aiUrl}?From={From}&To={To}&CallSid={CallSid}`;
 
-    const qs =
-      `From=${encodeURIComponent(From)}&` +
-      `To=${encodeURIComponent(To)}&` +
-      `CallSid=${encodeURIComponent(CallSid)}`;
-
-    // IMPORTANT: backticks are required here:
-    const redirectUrl = escapeAmp(`${aiUrl}?${qs}`);
-
-    const twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<!-- ai-entrypoint version: fix-escape-2 -->
-<Response>
-  <Pause length="2"/>
-  <Redirect method="GET">${redirectUrl}</Redirect>
-</Response>`;
+    // Build TwiML — no <Say/>, just a GET Redirect.
+    const twiml =
+      `<?xml version="1.0" encoding="UTF-8"?>` +
+      `<Response>` +
+      `<Redirect method="GET">${escapeAmp(url)}</Redirect>` +
+      `</Response>`;
 
     res.statusCode = 200;
-    res.setHeader("Content-Type", "application/xml; charset=utf-8");
-    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
     res.end(twiml);
-  } catch (e) {
+  } catch (err) {
+    // Worst case: return a tiny valid TwiML so Twilio doesn't retry-loop.
     res.statusCode = 200;
-    res.setHeader("Content-Type", "application/xml; charset=utf-8");
-    res.end(`<?xml version="1.0" encoding="UTF-8"?><Response><Say>Temporary server error.</Say></Response>`);
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+    res.end(
+      `<?xml version="1.0" encoding="UTF-8"?><Response><Say>Temporary server error.</Say></Response>`
+    );
   }
 };
