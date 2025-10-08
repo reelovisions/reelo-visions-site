@@ -1,115 +1,101 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Thanks — Your demo call</title>
   <style>
-    :root{--bg:#0b1220;--card:#121a2b;--text:#e6ecff;--sub:#97a3c0;--brand:#2563eb;--brand-h:#1d4ed8;--ok:#16a34a;--err:#ef4444;--muted:#243045}
-    *{box-sizing:border-box} html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial}
-    .wrap{max-width:900px;margin:40px auto;padding:16px}
-    .card{background:var(--card);border:1px solid var(--muted);border-radius:14px;padding:28px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-    h1{font-size:28px;margin:0 0 6px} .sub{color:var(--sub);margin:0 0 16px}
-    .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
-    input[type=text]{flex:1;min-width:260px;background:#0e1627;color:var(--text);border:1px solid var(--muted);border-radius:10px;padding:14px 12px;font-size:16px;outline:none}
-    input[type=text]:focus{border-color:#35518d;box-shadow:0 0 0 3px rgba(37,99,235,.25)}
-    button{background:var(--brand);color:white;border:0;border-radius:10px;padding:14px 16px;font-size:16px;cursor:pointer}
-    button:hover{background:var(--brand-h)}
-    .hint{color:var(--sub);font-size:13px;margin-top:8px}
-    .result{margin-top:18px;padding:14px;border-radius:10px;border:1px solid var(--muted);background:#0e1627}
-    .pill{display:inline-block;font-size:12px;border-radius:999px;padding:2px 10px;margin-right:8px}
-    .pill.ok{background:rgba(22,163,74,.12);color:var(--ok);border:1px solid rgba(22,163,74,.25)}
-    .pill.err{background:rgba(239,68,68,.12);color:var(--err);border:1px solid rgba(239,68,68,.25)}
-    pre{margin:10px 0 0;white-space:pre-wrap;word-break:break-word}
-    .faq{margin-top:10px}
-    details{margin-top:8px} summary{cursor:pointer}
-    .muted{color:var(--sub)}
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    body { margin: 0; background:#0b0f17; color:#e7ecf3; display:flex; min-height:100vh; align-items:center; justify-content:center; }
+    .card { width:min(680px, 92vw); background:#121826; border:1px solid #20283a; border-radius:16px; padding:28px; box-shadow:0 6px 20px rgba(0,0,0,.35); }
+    h1 { margin:0 0 8px; font-size:28px; }
+    p.sub { margin:0 0 16px; color:#aab7d0; }
+    .row { display:grid; gap:12px; grid-template-columns: 1fr 1fr; }
+    .row .full { grid-column:1 / -1; }
+    label { display:block; font-size:14px; color:#aab7d0; margin-bottom:6px; }
+    input { width:100%; padding:12px 14px; border:1px solid #2a3550; background:#0d1220; color:#e7ecf3; border-radius:10px; outline:none; }
+    input:focus { border-color:#5b7cff; box-shadow:0 0 0 3px rgba(91,124,255,.2); }
+    button { width:100%; padding:14px 16px; border:0; border-radius:12px; background:#5b7cff; color:white; font-weight:600; cursor:pointer; }
+    button[disabled] { opacity:.55; cursor:not-allowed; }
+    .note { font-size:12px; color:#92a2c6; margin-top:10px; }
+    .status { margin-top:14px; padding:12px; border-radius:10px; background:#0d1324; border:1px dashed #283557; color:#bcd0ff; white-space:pre-wrap; }
+    .ok { color:#9af09a; }
+    .err { color:#ff9aa7; }
+    .footer { margin-top:16px; font-size:12px; color:#7f91b5; }
+    a { color:#9ab6ff; text-decoration:none; }
+    a:hover { text-decoration:underline; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h1>You’re set. Let’s place your demo call.</h1>
-      <p class="sub">We pre-filled your number from the last step. Click the button to start the call.</p>
+  <main class="card">
+    <h1>You're almost set 🎉</h1>
+    <p class="sub">Tap “Call me” to trigger your demo call. You’ll get a short prompt to press 1, then we connect you to the AI receptionist.</p>
 
-      <div class="row">
-        <input id="phone" type="text" placeholder="E.164 (e.g. +16125551234)" />
-        <button id="go">Start Demo Call</button>
+    <div class="row">
+      <div>
+        <label for="phone">Your phone</label>
+        <input id="phone" type="tel" placeholder="+1 612 555 1212" autocomplete="tel" />
       </div>
-      <div class="hint">By continuing, you agree to our Consent &amp; SMS terms.</div>
-
-      <div id="status" class="result" style="display:none"></div>
-
-      <div class="faq">
-        <details>
-          <summary class="muted">Why two steps?</summary>
-          <div class="muted">We call you first to confirm consent (press 1), then connect you to the AI. This keeps your info safe and prevents spam calls.</div>
-        </details>
+      <div>
+        <label for="company">Your company (optional)</label>
+        <input id="company" type="text" placeholder="Demo HVAC Co." autocomplete="organization" />
+      </div>
+      <div class="full">
+        <label for="email">Your email (optional — used for demo confirmations)</label>
+        <input id="email" type="email" placeholder="you@example.com" autocomplete="email" />
       </div>
     </div>
-  </div>
+
+    <div style="margin:16px 0 10px">
+      <button id="callBtn">📞 Call me now</button>
+      <div class="note">By clicking, you agree to receive one demo call. Standard carrier rates may apply.</div>
+    </div>
+
+    <div id="status" class="status">Idle.</div>
+
+    <div class="footer">
+      Admin: <a href="/admin/calls.html">/admin/calls.html</a>
+    </div>
+  </main>
 
   <script>
-    // --- helpers
-    const qs = new URLSearchParams(location.search);
-    const phoneInput = document.getElementById('phone');
-    const statusEl = document.getElementById('status');
-    const btn = document.getElementById('go');
+    const params = new URLSearchParams(location.search);
+    const $ = (id) => document.getElementById(id);
+    if (params.get('phone')) $('phone').value = params.get('phone');
+    if (params.get('email')) $('email').value = params.get('email');
+    if (params.get('company')) $('company').value = params.get('company');
 
-    // prefill from URL (?phone=, ?email=, ?company=)
-    const pre = (qs.get('phone')||'').trim();
-    phoneInput.value = pre || '';
-
-    function toE164US(v){
-      const d = String(v).replace(/\D+/g,'');
-      if (d.length === 10) return '+1'+d;
-      if (d.length === 11 && d.startsWith('1')) return '+'+d;
-      if (/^\+1\d{10}$/.test(v.trim())) return v.trim();
-      return null;
+    const statusBox = $('status');
+    function setStatus(msg, cls) {
+      statusBox.textContent = msg;
+      statusBox.className = 'status ' + (cls || '');
     }
-
-    async function start(){
-      btn.disabled = true;
-      statusEl.style.display = 'block';
-      statusEl.innerHTML = 'Placing call…';
-
-      const email = qs.get('email') || '';
-      const company = qs.get('company') || '';
-      const formatted = toE164US(phoneInput.value);
-
-      if(!formatted){
-        statusEl.innerHTML = '<span class="pill err">bad input</span> Enter a US/CA number like +16125551234';
-        btn.disabled = false; return;
-      }
-
-      try{
-        const r = await fetch('/api/make-demo', {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ phone: formatted, email, company })
-        });
-        const data = await r.json().catch(()=>({}));
-        const ok = r.ok && data && data.ok !== false;
-        const sid = data && (data.sid || data.Sid);
-
-        // Show human summary + raw JSON (includes _log debug)
-        statusEl.innerHTML = `
-          <div>${ ok
-            ? '<span class="pill ok">queued</span> Call requested. You should get a ring in a few seconds.'
-            : '<span class="pill err">failed</span> ' + (data && (data.error||data.message) || ('HTTP '+r.status)) }
-          </div>
-          ${ sid ? '<div class="muted">Twilio SID: '+sid+'</div>' : '' }
-          <pre>${JSON.stringify(data, null, 2)}</pre>
-        `;
-      }catch(err){
-        statusEl.innerHTML = '<span class="pill err">error</span> ' + String(err);
-      }finally{
-        btn.disabled = false;
-      }
+    function normalizeUS(phone) {
+      const digits = (phone || '').replace(/[^\d]/g, '');
+      if (!digits) return '';
+      if (digits.startsWith('1') && digits.length === 11) return '+' + digits;
+      if (digits.length === 10) return '+1' + digits;
+      if (digits.startsWith('+')) return phone;
+      return '+' + digits;
     }
-
-    btn.addEventListener('click', start);
+    async function callMe() {
+      try {
+        const btn = $('callBtn'); btn.disabled = true; setStatus('Submitting…');
+        const to = normalizeUS($('phone').value);
+        const email = $('email').value.trim();
+        const company = $('company').value.trim() || 'Demo HVAC';
+        if (!to || to.length < 11) { setStatus('Please enter a valid phone number (US/Canada).', 'err'); btn.disabled=false; return; }
+        const payload = { to, email, company, mode:'press-1-gate', url:'/api/outbound-greet' };
+        const res = await fetch('/api/make-demo', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        const data = await res.json().catch(()=>({}));
+        if (!res.ok || data.ok===false) { setStatus('❌ Failed to start call: ' + (data.error || ('HTTP '+res.status)), 'err'); btn.disabled=false; return; }
+        const sid = data.sid || '(no SID returned)';
+        setStatus('✅ Call started. Look for an incoming call in ~10–20s.\nTwilio SID: '+sid+'\nFrom: '+(data.from||'(unknown)')+'\nTo: '+(data.to||to), 'ok');
+      } catch (e) {
+        setStatus('❌ Error: ' + (e && e.message ? e.message : String(e)), 'err');
+      } finally { $('callBtn').disabled=false; }
+    }
+    $('callBtn').addEventListener('click', callMe);
   </script>
 </body>
 </html>
