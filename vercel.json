@@ -1,0 +1,5 @@
+﻿{
+  "routes": [
+    { "src": "/api/ai-entrypoint", "dest": "/api/ai-entrypoint.js" }
+  ]
+}
