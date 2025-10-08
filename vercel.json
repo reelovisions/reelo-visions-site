@@ -1,5 +1,10 @@
-﻿{
+{
+  "version": 2,
+  "functions": {
+    "api/ai-entrypoint-v2.js": { "runtime": "nodejs22.x" },
+    "api/ping.js": { "runtime": "nodejs22.x" }
+  },
   "routes": [
-    { "src": "/api/ai-entrypoint", "dest": "/api/ai-entrypoint.js" }
+    { "src": "/api/ai-entrypoint$", "dest": "/api/ai-entrypoint-v2.js" }
   ]
 }

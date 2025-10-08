@@ -1,10 +1,9 @@
-// Minimal, backtick-free redirect to your Render voice webhook
 export default function handler(req, res) {
   try {
     var aiUrl = process.env.AI_REDIRECT_URL || 'https://reelo-receptionist-8uql.onrender.com/voice';
 
-    var from   = encodeURIComponent(req.query.From   || '');
-    var to     = encodeURIComponent(req.query.To     || '');
+    var from   = encodeURIComponent(req.query.From    || '');
+    var to     = encodeURIComponent(req.query.To      || '');
     var callId = encodeURIComponent(req.query.CallSid || '');
 
     var q = '?From=' + from + '&To=' + to + '&CallSid=' + callId;
