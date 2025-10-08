@@ -1,4 +1,4 @@
-// api/make-demo.js — validation + geo-allowlist + rate limits + Supabase logging + Twilio forward
+// api/make-demo.js — validation + geo-allowlist + rate limits + Supabase logging (+ debug) + Twilio forward
 
 const crypto = require('crypto');
 
@@ -55,22 +55,41 @@ function normalizeUS(input) {
 }
 const sha256 = (s) => crypto.createHash('sha256').update(String(s)).digest('hex');
 
+/**
+ * Write a row into public.demo_calls and return a debug object
+ * { ok: boolean, status: number, text?: string, error?: string }
+ */
 async function logToSupabase(row) {
+  const dbg = { ok: false, status: 0 };
   try {
-    const url = process.env.SUPABASE_URL;
-    const key = process.env.SUPABASE_SERVICE_ROLE;
-    if (!url || !key) return; // best-effort logging
-    await fetch(`${url}/rest/v1/demo_calls`, {
+    const base = (process.env.SUPABASE_URL || '').replace(/\/+$/, ''); // drop trailing slash
+    const key  = process.env.SUPABASE_SERVICE_ROLE || '';
+    if (!base || !key) {
+      dbg.error = 'missing supabase env';
+      return dbg; // best-effort logging; don't block
+    }
+    const r = await fetch(`${base}/rest/v1/demo_calls`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        apikey: key,
-        Authorization: `Bearer ${key}`,
-        Prefer: 'return=minimal',
+        'Content-Profile': 'public',  // ensure schema
+        'apikey': key,
+        'Authorization': `Bearer ${key}`,
+        'Prefer': 'return=minimal'
       },
       body: JSON.stringify([row]),
-    }).then(r => r.text()).catch(() => {});
-  } catch (_) {}
+    });
+    dbg.status = r.status;
+    // On success with return=minimal, body may be empty
+    dbg.ok = r.ok;
+    if (!r.ok) {
+      dbg.text = await r.text().catch(() => '');
+    }
+    return dbg;
+  } catch (e) {
+    dbg.error = String(e);
+    return dbg;
+  }
 }
 
 async function callTwilioFn({ secret, url, phone, email, company }) {
@@ -114,8 +133,10 @@ module.exports = async (req, res) => {
       rl_scope: log?.rl_scope ?? null,
       rl_retry_after_seconds: log?.rl_retry_after_seconds ?? null,
     };
-    logToSupabase(row);
-    return res.status(status).json(body);
+    const dbg = await logToSupabase(row); // TEMP: await & surface result
+    // attach minimal debug so we can see what's happening; doesn't break UI
+    const bodyOut = (typeof body === 'object' && body !== null) ? { ...body, _log: dbg } : body;
+    return res.status(status).json(bodyOut);
   }
 
   try {
