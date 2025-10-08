@@ -1,4 +1,4 @@
-// No template literals on purpose (Windows backtick safe)
+// no template strings anywhere (Windows-safe, backtick-free)
 export default async function handler(req, res) {
   const aiUrl = process.env.AI_WEBHOOK_URL
     || "https://reelo-receptionist-8uql.onrender.com/voice";
