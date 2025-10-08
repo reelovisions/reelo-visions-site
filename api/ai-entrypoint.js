@@ -1,26 +1,29 @@
 export default function handler(req, res) {
-  try {
-    var aiUrl = process.env.AI_REDIRECT_URL || 'https://reelo-receptionist-8uql.onrender.com/voice';
+  // Pull params from query (twilio will pass these)
+  const { From = "", To = "", CallSid = "" } = req.query || {};
 
-    var from   = encodeURIComponent(req.query.From    || '');
-    var to     = encodeURIComponent(req.query.To      || '');
-    var callId = encodeURIComponent(req.query.CallSid || '');
+  // Build the query string safely
+  const qs =
+    "From=" + encodeURIComponent(From) +
+    "&To=" + encodeURIComponent(To) +
+    "&CallSid=" + encodeURIComponent(CallSid);
 
-    var q = '?From=' + from + '&To=' + to + '&CallSid=' + callId;
-    var redirectUrl = aiUrl + q;
+  // Your Render voice webhook
+  const aiUrl = "https://reelo-receptionist-8uql.onrender.com/voice";
 
-    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-    res.status(200).end(
-      '<?xml version="1.0" encoding="UTF-8"?>' +
-      '<Response>' +
-        '<Redirect method="GET">' + redirectUrl + '</Redirect>' +
-      '</Response>'
-    );
-  } catch (e) {
-    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-    res.status(200).end(
-      '<?xml version="1.0" encoding="UTF-8"?>' +
-      '<Response><Say>Temporary server error.</Say></Response>'
-    );
-  }
+  // Full redirect URL
+  const redirectUrl = `${aiUrl}?${qs}`;
+
+  // Escape only the ampersands for XML
+  const xmlSafe = (s) => s.replace(/&/g, "&amp;");
+
+  const xml =
+    `<?xml version="1.0" encoding="UTF-8"?>` +
+    `<Response>` +
+      `<Pause length="1"/>` +
+      `<Redirect method="GET">` + xmlSafe(redirectUrl) + `</Redirect>` +
+    `</Response>`;
+
+  res.setHeader("Content-Type", "application/xml; charset=utf-8");
+  res.status(200).send(xml);
 }
