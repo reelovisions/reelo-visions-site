@@ -135,7 +135,8 @@
       localStorage.setItem('rv_company', fd.get('company') || '');
       localStorage.setItem('rv_email', fd.get('email') || '');
       localStorage.setItem('rv_phone', fd.get('phone') || '');
-      leadForm.action = `/demo/thank-you?phone=${encodeURIComponent(fd.get('phone')||'')}`;
+      leadForm.action = `/demo/thank-you.html?phone=${encodeURIComponent(fd.get('phone')||'')}`;
+
     });
     // Smooth scroll for Pricing
     document.querySelectorAll('a[href="#pricing"]').forEach(a => {
