@@ -1,29 +1,34 @@
-﻿// api/ai-entrypoint.js
-export default async function handler(req, res) {
-  // Accept both GET (Twilio webhook) and POST (your page calling it)
-  const q = req.method === "GET" ? (req.query || {}) : (req.body || {});
-  const From = q.From || "";
-  const To = q.To || "";
-  const CallSid = q.CallSid || "";
+﻿// Minimal, backtick-free, bulletproof redirect to your Render voice webhook
+export default function handler(req, res) {
+  try {
+    // Your Render voice endpoint (change if needed)
+    var aiUrl = process.env.AI_REDIRECT_URL || 'https://reelo-receptionist-8uql.onrender.com/voice';
 
-  // Your AI receptionist webhook (Render)
-  const base = "https://reelo-receptionist-8uql.onrender.com/voice";
+    // Pull Twilio’s query params and URL-encode them
+    var from   = encodeURIComponent(req.query.From   || '');
+    var to     = encodeURIComponent(req.query.To     || '');
+    var callId = encodeURIComponent(req.query.CallSid || '');
 
-  // Build the target URL and carry through the common params
-  const u = new URL(base);
-  if (From) u.searchParams.set("From", From);
-  if (To) u.searchParams.set("To", To);
-  if (CallSid) u.searchParams.set("CallSid", CallSid);
+    // Build the querystring without template literals
+    var q = '?From=' + from + '&To=' + to + '&CallSid=' + callId;
 
-  // Escape & for XML
-  const target = u.toString().replace(/&/g, "&amp;");
+    // Final target
+    var redirectUrl = aiUrl + q;
 
-  // Emit TwiML that redirects with GET (required)
-  res.setHeader("Content-Type", "application/xml; charset=utf-8");
-  res.status(200).send(
-    `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Redirect method="GET">${target}</Redirect>
-</Response>`
-  );
+    // Return TwiML
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+    res.status(200).end(
+      '<?xml version="1.0" encoding="UTF-8"?>' +
+      '<Response>' +
+        '<Redirect method="GET">' + redirectUrl + '</Redirect>' +
+      '</Response>'
+    );
+  } catch (e) {
+    // Safe fallback TwiML
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+    res.status(200).end(
+      '<?xml version="1.0" encoding="UTF-8"?>' +
+      '<Response><Say>Temporary server error.</Say></Response>'
+    );
+  }
 }
