@@ -2,81 +2,270 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin · Demo Calls</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    :root{--bg:#0b1220;--card:#121a2b;--muted:#23304a;--text:#e6ecff;--sub:#97a3c0;--ok:#16a34a;--err:#ef4444;--brand:#2563eb}
-    body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,Segoe UI,Inter,Arial}
-    .wrap{max-width:1100px;margin:32px auto;padding:0 16px}
+    :root{
+      --bg:#0b1220;--panel:#121a2b;--muted:#23304a;--text:#e6ecff;--sub:#97a3c0;
+      --ok:#16a34a;--err:#ef4444;--brand:#2563eb;--border:#1b2335
+    }
+    html,body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,Segoe UI,Inter,Arial}
+    .wrap{max-width:1200px;margin:32px auto;padding:0 16px}
     h1{margin:0 0 16px;font-size:22px}
-    .card{background:var(--card);border:1px solid var(--muted);border-radius:12px;padding:16px}
-    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
-    input,button{border-radius:10px;border:1px solid var(--muted);background:#0e1627;color:var(--text);padding:10px 12px}
-    button{background:var(--brand);border:0;cursor:pointer}
-    table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+
+    /* Toolbar */
+    .toolbar{
+      background:var(--panel);border:1px solid var(--muted);border-radius:12px;
+      padding:12px;display:grid;gap:8px;grid-template-columns: repeat(8,minmax(0,1fr));align-items:end
+    }
+    .field{display:flex;flex-direction:column;gap:6px}
+    label{font-size:12px;color:var(--sub)}
+    input,select,button{
+      border-radius:10px;border:1px solid var(--muted);background:#0e1627;color:var(--text);padding:10px 12px;font-size:14px
+    }
+    button{background:var(--brand);border:0;cursor:pointer;font-weight:600}
+    .ghost{background:#0e1627;border:1px solid var(--muted)}
+
+    /* Table card */
+    .card{background:var(--panel);border:1px solid var(--muted);border-radius:12px;padding:12px;margin-top:12px}
+    table{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
     th,td{border-bottom:1px solid var(--muted);padding:10px 8px;text-align:left;vertical-align:top}
     th{color:var(--sub);font-weight:600}
-    .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px}
-    .ok{background:rgba(22,163,74,.12);color:var(--ok);border:1px solid rgba(22,163,74,.25)}
-    .fail{background:rgba(239,68,68,.12);color:var(--err);border:1px solid rgba(239,68,68,.25)}
+    tbody tr:hover{background:#0f1727;cursor:pointer}
+    .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid transparent}
+    .ok{background:rgba(22,163,74,.12);color:var(--ok);border-color:rgba(22,163,74,.25)}
+    .fail{background:rgba(239,68,68,.12);color:var(--err);border-color:rgba(239,68,68,.25)}
     .muted{color:var(--sub)}
+    .right{text-align:right}
+
+    /* Slide-over detail */
+    .detail{
+      position:fixed;top:0;right:0;height:100%;width:440px;max-width:92vw;background:#0b111d;
+      border-left:1px solid var(--border);transform:translateX(100%);transition:transform .25s ease;
+      box-shadow:-12px 0 40px rgba(0,0,0,.45);z-index:50;display:flex;flex-direction:column
+    }
+    .detail.open{transform:translateX(0)}
+    .detail header{padding:14px;border-bottom:1px solid var(--muted);display:flex;align-items:center;justify-content:space-between}
+    .detail header h2{margin:0;font-size:16px}
+    .detail .content{padding:14px 14px 18px;overflow:auto;display:flex;flex-direction:column;gap:12px}
+    .kv{display:grid;grid-template-columns:120px 1fr;gap:8px;font-size:13px}
+    .kv div:nth-child(odd){color:var(--sub)}
+    .mono{font-family:ui-monospace,Menlo,Consolas,monospace;background:#0b0f18;border:1px solid var(--muted);border-radius:8px;padding:8px;font-size:12px;white-space:pre-wrap;word-break:break-word}
+    .row{display:flex;gap:8px}
+    .btn{flex:1;background:#0e1627;border:1px solid var(--muted);padding:10px 12px;border-radius:8px;cursor:pointer}
+    .btn.primary{background:var(--brand);border-color:transparent;color:#fff}
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1>Demo Calls</h1>
-    <div class="card">
-      <div class="row">
-        <input id="token" placeholder="Admin token" style="min-width:260px">
-        <input id="q" placeholder="Search company/email/phone" style="flex:1;min-width:220px">
+
+    <!-- Enhanced toolbar (keeps token + refresh + CSV from your current page) -->
+    <div class="toolbar">
+      <div class="field" style="grid-column: span 2;">
+        <label for="token">Admin token</label>
+        <input id="token" placeholder="Admin token" />
+      </div>
+      <div class="field" style="grid-column: span 2;">
+        <label for="q">Search</label>
+        <input id="q" placeholder="company / email / phone / SID" />
+      </div>
+      <div class="field">
+        <label for="from">From date</label>
+        <input id="from" type="date" />
+      </div>
+      <div class="field">
+        <label for="to">To date</label>
+        <input id="to" type="date" />
+      </div>
+      <div class="field">
+        <label for="status">Status</label>
+        <select id="status">
+          <option value="">Any</option>
+          <option value="ok">ok / completed</option>
+          <option value="failed">failed / error</option>
+          <option value="pending">pending / queued</option>
+        </select>
+      </div>
+      <div class="field">
         <button id="load">Refresh</button>
+      </div>
+      <div class="field">
         <button id="csv">Export CSV</button>
       </div>
+    </div>
+
+    <div class="card">
       <div class="muted" id="info"></div>
       <table id="t">
         <thead>
           <tr>
-            <th>Time (UTC)</th><th>Company</th><th>Email</th><th>Phone</th><th>Country</th><th>Status</th><th>SID</th>
+            <th>Time (UTC)</th><th>Company</th><th>Email</th><th>Phone</th><th>Country</th><th>Status</th><th class="right">SID</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
   </div>
-<script>
-const els={token:$('#token'), q:$('#q'), info:$('#info'), tbody:$('#t tbody')};
-function $(s,d=document){return d.querySelector(s)}
-function fmtTs(s){try{return new Date(s).toISOString().replace('T',' ').replace('Z','')}catch{return s}}
-function toCSV(rows){const head=['ts','company','email','phone_e164','country','status','tw_sid'];const esc=v=>('"'+String(v??'').replace(/"/g,'""')+'"');return [head.join(','),...rows.map(r=>head.map(k=>esc(r[k])).join(','))].join('\n')}
-function render(rows){
-  const q=(els.q.value||'').toLowerCase();
-  const view = q ? rows.filter(r => [r.company,r.email,r.phone_e164].some(x => String(x||'').toLowerCase().includes(q))) : rows;
-  els.tbody.innerHTML = view.map(r=>`
-    <tr>
-      <td>${fmtTs(r.ts)}</td>
-      <td>${r.company??''}</td>
-      <td>${r.email??''}</td>
-      <td>${r.phone_e164??''}</td>
-      <td>${r.country??''}</td>
-      <td><span class="pill ${r.status==='ok'?'ok':'fail'}">${r.status??''}</span></td>
-      <td class="muted">${r.tw_sid??''}</td>
-    </tr>`).join('');
-  els.info.textContent = `${view.length} shown (${rows.length} total)`;
-}
-async function load(){
-  const token=els.token.value.trim()||localStorage.getItem('admin_token')||'';
-  if(!token){alert('Enter the admin token'); return;}
-  localStorage.setItem('admin_token', token);
-  const r = await fetch('/api/admin-calls', { headers: { Authorization: 'Bearer '+token }});
-  const data = await r.json().catch(()=>({}));
-  if(!r.ok || !data.ok){alert('Auth failed or server error'); return;}
-  window.__rows = data.rows || [];
-  render(window.__rows);
-}
-$('#load').onclick = load;
-$('#csv').onclick = ()=>{ if(!window.__rows) return; const blob=new Blob([toCSV(window.__rows)],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='demo-calls.csv'; a.click(); };
-els.q.oninput = ()=> render(window.__rows||[]);
-window.addEventListener('DOMContentLoaded',()=>{ const t=localStorage.getItem('admin_token'); if(t){els.token.value=t; load();}});
-</script>
+
+  <!-- Slide-over detail -->
+  <aside id="detail" class="detail" aria-hidden="true">
+    <header>
+      <h2 id="detail-title">Call details</h2>
+      <button id="close" class="btn">✕</button>
+    </header>
+    <div class="content">
+      <div class="kv">
+        <div>Time</div><div id="d-time"></div>
+        <div>Company</div><div id="d-company"></div>
+        <div>Email</div><div id="d-email"></div>
+        <div>Phone</div><div id="d-phone"></div>
+        <div>Country</div><div id="d-country"></div>
+        <div>Status</div><div id="d-status"></div>
+        <div>SID</div><div id="d-sid" class="mono"></div>
+      </div>
+
+      <div>
+        <div class="muted" style="margin-bottom:6px">Raw payload</div>
+        <pre id="d-raw" class="mono">{}</pre>
+      </div>
+
+      <div class="row">
+        <button id="copyEmail" class="btn">Copy email</button>
+        <button id="copyPhone" class="btn">Copy phone</button>
+      </div>
+    </div>
+  </aside>
+
+  <script>
+    // ------- Helpers & state -------
+    const $ = (s,d=document)=>d.querySelector(s);
+    const $$ = s => Array.from(document.querySelectorAll(s));
+    const els = { token:$('#token'), q:$('#q'), info:$('#info'), tbody:$('#t tbody') };
+
+    function fmtTs(s){
+      try{ return new Date(s).toISOString().replace('T',' ').replace('Z','') }catch{ return s||'' }
+    }
+    function statusClass(s){
+      const v=(s||'').toLowerCase();
+      if(v.includes('ok')||v.includes('complete')||v.includes('connected')) return 'pill ok';
+      if(v.includes('fail')||v.includes('error')||v.includes('canceled')) return 'pill fail';
+      return 'pill'; // pending/other
+    }
+    function toCSV(rows){
+      const head=['ts','company','email','phone_e164','country','status','tw_sid'];
+      const esc=v=>('"'+String(v??'').replace(/"/g,'""')+'"');
+      return [head.join(','),...rows.map(r=>head.map(k=>esc(r[k])).join(','))].join('\n');
+    }
+
+    // ------- Data load (keeps your /api/admin-calls + token auth) -------
+    async function load(){
+      const token = els.token.value.trim() || localStorage.getItem('admin_token') || '';
+      if(!token){ alert('Enter the admin token'); return; }
+      localStorage.setItem('admin_token', token);
+
+      const res = await fetch('/api/admin-calls', { headers:{ Authorization:'Bearer '+token }});
+      const data = await res.json().catch(()=>({}));
+      if(!res.ok || !data.ok){ alert('Auth failed or server error'); return; }
+
+      window.__rows = Array.isArray(data.rows) ? data.rows : [];
+      render(window.__rows);
+    }
+
+    // ------- Filters -------
+    function applyFilters(all){
+      const f = $('#from').value ? new Date($('#from').value) : null;
+      const t = $('#to').value ? new Date($('#to').value+'T23:59:59') : null;
+      const st = $('#status').value.trim().toLowerCase();
+      const q = (els.q.value||'').toLowerCase();
+
+      return all.filter(r=>{
+        const ts = new Date(r.ts || Date.now());
+        if(f && ts < f) return false;
+        if(t && ts > t) return false;
+
+        if(st){
+          const s=(r.status||'').toLowerCase();
+          const map = {
+            ok: s.includes('ok') || s.includes('complete') || s.includes('connected'),
+            failed: s.includes('fail') || s.includes('error') || s.includes('canceled'),
+            pending: s.includes('pend') || s.includes('queue') || s.includes('init')
+          };
+          if(!map[st]) return false;
+        }
+
+        if(q){
+          const hay = [r.company,r.email,r.phone_e164,r.country,r.status,r.tw_sid]
+            .map(x=>String(x||'').toLowerCase()).join(' ');
+          if(!hay.includes(q)) return false;
+        }
+        return true;
+      });
+    }
+
+    // ------- Render table -------
+    function render(rows){
+      const view = applyFilters(rows);
+      els.tbody.innerHTML = view.map(r=>`
+        <tr data-sid="${r.tw_sid||''}">
+          <td>${fmtTs(r.ts)}</td>
+          <td>${r.company??''}</td>
+          <td>${r.email??''}</td>
+          <td>${r.phone_e164??''}</td>
+          <td>${r.country??''}</td>
+          <td><span class="${statusClass(r.status)}">${r.status??''}</span></td>
+          <td class="right muted">${r.tw_sid??''}</td>
+        </tr>
+      `).join('');
+      els.info.textContent = `${view.length} shown (${rows.length} total)`;
+
+      // row click → detail
+      $$('#t tbody tr').forEach((tr,i)=>{
+        tr.onclick = ()=> openDetail(view[i]);
+      });
+    }
+
+    // ------- Detail slide-over -------
+    function openDetail(r){
+      $('#detail').classList.add('open');
+      $('#detail-title').textContent = r.company || r.email || r.phone_e164 || 'Call';
+      $('#d-time').textContent = fmtTs(r.ts);
+      $('#d-company').textContent = r.company||'';
+      $('#d-email').textContent = r.email||'';
+      $('#d-phone').textContent = r.phone_e164||'';
+      $('#d-country').textContent = r.country||'';
+      $('#d-status').innerHTML = `<span class="${statusClass(r.status)}">${r.status||''}</span>`;
+      $('#d-sid').textContent = r.tw_sid||'';
+      $('#d-raw').textContent = JSON.stringify(r,null,2);
+
+      $('#copyEmail').onclick = ()=> navigator.clipboard.writeText($('#d-email').textContent||'');
+      $('#copyPhone').onclick = ()=> navigator.clipboard.writeText($('#d-phone').textContent||'');
+    }
+    $('#close').onclick = ()=> $('#detail').classList.remove('open');
+
+    // ------- CSV -------
+    function exportCSV(){
+      if(!window.__rows) return;
+      const blob = new Blob([toCSV(window.__rows)], {type:'text/csv'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'demo-calls.csv';
+      a.click();
+    }
+
+    // ------- Wire up -------
+    $('#load').onclick = load;
+    $('#csv').onclick = exportCSV;
+    $('#q').oninput = ()=> window.__rows && render(window.__rows);
+    $('#from').onchange = ()=> window.__rows && render(window.__rows);
+    $('#to').onchange = ()=> window.__rows && render(window.__rows);
+    $('#status').onchange = ()=> window.__rows && render(window.__rows);
+
+    // Auto-load if token is stored
+    window.addEventListener('DOMContentLoaded',()=>{
+      const t = localStorage.getItem('admin_token');
+      if(t){ els.token.value = t; load(); }
+    });
+  </script>
 </body>
 </html>
